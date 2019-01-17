@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
-Audimat : an audio plugin host
-Copyright (C) 2005-2017  George E Greaney
+Transonic Patch Library
+Copyright (C) 1995-2017  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,20 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 
-namespace Audimat
+namespace Transonic.Patch
 {
-    public partial class AudimatWindow : Form
+    public interface IPatchView
     {
-        public AudimatWindow()
-        {
-            InitializeComponent();
-        }
     }
 }

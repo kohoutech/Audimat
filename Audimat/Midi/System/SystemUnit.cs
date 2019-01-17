@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
-Audimat : an audio plugin host
-Copyright (C) 2005-2017  George E Greaney
+Transonic MIDI Library
+Copyright (C) 1995-2018  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,20 +19,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 
-namespace Audimat
+namespace Transonic.MIDI.System
 {
-    public partial class AudimatWindow : Form
+    public abstract class SystemUnit
     {
-        public AudimatWindow()
+        public String name;
+        public InputDevice inputDev;                    //connect from input device
+        public List<OutputDevice> outputDevList;        //connections to output devices
+
+        public SystemUnit(String _name)
         {
-            InitializeComponent();
+            name = _name;
+            inputDev = null;
+            outputDevList = new List<OutputDevice>();
+        }
+
+        //for connection to input devices
+        public virtual void receiveMessage(byte[] msg)
+        {
+        }
+
+        //for connection to output devices
+        public virtual void sendMessage(byte[] msg)
+        {
         }
     }
 }
+
+//Console.WriteLine("there's no sun in the shadow of the wizard");

@@ -52,10 +52,47 @@
     <Compile Include="AudimatWindow.Designer.cs">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Midi\Engine\MidiTimer.cs" />
+    <Compile Include="Midi\Engine\Transport.cs" />
+    <Compile Include="Midi\Event.cs" />
+    <Compile Include="Midi\MarkerMap.cs" />
+    <Compile Include="Midi\Message.cs" />
+    <Compile Include="Midi\MeterMap.cs" />
+    <Compile Include="Midi\MidiFile.cs" />
+    <Compile Include="Midi\Sequence.cs" />
+    <Compile Include="Midi\System\InputDevice.cs" />
+    <Compile Include="Midi\System\MidiSystem.cs" />
+    <Compile Include="Midi\System\OutputDevice.cs" />
+    <Compile Include="Midi\System\SystemUnit.cs" />
+    <Compile Include="Midi\TempoMap.cs" />
+    <Compile Include="Midi\Track.cs" />
+    <Compile Include="Patch\iPatchConnector.cs" />
+    <Compile Include="Patch\IPatchView.cs" />
+    <Compile Include="Patch\PatchBox.cs" />
+    <Compile Include="Patch\PatchCanvas.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Patch\PatchLine.cs" />
+    <Compile Include="Patch\PatchPanel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\EditorWindow.cs" />
+    <Compile Include="UI\PatchWindow.cs" />
+    <Compile Include="UI\VSTPanel.cs" />
+    <Compile Include="UI\VSTRack.cs" />
+    <Compile Include="VST\VSTHost.cs" />
+    <Compile Include="VST\VSTPlugin.cs" />
+    <Compile Include="Widget\KeyboardBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Widget\Knob.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="AudimatWindow.resx">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patch\PatchCanvas.resx">
+      <DependentUpon>PatchCanvas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -66,6 +103,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Widget\KeyboardBar.resx">
+      <DependentUpon>KeyboardBar.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -76,6 +116,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Midi\draft\api.txt" />
+    <Content Include="Midi\draft\cakewalk.txt" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
