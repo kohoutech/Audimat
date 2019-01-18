@@ -21,10 +21,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+using System.Drawing;
+
 
 namespace Audimat.UI
 {
-    class VSTRack
+    public class VSTRack : Control
     {
+        AudimatWindow auditwin;
+
+        public VSTRack(AudimatWindow _auditwin)
+        {
+            auditwin = _auditwin;
+            this.BackColor = Color.Black;
+        }
     }
 }

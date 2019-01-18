@@ -24,7 +24,7 @@ using System.Text;
 
 namespace Transonic.VST
 {
-    class VSTHost
+    public class VSTHost
     {
     }
 }

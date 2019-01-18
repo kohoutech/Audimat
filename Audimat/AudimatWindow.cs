@@ -26,13 +26,43 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using Audimat.UI;
+
 namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
+        public VSTRack rack;
+
         public AudimatWindow()
         {
             InitializeComponent();
+
+            rack = new VSTRack(this);
+            rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+            rack.Location = new Point(AudimatToolbar.Bottom, this.ClientRectangle.Left);
+            this.Controls.Add(rack);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+        }
+
+//- file menu -----------------------------------------------------------------
+
+        private void exitFileMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+//- help menu -----------------------------------------------------------------
+
+        private void aboutHelpMenuItem_Click(object sender, EventArgs e)
+        {
+            String msg = "Audimat\nversion 1.0.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            MessageBox.Show(msg, "About");
         }
     }
 }
