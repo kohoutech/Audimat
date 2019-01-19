@@ -21,10 +21,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Audimat.UI
 {
-    class PatchWindow
+    public class PatchWindow : Form
     {
+        private AudimatWindow audimatWindow;
+
+        public PatchWindow(AudimatWindow audimatWindow)
+        {
+            // TODO: Complete member initialization
+            this.audimatWindow = audimatWindow;
+        }
     }
 }

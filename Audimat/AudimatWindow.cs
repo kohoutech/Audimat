@@ -34,21 +34,28 @@ namespace Audimat
     {
         public VSTRack rack;
 
+        public PatchWindow patchWin;
+
         public AudimatWindow()
         {
             InitializeComponent();
 
             rack = new VSTRack(this);
             rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
-            rack.Location = new Point(AudimatToolbar.Bottom, this.ClientRectangle.Left);
+            rack.Location = new Point(this.ClientRectangle.Left, AudimatToolbar.Bottom);
             this.Controls.Add(rack);
+
+            patchWin = new PatchWindow(this);
         }
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            if (rack != null) {
             rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+            }
         }
+        
 
 //- file menu -----------------------------------------------------------------
 
@@ -57,12 +64,50 @@ namespace Audimat
             Application.Exit();
         }
 
-//- help menu -----------------------------------------------------------------
+        //- plugin menu -------------------------------------------------------
+
+        private void loadPlugin_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        //- host menu -----------------------------------------------------------------
+
+        private void StartHost_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void StopHost_Click(object sender, EventArgs e)
+        {
+
+        }
+        
+        //- help menu -----------------------------------------------------------------
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
             String msg = "Audimat\nversion 1.0.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
+
+        //- toolbar -----------------------------------------------------------------
+
+        private void patchButton_Click(object sender, EventArgs e)
+        {
+            patchWin.Show();
+        }
+
+        private void keysButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panicButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }
