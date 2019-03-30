@@ -34,17 +34,21 @@ namespace Transonic.VST
         //public String filename;
         //public int plugnum;        
 
-        //public String name;
-        //public String vendor;
-        //public int version; 
-        //public int numPrograms;
-        //public int numParams;
-        //public int numInputs;
-        //public int numOutputs;
+        public int id;
+        public String name;
+        public String filename;
+        public String vendor;
+        public int version; 
+        public int numPrograms;
+        public int numParams;
+        public int numInputs;
+        public int numOutputs;
         //public int flags;
         //public int uniqueID;
-        //public int editorWidth;
-        //public int editorHeight;
+
+        public bool hasEditor;
+        public int editorWidth;
+        public int editorHeight;
 
         //public VSTParam[] parameters;
         //public String[] programs;

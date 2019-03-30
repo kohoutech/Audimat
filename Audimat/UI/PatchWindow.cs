@@ -22,17 +22,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing;
+
+using Transonic.Patch;
 
 namespace Audimat.UI
 {
-    public class PatchWindow : Form
+    public class PatchWindow : Form, IPatchView
     {
-        private AudimatWindow audimatWindow;
+        public AudimatWindow audimatWindow;
+        public PatchCanvas canvas; 
 
-        public PatchWindow(AudimatWindow audimatWindow)
+
+        public PatchWindow(AudimatWindow _audimatWindow)
         {
-            // TODO: Complete member initialization
-            this.audimatWindow = audimatWindow;
+            audimatWindow = _audimatWindow;
+
+            canvas = new PatchCanvas(this);
+            canvas.Size = new Size(this.ClientSize.Width, this.ClientSize.Height);
+            canvas.Location = new Point(0, 0);
+            canvas.BackColor = Color.LawnGreen;
+            this.Controls.Add(canvas);
+
+            this.ShowInTaskbar = false;
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            if (canvas != null)
+            {
+                canvas.Size = new Size(this.ClientSize.Width, this.ClientSize.Height);
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                Hide();
+            }
         }
     }
 }

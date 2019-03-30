@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -123,10 +123,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="VST\Vashti.vcxproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Midi\draft\api.txt" />
     <Content Include="Midi\draft\cakewalk.txt" />
+    <Content Include="VST\Vashti.cpp" />
+    <Content Include="VST\Vashti.h" />
+    <Content Include="VST\Vashti.vcxproj.filters" />
+    <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Graph\" />
