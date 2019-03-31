@@ -88,6 +88,7 @@
     <Compile Include="UI\VSTRack.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="VST\Vashti.cs" />
     <Compile Include="VST\VSTHost.cs" />
     <Compile Include="VST\VSTPlugin.cs" />
     <Compile Include="Widget\KeyboardBar.cs">
