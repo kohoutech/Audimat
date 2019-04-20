@@ -29,7 +29,7 @@ namespace Audimat.UI
 {
     public class VSTRack : Control
     {
-        AudimatWindow auditwin;
+        public AudimatWindow auditwin;
 
         public VSTRack(AudimatWindow _auditwin)
         {
