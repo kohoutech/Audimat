@@ -40,6 +40,11 @@ namespace Audimat
         {
             InitializeComponent();
 
+            int minHeight = this.AudimatMenu.Height + this.AudimatToolbar.Height + this.AudimatStatus.Height;
+            this.ClientSize = new System.Drawing.Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * VSTRack.UNITCOUNT + minHeight);
+            this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - (VSTPanel.PANELHEIGHT * VSTRack.UNITCOUNT));
+            this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
+
             rack = new VSTRack(this);
             rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
             rack.Location = new Point(this.ClientRectangle.Left, AudimatToolbar.Bottom);
@@ -50,6 +55,7 @@ namespace Audimat
 
         protected override void OnResize(EventArgs e)
         {
+            //this.Size = new System.Drawing.Size(400, this.Size.Height);
             base.OnResize(e);
             if (rack != null) {
             rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
@@ -64,11 +70,36 @@ namespace Audimat
             Application.Exit();
         }
 
-        //- plugin menu -------------------------------------------------------
+//- plugin menu -------------------------------------------------------
+
+        public void loadPlugin()
+        {
+            String pluginPath = "";
+            loadPluginDialog.InitialDirectory = Application.StartupPath;
+            loadPluginDialog.ShowDialog();
+            pluginPath = loadPluginDialog.FileName;
+            if (pluginPath.Length == 0) return;
+
+            bool result = rack.loadPlugin(pluginPath);
+
+            if (result)
+            {
+                //plugLoaded[plugNum] = true;
+                //plugloadItems[plugNum].Text = "Unload Plugin " + pluginLetters[plugNum];
+                //plugselectItems[plugNum].Enabled = true;
+                //plugselectButtons[plugNum].Enabled = true;
+                //setCurrentPlugin(plugNum);
+            }
+            else
+            {
+                MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void loadPlugin_Click(object sender, EventArgs e)
         {
-
+            loadPlugin();
         }
 
 
@@ -111,3 +142,5 @@ namespace Audimat
 
     }
 }
+
+//  Console.WriteLine(" there's no sun in the shadow of the wizard");

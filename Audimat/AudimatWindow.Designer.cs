@@ -50,6 +50,7 @@
             this.keysToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.panicToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
+            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.AudimatMenu.SuspendLayout();
             this.AudimatToolbar.SuspendLayout();
             this.SuspendLayout();
@@ -79,7 +80,7 @@
             // exitFileMenuItem
             // 
             this.exitFileMenuItem.Name = "exitFileMenuItem";
-            this.exitFileMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitFileMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitFileMenuItem.Text = "E&xit";
             this.exitFileMenuItem.Click += new System.EventHandler(this.exitFileMenuItem_Click);
             // 
@@ -96,7 +97,7 @@
             // 
             this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
             this.loadPluginMenuItem.Text = "&Load Plugin";
             this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
@@ -112,14 +113,14 @@
             // StartHostMenuItem
             // 
             this.StartHostMenuItem.Name = "StartHostMenuItem";
-            this.StartHostMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.StartHostMenuItem.Size = new System.Drawing.Size(137, 22);
             this.StartHostMenuItem.Text = "&Start Engine";
             this.StartHostMenuItem.Click += new System.EventHandler(this.StartHost_Click);
             // 
             // StopHostMenuItem
             // 
             this.StopHostMenuItem.Name = "StopHostMenuItem";
-            this.StopHostMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.StopHostMenuItem.Size = new System.Drawing.Size(137, 22);
             this.StopHostMenuItem.Text = "Sto&p Engine";
             this.StopHostMenuItem.Click += new System.EventHandler(this.StopHost_Click);
             // 
@@ -140,7 +141,7 @@
             // aboutHelpMenuItem
             // 
             this.aboutHelpMenuItem.Name = "aboutHelpMenuItem";
-            this.aboutHelpMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutHelpMenuItem.Size = new System.Drawing.Size(116, 22);
             this.aboutHelpMenuItem.Text = "&About...";
             this.aboutHelpMenuItem.Click += new System.EventHandler(this.aboutHelpMenuItem_Click);
             // 
@@ -285,6 +286,7 @@
         private System.Windows.Forms.ToolStripButton keysToolStripButton;
         private System.Windows.Forms.ToolStripButton panicToolStripButton;
         private System.Windows.Forms.ToolStripButton loadToolStripButton;
+        private System.Windows.Forms.OpenFileDialog loadPluginDialog;
     }
 }
 

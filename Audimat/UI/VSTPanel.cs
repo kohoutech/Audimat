@@ -30,7 +30,7 @@ using Transonic.VST;
 
 namespace Audimat.UI
 {
-    class VSTPanel : UserControl
+    public class VSTPanel : UserControl
     {
         public VSTRack rack;                //container
         public AudimatWindow auditwin;      //container's container

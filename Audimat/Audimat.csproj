@@ -112,6 +112,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UI\VSTRack.resx">
+      <DependentUpon>VSTRack.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Widget\KeyboardBar.resx">
       <DependentUpon>KeyboardBar.cs</DependentUpon>
     </EmbeddedResource>

@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
-
+using System.Drawing.Drawing2D;
 
 namespace Audimat.UI
 {
@@ -31,10 +31,110 @@ namespace Audimat.UI
     {
         public AudimatWindow auditwin;
 
+        public const int UNITCOUNT = 4;
+        public VSTPanel[] panels;
+        public int currentPlugin;
+
+        int rackWidth;
+        int rackHeight;
+        public Rectangle leftRail;
+        public Rectangle rightRail;
+        public const int RAILWIDTH = 20;
+
+        //cons
         public VSTRack(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
+
+            rackWidth = VSTPanel.PANELWIDTH;
+            rackHeight = VSTPanel.PANELHEIGHT * UNITCOUNT;
+            this.Size = new Size(rackWidth, rackHeight);
             this.BackColor = Color.Black;
+            leftRail = new Rectangle(0, 0, RAILWIDTH, rackHeight);
+            rightRail = new Rectangle(rackWidth - RAILWIDTH, 0, RAILWIDTH, rackHeight);
+
+            panels = new VSTPanel[UNITCOUNT];
+            currentPlugin = -1;                     //no plugins to select initially
+        }
+
+        //- panel management ----------------------------------------------------------
+
+        public bool loadPlugin(String plugPath)
+        {
+            int plugNum = 0;
+            VSTPanel panel = new VSTPanel(this, plugNum);
+            bool result = panel.loadPlugin(plugPath);
+            if (result)
+            {
+                panels[plugNum] = panel;
+                panel.Location = new Point(0, plugNum * VSTPanel.PANELHEIGHT);
+                this.Controls.Add(panel);
+            }
+            return result;
+        }
+
+        public void unloadPlugin(int plugNum)
+        {
+            if (currentPlugin == plugNum)       //if we remove the current panel, then no other panel is current (for now)
+            {
+                currentPlugin = -1;
+            }
+            panels[plugNum].shutDownPlugin();
+            this.Controls.Remove(panels[plugNum]);
+        }
+
+        public void selectPlugin(int plugNum)
+        {
+            if (currentPlugin >= 0)
+            {
+                panels[currentPlugin].clearCurrentPlugin();      //unselect current plug
+            }
+            currentPlugin = plugNum;
+            panels[currentPlugin].setCurrentPlugin();        //and select new plug
+        }
+
+        public void showSelectedPluginInfo()
+        {
+
+        }
+
+        public void showSelectedPluginParams()
+        {
+        }
+
+        public void showSelectedPluginEditor()
+        {
+            panels[currentPlugin].showEditorWindow();
+        }
+
+        //- painting ------------------------------------------------------------------
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            //rails
+            g.FillRectangle(Brushes.DarkGray, leftRail);
+            g.FillRectangle(Brushes.DarkGray, rightRail);
+
+            //screw holes
+            for (int i = 0; i < UNITCOUNT; i++)
+            {
+                int rackofs = i * VSTPanel.PANELHEIGHT;
+                g.FillEllipse(Brushes.Black, 5, rackofs + 10, 10, 10);
+                g.FillEllipse(Brushes.Black, 5, rackofs + 55, 10, 10);
+                g.FillEllipse(Brushes.Black, 385, rackofs + 10, 10, 10);
+                g.FillEllipse(Brushes.Black, 385, rackofs + 55, 10, 10);
+            }
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.ResumeLayout(false);
+
         }
     }
 }
