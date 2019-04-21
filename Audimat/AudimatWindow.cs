@@ -40,25 +40,26 @@ namespace Audimat
         {
             InitializeComponent();
 
-            int minHeight = this.AudimatMenu.Height + this.AudimatToolbar.Height + this.AudimatStatus.Height;
-            this.ClientSize = new System.Drawing.Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * VSTRack.UNITCOUNT + minHeight);
-            this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - (VSTPanel.PANELHEIGHT * VSTRack.UNITCOUNT));
-            this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
-
+            //rack control fills up entire client area between menu/tool & status bars
             rack = new VSTRack(this);
-            rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+            //rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
             rack.Location = new Point(this.ClientRectangle.Left, AudimatToolbar.Bottom);
             this.Controls.Add(rack);
+
+            int minHeight = this.AudimatMenu.Height + this.AudimatToolbar.Height + this.AudimatStatus.Height;
+            this.ClientSize = new System.Drawing.Size(rack.Size.Width, rack.Size.Height + minHeight);
+            this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - VSTPanel.PANELHEIGHT);
+            this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
 
             patchWin = new PatchWindow(this);
         }
 
         protected override void OnResize(EventArgs e)
         {
-            //this.Size = new System.Drawing.Size(400, this.Size.Height);
             base.OnResize(e);
-            if (rack != null) {
-            rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+            if (rack != null)
+            {
+                rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
             }
         }
         
@@ -75,10 +76,10 @@ namespace Audimat
         public void loadPlugin()
         {
             String pluginPath = "";
-            loadPluginDialog.InitialDirectory = Application.StartupPath;
-            loadPluginDialog.ShowDialog();
-            pluginPath = loadPluginDialog.FileName;
-            if (pluginPath.Length == 0) return;
+            //loadPluginDialog.InitialDirectory = Application.StartupPath;
+            //loadPluginDialog.ShowDialog();
+            //pluginPath = loadPluginDialog.FileName;
+            //if (pluginPath.Length == 0) return;
 
             bool result = rack.loadPlugin(pluginPath);
 
@@ -102,6 +103,12 @@ namespace Audimat
             loadPlugin();
         }
 
+        private void unloadPlugin_Click(object sender, EventArgs e)
+        {
+            rack.unloadPlugin(0);
+        }
+
+
 
         //- host menu -----------------------------------------------------------------
 
@@ -119,7 +126,7 @@ namespace Audimat
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.0.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion 1.1.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
 

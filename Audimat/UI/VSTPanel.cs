@@ -74,13 +74,14 @@ namespace Audimat.UI
             auditwin = rack.auditwin;
 
             plugNum = _plugNum;
-            plugName = "plugin " + panelLetters[plugNum];
+            //plugName = "plugin " + panelLetters[plugNum];
+            plugName = "plugin " + plugNum.ToString();
             plugPath = null;
             fileName = null;
             plugin = null;
 
             this.Size = new Size(PANELWIDTH, PANELHEIGHT);
-            this.lblPanelLetter.Text = "" + panelLetters[plugNum];
+            this.lblPanelLetter.Text = plugNum.ToString();
 
             isCurrent = false;
             editorWindow = null;
@@ -263,8 +264,8 @@ namespace Audimat.UI
 
         void drawRackScrew(Graphics g, int xpos, int ypos)
         {
-            g.DrawEllipse(Pens.Black, xpos, ypos, 10, 10);
-            g.FillEllipse(Brushes.Gray, xpos, ypos, 10, 10);
+            g.DrawEllipse(Pens.Black, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
+            g.FillEllipse(Brushes.Gray, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
             Pen slotPen = new Pen(Color.Black, 2);
             g.DrawLine(slotPen, xpos + 5, ypos, xpos + 5, ypos + 10);
             g.DrawLine(slotPen, xpos, ypos + 5, xpos + 10, ypos + 5);
@@ -281,10 +282,12 @@ namespace Audimat.UI
             g.DrawLine(Pens.SteelBlue, PANELWIDTH - 3, 1, PANELWIDTH - 3, PANELHEIGHT - 1);         //right
 
             //rack screws
-            drawRackScrew(g, 5, 10);
-            drawRackScrew(g, 5, 55);
-            drawRackScrew(g, 385, 10);
-            drawRackScrew(g, 385, 55);
+            int rightOfs = PANELWIDTH - VSTRack.SCREWHOLE - VSTRack.SCREWOFS;
+            int bottomofs = PANELHEIGHT - (VSTRack.SCREWHOLE * 2);
+            drawRackScrew(g, VSTRack.SCREWOFS, VSTRack.SCREWHOLE);
+            drawRackScrew(g, VSTRack.SCREWOFS, bottomofs);
+            drawRackScrew(g, rightOfs, VSTRack.SCREWHOLE);
+            drawRackScrew(g, rightOfs, bottomofs);
 
             //running LED
             Color LEDColor = isCurrent ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);

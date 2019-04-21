@@ -27,70 +27,109 @@ using System.Drawing.Drawing2D;
 
 namespace Audimat.UI
 {
-    public class VSTRack : Control
+    public class VSTRack : UserControl
     {
         public AudimatWindow auditwin;
 
-        public const int UNITCOUNT = 4;
-        public VSTPanel[] panels;
-        public int currentPlugin;
+        private VScrollBar scrollbar;
+        private Panel panelSpace;
 
-        int rackWidth;
-        int rackHeight;
-        public Rectangle leftRail;
-        public Rectangle rightRail;
-        public const int RAILWIDTH = 20;
+        public int panelcount;
+        public List<VSTPanel> panels;
 
         //cons
         public VSTRack(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
 
-            rackWidth = VSTPanel.PANELWIDTH;
-            rackHeight = VSTPanel.PANELHEIGHT * UNITCOUNT;
-            this.Size = new Size(rackWidth, rackHeight);
-            this.BackColor = Color.Black;
-            leftRail = new Rectangle(0, 0, RAILWIDTH, rackHeight);
-            rightRail = new Rectangle(rackWidth - RAILWIDTH, 0, RAILWIDTH, rackHeight);
+            scrollbar = new VScrollBar();
+            scrollbar.Minimum = 0;
+            scrollbar.Dock = DockStyle.Right;
+            scrollbar.ValueChanged += new EventHandler(scrollbar_ValueChanged);
 
-            panels = new VSTPanel[UNITCOUNT];
-            currentPlugin = -1;                     //no plugins to select initially
+            panelSpace = new Panel();
+
+            panelSpace.BackColor = Color.PowderBlue;
+            panelSpace.Location = new Point(0, 0);
+            panelSpace.Size = new Size(0, 0);
+
+            this.Controls.Add(scrollbar);
+            this.Controls.Add(panelSpace);
+
+            this.Size = new Size(VSTPanel.PANELWIDTH + scrollbar.Width, VSTPanel.PANELHEIGHT);        //initial size
+            this.BackColor = Color.Black;
+
+            panelcount = 0;
+            panels = new List<VSTPanel>();
+        }
+
+        void scrollbar_ValueChanged(object sender, EventArgs e)
+        {
+            panelSpace.Location = new Point(0, -scrollbar.Value);
+        }
+
+        //compensate for the fact that if the scrollbar max = 50, the greatest value will be 50 - THUMBWIDTH (value determined experimentally)
+        const int THUMBWIDTH = 9;
+
+        //called when the race space or panel space changes
+        void updateScrollBar()
+        {
+            scrollbar.Maximum = ((this.Height) < panelSpace.Height) ? (panelSpace.Height - this.Height + THUMBWIDTH) : 0;
+            if ((scrollbar.Maximum > THUMBWIDTH) && (scrollbar.Maximum - scrollbar.Value < THUMBWIDTH))
+            {
+                scrollbar.Value = scrollbar.Maximum - THUMBWIDTH;
+            }
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            updateScrollBar();
         }
 
         //- panel management ----------------------------------------------------------
 
         public bool loadPlugin(String plugPath)
         {
-            int plugNum = 0;
-            VSTPanel panel = new VSTPanel(this, plugNum);
-            bool result = panel.loadPlugin(plugPath);
+            panelcount++;
+            panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panelcount);
+
+            VSTPanel panel = new VSTPanel(this, panelcount);
+            bool result = true;
+            //bool result = panel.loadPlugin(plugPath);
             if (result)
             {
-                panels[plugNum] = panel;
-                panel.Location = new Point(0, plugNum * VSTPanel.PANELHEIGHT);
-                this.Controls.Add(panel);
+                panels.Add(panel);
+                panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panelcount - 1));
+                panelSpace.Controls.Add(panel);
             }
+            updateScrollBar();
             return result;
         }
 
         public void unloadPlugin(int plugNum)
         {
-            if (currentPlugin == plugNum)       //if we remove the current panel, then no other panel is current (for now)
-            {
-                currentPlugin = -1;
-            }
-            panels[plugNum].shutDownPlugin();
-            this.Controls.Remove(panels[plugNum]);
+            //if (currentPlugin == plugNum)       //if we remove the current panel, then no other panel is current (for now)
+            //{
+            //    currentPlugin = -1;
+            //}
+            //panels[plugNum].shutDownPlugin();
+            //this.Controls.Remove(panels[plugNum]);
+            panelcount--;
+            if (panelcount < 0) panelcount = 0;
+            panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panelcount);
+            updateScrollBar();
+            Invalidate();
         }
 
         public void selectPlugin(int plugNum)
         {
-            if (currentPlugin >= 0)
-            {
-                panels[currentPlugin].clearCurrentPlugin();      //unselect current plug
-            }
-            currentPlugin = plugNum;
-            panels[currentPlugin].setCurrentPlugin();        //and select new plug
+            //if (currentPlugin >= 0)
+            //{
+            //    panels[currentPlugin].clearCurrentPlugin();      //unselect current plug
+            //}
+            //currentPlugin = plugNum;
+            //panels[currentPlugin].setCurrentPlugin();        //and select new plug
         }
 
         public void showSelectedPluginInfo()
@@ -104,10 +143,14 @@ namespace Audimat.UI
 
         public void showSelectedPluginEditor()
         {
-            panels[currentPlugin].showEditorWindow();
+            //panels[currentPlugin].showEditorWindow();
         }
 
         //- painting ------------------------------------------------------------------
+
+        public const int RAILWIDTH = 20;
+        public const int SCREWHOLE = RAILWIDTH / 2;
+        public const int SCREWOFS = (RAILWIDTH - SCREWHOLE) / 2;
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -115,26 +158,26 @@ namespace Audimat.UI
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            //rails
+            //rails in empty rack space
+            Rectangle leftRail = new Rectangle(0, panelSpace.Bottom, RAILWIDTH, this.Height - panelSpace.Bottom);
+            Rectangle rightRail = new Rectangle(VSTPanel.PANELWIDTH - RAILWIDTH, panelSpace.Bottom, RAILWIDTH, this.Height - panelSpace.Bottom);
+
             g.FillRectangle(Brushes.DarkGray, leftRail);
             g.FillRectangle(Brushes.DarkGray, rightRail);
 
-            //screw holes
-            for (int i = 0; i < UNITCOUNT; i++)
+            //screw holes on rails
+            int unitCount = (this.Height + VSTPanel.PANELHEIGHT - 1) / VSTPanel.PANELHEIGHT;
+            int rightOfs = VSTPanel.PANELWIDTH - SCREWHOLE - SCREWOFS;
+            int bottomofs = VSTPanel.PANELHEIGHT - (SCREWHOLE * 2);
+            for (int i = 0; i < unitCount; i++)
             {
-                int rackofs = i * VSTPanel.PANELHEIGHT;
-                g.FillEllipse(Brushes.Black, 5, rackofs + 10, 10, 10);
-                g.FillEllipse(Brushes.Black, 5, rackofs + 55, 10, 10);
-                g.FillEllipse(Brushes.Black, 385, rackofs + 10, 10, 10);
-                g.FillEllipse(Brushes.Black, 385, rackofs + 55, 10, 10);
+                int rackofs = i * VSTPanel.PANELHEIGHT + panelSpace.Bottom;
+
+                g.FillEllipse(Brushes.Black, SCREWOFS, rackofs + SCREWHOLE, SCREWHOLE, SCREWHOLE);
+                g.FillEllipse(Brushes.Black, SCREWOFS, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);
+                g.FillEllipse(Brushes.Black, rightOfs, rackofs + SCREWHOLE, SCREWHOLE, SCREWHOLE);
+                g.FillEllipse(Brushes.Black, rightOfs, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);
             }
-        }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            this.ResumeLayout(false);
-
         }
     }
 }
