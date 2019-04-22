@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ----------------------------------------------------------------------------*/
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,7 +34,8 @@ namespace Audimat.UI
     public class VSTPanel : UserControl
     {
         public VSTRack rack;                //container
-        public AudimatWindow auditwin;      //container's container
+        public AudimatWindow audiwin;       //container's container
+        public Vashti vashti;
 
         public VSTPlugin plugin;
         public int plugNum;
@@ -43,8 +45,6 @@ namespace Audimat.UI
 
         public const int PANELHEIGHT = 75;
         public const int PANELWIDTH = 400;
-
-        private Label lblPanelLetter;
         private Label lblPlugName;
         private ComboBox cbxProgList;
         private Button btnPrevProg;
@@ -60,8 +60,8 @@ namespace Audimat.UI
 
         public bool isCurrent;
 
-        //PluginInfoWnd pluginInfoWnd;
-        //ParamEditor paramEditorWnd;
+        PluginInfoWnd pluginInfoWnd;
+        ParamEditor paramEditorWnd;
         Form editorWindow;
         Size editorWindowSize;
 
@@ -71,56 +71,48 @@ namespace Audimat.UI
             InitializeComponent();
 
             rack = _rack;
-            auditwin = rack.auditwin;
+            audiwin = rack.auditwin;
+            vashti = audiwin.vashti;
 
             plugNum = _plugNum;
-            //plugName = "plugin " + panelLetters[plugNum];
             plugName = "plugin " + plugNum.ToString();
+            this.lblPlugName.Text = plugName;
             plugPath = null;
             fileName = null;
             plugin = null;
 
             this.Size = new Size(PANELWIDTH, PANELHEIGHT);
-            this.lblPanelLetter.Text = plugNum.ToString();
 
-            isCurrent = false;
+            pluginInfoWnd = null;
+            paramEditorWnd = null;
             editorWindow = null;
         }
 
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.lblPanelLetter = new System.Windows.Forms.Label();
             this.lblPlugName = new System.Windows.Forms.Label();
+
             this.cbxProgList = new System.Windows.Forms.ComboBox();
             this.btnPrevProg = new System.Windows.Forms.Button();
             this.btnNextProg = new System.Windows.Forms.Button();
-            this.btnPlugClose = new System.Windows.Forms.Button();
+
             this.btnPlugInfo = new System.Windows.Forms.Button();
             this.btnPlugParam = new System.Windows.Forms.Button();
             this.btnPlugEditor = new System.Windows.Forms.Button();
+
+            this.btnPlugClose = new System.Windows.Forms.Button();
+
             this.paneltoolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
-            // 
-            // lblPanelLetter
-            // 
-            this.lblPanelLetter.AutoSize = true;
-            this.lblPanelLetter.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPanelLetter.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblPanelLetter.Location = new System.Drawing.Point(2, 27);
-            this.lblPanelLetter.Name = "lblPanelLetter";
-            this.lblPanelLetter.Size = new System.Drawing.Size(19, 19);
-            this.lblPanelLetter.TabIndex = 0;
-            this.lblPanelLetter.Text = "A";
-            this.lblPanelLetter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblPlugName
             // 
             this.lblPlugName.AutoSize = true;
             this.lblPlugName.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlugName.Location = new System.Drawing.Point(50, 10);
+            this.lblPlugName.Location = new System.Drawing.Point(26, 10);
             this.lblPlugName.Name = "lblPlugName";
-            this.lblPlugName.Size = new System.Drawing.Size(57, 19);
+            this.lblPlugName.Size = new System.Drawing.Size(78, 19);
             this.lblPlugName.TabIndex = 1;
             this.lblPlugName.Text = "not loaded";
             this.lblPlugName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -213,7 +205,6 @@ namespace Audimat.UI
             this.Controls.Add(this.btnPrevProg);
             this.Controls.Add(this.cbxProgList);
             this.Controls.Add(this.lblPlugName);
-            this.Controls.Add(this.lblPanelLetter);
             this.Name = "VSTPanel";
             this.Size = new System.Drawing.Size(398, 73);
             this.ResumeLayout(false);
@@ -221,43 +212,29 @@ namespace Audimat.UI
 
         }
 
-        //-----------------------------------------------------------------------------
+        //- panel management ----------------------------------------------------------
 
         public bool loadPlugin(String _plugPath)
         {
-            //plugPath = _plugPath;
-            //fileName = Path.GetFileNameWithoutExtension(plugPath);
-            //plugin = new VSTPlugin(this, auditwin.waverly, plugNum, plugPath);
-            //bool result = plugin.load();
-            //if (result)
-            //{
-            //    plugName = (plugin.name.Length > 0) ? plugin.name : fileName;
+            plugPath = _plugPath;
+            fileName = Path.GetFileNameWithoutExtension(plugPath);
+            plugin = new VSTPlugin(vashti, plugPath);
+            bool result = plugin.load();
+            if (result)
+            {
+                plugName = (plugin.name.Length > 0) ? plugin.name : fileName;
             //    //if (plugNum == 2) plugName = "Another VST";
             //    //if (plugNum == 3) plugName = "Yet Another VST";
-            //    lblPlugName.Text = plugName;
+                lblPlugName.Text = plugName;
             //    editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
             //    cbxProgList.DataSource = plugin.programs;
-            //}
-            //return result;
-            return true;
+            }
+            return result;
         }
 
         public void shutDownPlugin()
         {
             if (editorWindow != null) editorWindow.Close();
-        }
-
-        public void setCurrentPlugin()
-        {
-            //plugin.setCurrent();
-            //isCurrent = true;
-            //Invalidate();
-        }
-
-        public void clearCurrentPlugin()
-        {
-            isCurrent = false;
-            Invalidate();
         }
 
         //- painting ------------------------------------------------------------------
@@ -290,14 +267,19 @@ namespace Audimat.UI
             drawRackScrew(g, rightOfs, bottomofs);
 
             //running LED
-            Color LEDColor = isCurrent ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
-            Brush LEDBrush = new SolidBrush(LEDColor);
-            g.FillEllipse(LEDBrush, 34, 12, 16, 16);
-            g.DrawEllipse(Pens.White, 34, 12, 16, 16);
-            LEDBrush.Dispose();
+            //Color LEDColor = isCurrent ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
+            //Brush LEDBrush = new SolidBrush(LEDColor);
+            //g.FillEllipse(LEDBrush, 34, 12, 16, 16);
+            //g.DrawEllipse(Pens.White, 34, 12, 16, 16);
+            //LEDBrush.Dispose();
         }
 
         //- event handlers ------------------------------------------------------------
+
+        private void cbxProgList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //plugin.setProgram(cbxProgList.SelectedIndex);
+        }
 
         private void btnPrevProg_Click(object sender, EventArgs e)
         {
@@ -307,11 +289,6 @@ namespace Audimat.UI
             {
                 cbxProgList.SelectedIndex = curprog;
             }
-        }
-
-        private void cbxProgList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //plugin.setProgram(cbxProgList.SelectedIndex);
         }
 
         private void btnNextProg_Click(object sender, EventArgs e)
@@ -349,11 +326,11 @@ namespace Audimat.UI
             //editorWindow.Owner = auditwin;
             editorWindow.ClientSize = editorWindowSize;
             editorWindow.Text = plugName + " editor";
-            editorWindow.Icon = auditwin.Icon;
+            editorWindow.Icon = audiwin.Icon;
             editorWindow.ShowInTaskbar = false;
             editorWindow.MaximizeBox = false;
             editorWindow.FormClosing += new FormClosingEventHandler(editorWindow_FormClosing);
-            editorWindow.Show(auditwin);
+            editorWindow.Show(audiwin);
             //plugin.openEditorWindow(editorWindow.Handle);
         }
 
@@ -372,7 +349,7 @@ namespace Audimat.UI
 
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
-            //auditwin.unloadPlugin(plugNum);
+            rack.unloadPlugin(plugNum);
             //plugin.unload();
         }
     }

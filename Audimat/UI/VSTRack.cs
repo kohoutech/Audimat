@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2017  George E Greaney
+Copyright (C) 2005-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -34,7 +34,6 @@ namespace Audimat.UI
         private VScrollBar scrollbar;
         private Panel panelSpace;
 
-        public int panelcount;
         public List<VSTPanel> panels;
 
         //cons
@@ -59,7 +58,6 @@ namespace Audimat.UI
             this.Size = new Size(VSTPanel.PANELWIDTH + scrollbar.Width, VSTPanel.PANELHEIGHT);        //initial size
             this.BackColor = Color.Black;
 
-            panelcount = 0;
             panels = new List<VSTPanel>();
         }
 
@@ -91,59 +89,33 @@ namespace Audimat.UI
 
         public bool loadPlugin(String plugPath)
         {
-            panelcount++;
-            panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panelcount);
-
-            VSTPanel panel = new VSTPanel(this, panelcount);
-            bool result = true;
+            VSTPanel panel = new VSTPanel(this, panels.Count);
             //bool result = panel.loadPlugin(plugPath);
+            bool result = true;
             if (result)
             {
                 panels.Add(panel);
-                panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panelcount - 1));
+                panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panels.Count);
+                panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panels.Count - 1));
                 panelSpace.Controls.Add(panel);
+                updateScrollBar();
             }
-            updateScrollBar();
             return result;
         }
 
         public void unloadPlugin(int plugNum)
         {
-            //if (currentPlugin == plugNum)       //if we remove the current panel, then no other panel is current (for now)
-            //{
-            //    currentPlugin = -1;
-            //}
-            //panels[plugNum].shutDownPlugin();
-            //this.Controls.Remove(panels[plugNum]);
-            panelcount--;
-            if (panelcount < 0) panelcount = 0;
-            panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panelcount);
+            VSTPanel panel = panels[plugNum];
+            panelSpace.Controls.Remove(panel);
+            panels.Remove(panel);
+            panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panels.Count);
+            for (int i = 0; i < panels.Count; i++)
+            {
+                panels[i].plugNum = i;
+                panels[i].Location = new Point(0, VSTPanel.PANELHEIGHT * i);
+            }
             updateScrollBar();
             Invalidate();
-        }
-
-        public void selectPlugin(int plugNum)
-        {
-            //if (currentPlugin >= 0)
-            //{
-            //    panels[currentPlugin].clearCurrentPlugin();      //unselect current plug
-            //}
-            //currentPlugin = plugNum;
-            //panels[currentPlugin].setCurrentPlugin();        //and select new plug
-        }
-
-        public void showSelectedPluginInfo()
-        {
-
-        }
-
-        public void showSelectedPluginParams()
-        {
-        }
-
-        public void showSelectedPluginEditor()
-        {
-            //panels[currentPlugin].showEditorWindow();
         }
 
         //- painting ------------------------------------------------------------------

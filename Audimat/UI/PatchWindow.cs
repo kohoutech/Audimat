@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2017  George E Greaney
+Copyright (C) 2005-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
