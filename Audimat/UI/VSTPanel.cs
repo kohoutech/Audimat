@@ -92,17 +92,13 @@ namespace Audimat.UI
         {
             this.components = new System.ComponentModel.Container();
             this.lblPlugName = new System.Windows.Forms.Label();
-
             this.cbxProgList = new System.Windows.Forms.ComboBox();
             this.btnPrevProg = new System.Windows.Forms.Button();
             this.btnNextProg = new System.Windows.Forms.Button();
-
             this.btnPlugInfo = new System.Windows.Forms.Button();
             this.btnPlugParam = new System.Windows.Forms.Button();
             this.btnPlugEditor = new System.Windows.Forms.Button();
-
             this.btnPlugClose = new System.Windows.Forms.Button();
-
             this.paneltoolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
@@ -148,18 +144,6 @@ namespace Audimat.UI
             this.btnNextProg.UseVisualStyleBackColor = true;
             this.btnNextProg.Click += new System.EventHandler(this.btnNextProg_Click);
             // 
-            // btnPlugClose
-            // 
-            this.btnPlugClose.BackColor = System.Drawing.Color.Red;
-            this.btnPlugClose.Location = new System.Drawing.Point(349, 10);
-            this.btnPlugClose.Name = "btnPlugClose";
-            this.btnPlugClose.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugClose.TabIndex = 8;
-            this.btnPlugClose.Text = "X";
-            this.paneltoolTip.SetToolTip(this.btnPlugClose, "close plugin");
-            this.btnPlugClose.UseVisualStyleBackColor = false;
-            this.btnPlugClose.Click += new System.EventHandler(this.btnPlugClose_Click);
-            // 
             // btnPlugInfo
             // 
             this.btnPlugInfo.Location = new System.Drawing.Point(264, 38);
@@ -193,9 +177,21 @@ namespace Audimat.UI
             this.btnPlugEditor.UseVisualStyleBackColor = true;
             this.btnPlugEditor.Click += new System.EventHandler(this.btnPlugEditor_Click);
             // 
+            // btnPlugClose
+            // 
+            this.btnPlugClose.BackColor = System.Drawing.Color.Red;
+            this.btnPlugClose.Location = new System.Drawing.Point(349, 10);
+            this.btnPlugClose.Name = "btnPlugClose";
+            this.btnPlugClose.Size = new System.Drawing.Size(24, 24);
+            this.btnPlugClose.TabIndex = 8;
+            this.btnPlugClose.Text = "X";
+            this.paneltoolTip.SetToolTip(this.btnPlugClose, "close plugin");
+            this.btnPlugClose.UseVisualStyleBackColor = false;
+            this.btnPlugClose.Click += new System.EventHandler(this.btnPlugClose_Click);
+            // 
             // VSTPanel
             // 
-            this.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.btnPlugEditor);
             this.Controls.Add(this.btnPlugParam);
@@ -223,11 +219,9 @@ namespace Audimat.UI
             if (result)
             {
                 plugName = (plugin.name.Length > 0) ? plugin.name : fileName;
-            //    //if (plugNum == 2) plugName = "Another VST";
-            //    //if (plugNum == 3) plugName = "Yet Another VST";
                 lblPlugName.Text = plugName;
-            //    editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
-            //    cbxProgList.DataSource = plugin.programs;
+                editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
+                cbxProgList.DataSource = plugin.programs;
             }
             return result;
         }
@@ -278,7 +272,7 @@ namespace Audimat.UI
 
         private void cbxProgList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //plugin.setProgram(cbxProgList.SelectedIndex);
+            plugin.setProgram(cbxProgList.SelectedIndex);
         }
 
         private void btnPrevProg_Click(object sender, EventArgs e)
@@ -295,60 +289,78 @@ namespace Audimat.UI
         {
             int curprog = cbxProgList.SelectedIndex;
             curprog++;
-            //if (curprog < plugin.programs.Length)
-            //{
-            //    cbxProgList.SelectedIndex = curprog;
-            //}
+            if (curprog < plugin.programs.Length)
+            {
+                cbxProgList.SelectedIndex = curprog;
+            }
         }
 
-        //- plugin info & param windows -----------------------------------------------
+        //- plugin info window ------------------------------------------------
 
         private void btnPlugInfo_Click(object sender, EventArgs e)
         {
-            //pluginInfoWnd = new PluginInfoWnd(this);
-            //pluginInfoWnd.Text = plugName + " info";
-            //pluginInfoWnd.Show(auditwin);
+            btnPlugInfo.Enabled = false;
+            pluginInfoWnd = new PluginInfoWnd(this);
+            pluginInfoWnd.Text = plugName + " info";
+            pluginInfoWnd.Icon = audiwin.Icon;
+            pluginInfoWnd.FormClosing += new FormClosingEventHandler(infoWindow_FormClosing);
+            pluginInfoWnd.Show();
         }
+
+        private void infoWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            btnPlugInfo.Enabled = true;
+        }
+
+        //- plugin parameter window -------------------------------------------
 
         private void btnPlugParam_Click(object sender, EventArgs e)
         {
-            //paramEditorWnd = new ParamEditor(this);
-            //paramEditorWnd.Text = plugName + " parameters";
-            //paramEditorWnd.Show(auditwin);
+            btnPlugParam.Enabled = false;
+            paramEditorWnd = new ParamEditor(this);
+            paramEditorWnd.Text = plugName + " parameters";
+            paramEditorWnd.Icon = audiwin.Icon;
+            paramEditorWnd.FormClosing += new FormClosingEventHandler(paramWindow_FormClosing);
+            paramEditorWnd.Show();
+        }
+
+        private void paramWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            btnPlugParam.Enabled = true;
         }
 
         //- plugin editor window ------------------------------------------------------
 
-        public void showEditorWindow()
+        private void btnPlugEditor_Click(object sender, EventArgs e)
         {
             btnPlugEditor.Enabled = false;
             editorWindow = new Form();
-            //editorWindow.Owner = auditwin;
             editorWindow.ClientSize = editorWindowSize;
             editorWindow.Text = plugName + " editor";
             editorWindow.Icon = audiwin.Icon;
             editorWindow.ShowInTaskbar = false;
             editorWindow.MaximizeBox = false;
+            editorWindow.FormBorderStyle = FormBorderStyle.FixedSingle;
             editorWindow.FormClosing += new FormClosingEventHandler(editorWindow_FormClosing);
-            editorWindow.Show(audiwin);
-            //plugin.openEditorWindow(editorWindow.Handle);
-        }
-
-        private void btnPlugEditor_Click(object sender, EventArgs e)
-        {
-            showEditorWindow();
+            editorWindow.Show();
+            plugin.openEditorWindow(editorWindow.Handle);
         }
 
         private void editorWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             btnPlugEditor.Enabled = true;
-            //plugin.closeEditorWindow();
+            plugin.closeEditorWindow();
+            editorWindow = null;
         }
 
         //-----------------------------------------------------------------------------
 
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
+            if (editorWindow != null)
+            {
+                editorWindow.Close();
+            }
             rack.unloadPlugin(plugNum);
             //plugin.unload();
         }
