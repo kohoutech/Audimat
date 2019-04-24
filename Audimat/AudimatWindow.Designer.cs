@@ -34,7 +34,6 @@
             this.exitFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.unloadPluginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StartHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StopHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,8 +87,7 @@
             // pluginMenuItem
             // 
             this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadPluginMenuItem,
-            this.unloadPluginToolStripMenuItem});
+            this.loadPluginMenuItem});
             this.pluginMenuItem.Name = "pluginMenuItem";
             this.pluginMenuItem.ShowShortcutKeys = false;
             this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
@@ -102,14 +100,6 @@
             this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
             this.loadPluginMenuItem.Text = "&Load Plugin";
             this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
-            // 
-            // unloadPluginToolStripMenuItem
-            // 
-            this.unloadPluginToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.unloadPluginToolStripMenuItem.Name = "unloadPluginToolStripMenuItem";
-            this.unloadPluginToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.unloadPluginToolStripMenuItem.Text = "&Unload Plugin";
-            this.unloadPluginToolStripMenuItem.Click += new System.EventHandler(this.unloadPlugin_Click);
             // 
             // hostMenuItem
             // 
@@ -298,7 +288,6 @@
         private System.Windows.Forms.ToolStripButton panicToolStripButton;
         private System.Windows.Forms.ToolStripButton loadToolStripButton;
         private System.Windows.Forms.OpenFileDialog loadPluginDialog;
-        private System.Windows.Forms.ToolStripMenuItem unloadPluginToolStripMenuItem;
     }
 }
 

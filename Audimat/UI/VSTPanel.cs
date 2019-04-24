@@ -47,8 +47,6 @@ namespace Audimat.UI
         public const int PANELWIDTH = 400;
         private Label lblPlugName;
         private ComboBox cbxProgList;
-        private Button btnPrevProg;
-        private Button btnNextProg;
         private Button btnPlugClose;
         private Button btnPlugInfo;
         private Button btnPlugParam;
@@ -60,9 +58,13 @@ namespace Audimat.UI
 
         public bool isCurrent;
 
+        PluginSettingsWnd pluginSettingsWnd;
         PluginInfoWnd pluginInfoWnd;
-        ParamEditor paramEditorWnd;
+        ParamEditorWnd paramEditorWnd;
         Form editorWindow;
+        private Button btnNextProg;
+        private Button btnPrevProg;
+        private Button btnPlugSettings;
         Size editorWindowSize;
 
         //cons
@@ -93,13 +95,14 @@ namespace Audimat.UI
             this.components = new System.ComponentModel.Container();
             this.lblPlugName = new System.Windows.Forms.Label();
             this.cbxProgList = new System.Windows.Forms.ComboBox();
-            this.btnPrevProg = new System.Windows.Forms.Button();
-            this.btnNextProg = new System.Windows.Forms.Button();
             this.btnPlugInfo = new System.Windows.Forms.Button();
             this.btnPlugParam = new System.Windows.Forms.Button();
             this.btnPlugEditor = new System.Windows.Forms.Button();
             this.btnPlugClose = new System.Windows.Forms.Button();
             this.paneltoolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnNextProg = new System.Windows.Forms.Button();
+            this.btnPrevProg = new System.Windows.Forms.Button();
+            this.btnPlugSettings = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblPlugName
@@ -109,47 +112,26 @@ namespace Audimat.UI
             this.lblPlugName.Location = new System.Drawing.Point(26, 10);
             this.lblPlugName.Name = "lblPlugName";
             this.lblPlugName.Size = new System.Drawing.Size(78, 19);
-            this.lblPlugName.TabIndex = 1;
+            this.lblPlugName.TabIndex = 0;
             this.lblPlugName.Text = "not loaded";
             this.lblPlugName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // cbxProgList
             // 
+            this.cbxProgList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxProgList.FormattingEnabled = true;
-            this.cbxProgList.Location = new System.Drawing.Point(54, 40);
+            this.cbxProgList.Location = new System.Drawing.Point(45, 39);
             this.cbxProgList.Name = "cbxProgList";
-            this.cbxProgList.Size = new System.Drawing.Size(172, 21);
+            this.cbxProgList.Size = new System.Drawing.Size(172, 23);
             this.cbxProgList.TabIndex = 2;
             this.cbxProgList.SelectedIndexChanged += new System.EventHandler(this.cbxProgList_SelectedIndexChanged);
             // 
-            // btnPrevProg
-            // 
-            this.btnPrevProg.Location = new System.Drawing.Point(30, 38);
-            this.btnPrevProg.Name = "btnPrevProg";
-            this.btnPrevProg.Size = new System.Drawing.Size(24, 24);
-            this.btnPrevProg.TabIndex = 1;
-            this.btnPrevProg.Text = "<";
-            this.paneltoolTip.SetToolTip(this.btnPrevProg, "previous program");
-            this.btnPrevProg.UseVisualStyleBackColor = true;
-            this.btnPrevProg.Click += new System.EventHandler(this.btnPrevProg_Click);
-            // 
-            // btnNextProg
-            // 
-            this.btnNextProg.Location = new System.Drawing.Point(226, 38);
-            this.btnNextProg.Name = "btnNextProg";
-            this.btnNextProg.Size = new System.Drawing.Size(24, 24);
-            this.btnNextProg.TabIndex = 3;
-            this.btnNextProg.Text = ">";
-            this.paneltoolTip.SetToolTip(this.btnNextProg, "next program");
-            this.btnNextProg.UseVisualStyleBackColor = true;
-            this.btnNextProg.Click += new System.EventHandler(this.btnNextProg_Click);
-            // 
             // btnPlugInfo
             // 
-            this.btnPlugInfo.Location = new System.Drawing.Point(264, 38);
+            this.btnPlugInfo.Location = new System.Drawing.Point(269, 38);
             this.btnPlugInfo.Name = "btnPlugInfo";
             this.btnPlugInfo.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugInfo.TabIndex = 4;
+            this.btnPlugInfo.TabIndex = 5;
             this.btnPlugInfo.Text = "I";
             this.paneltoolTip.SetToolTip(this.btnPlugInfo, "show plugin info");
             this.btnPlugInfo.UseVisualStyleBackColor = true;
@@ -157,10 +139,10 @@ namespace Audimat.UI
             // 
             // btnPlugParam
             // 
-            this.btnPlugParam.Location = new System.Drawing.Point(287, 38);
+            this.btnPlugParam.Location = new System.Drawing.Point(293, 38);
             this.btnPlugParam.Name = "btnPlugParam";
             this.btnPlugParam.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugParam.TabIndex = 5;
+            this.btnPlugParam.TabIndex = 6;
             this.btnPlugParam.Text = "P";
             this.paneltoolTip.SetToolTip(this.btnPlugParam, "edit plugin parameters");
             this.btnPlugParam.UseVisualStyleBackColor = true;
@@ -168,7 +150,7 @@ namespace Audimat.UI
             // 
             // btnPlugEditor
             // 
-            this.btnPlugEditor.Location = new System.Drawing.Point(310, 38);
+            this.btnPlugEditor.Location = new System.Drawing.Point(317, 38);
             this.btnPlugEditor.Name = "btnPlugEditor";
             this.btnPlugEditor.Size = new System.Drawing.Size(24, 24);
             this.btnPlugEditor.TabIndex = 7;
@@ -189,10 +171,44 @@ namespace Audimat.UI
             this.btnPlugClose.UseVisualStyleBackColor = false;
             this.btnPlugClose.Click += new System.EventHandler(this.btnPlugClose_Click);
             // 
+            // btnNextProg
+            // 
+            this.btnNextProg.Location = new System.Drawing.Point(217, 38);
+            this.btnNextProg.Name = "btnNextProg";
+            this.btnNextProg.Size = new System.Drawing.Size(18, 24);
+            this.btnNextProg.TabIndex = 3;
+            this.btnNextProg.Text = "+";
+            this.paneltoolTip.SetToolTip(this.btnNextProg, "next program");
+            this.btnNextProg.UseVisualStyleBackColor = true;
+            this.btnNextProg.Click += new System.EventHandler(this.btnNextProg_Click);
+            // 
+            // btnPrevProg
+            // 
+            this.btnPrevProg.Location = new System.Drawing.Point(27, 38);
+            this.btnPrevProg.Name = "btnPrevProg";
+            this.btnPrevProg.Size = new System.Drawing.Size(18, 24);
+            this.btnPrevProg.TabIndex = 1;
+            this.btnPrevProg.Text = "-";
+            this.paneltoolTip.SetToolTip(this.btnPrevProg, "previous program");
+            this.btnPrevProg.UseVisualStyleBackColor = true;
+            this.btnPrevProg.Click += new System.EventHandler(this.btnPrevProg_Click);
+            // 
+            // btnPlugSettings
+            // 
+            this.btnPlugSettings.Location = new System.Drawing.Point(245, 38);
+            this.btnPlugSettings.Name = "btnPlugSettings";
+            this.btnPlugSettings.Size = new System.Drawing.Size(24, 24);
+            this.btnPlugSettings.TabIndex = 4;
+            this.btnPlugSettings.Text = "S";
+            this.paneltoolTip.SetToolTip(this.btnPlugSettings, "show plugin info");
+            this.btnPlugSettings.UseVisualStyleBackColor = true;
+            this.btnPlugSettings.Click += new System.EventHandler(this.btnPlugSettings_Click);
+            // 
             // VSTPanel
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Controls.Add(this.btnPlugSettings);
             this.Controls.Add(this.btnPlugEditor);
             this.Controls.Add(this.btnPlugParam);
             this.Controls.Add(this.btnPlugInfo);
@@ -295,6 +311,21 @@ namespace Audimat.UI
             }
         }
 
+        private void btnPlugSettings_Click(object sender, EventArgs e)
+        {
+            btnPlugSettings.Enabled = false;
+            pluginSettingsWnd = new PluginSettingsWnd(this);
+            pluginSettingsWnd.Text = plugName + " settings";
+            pluginSettingsWnd.Icon = audiwin.Icon;
+            pluginSettingsWnd.FormClosing += new FormClosingEventHandler(settingsWindow_FormClosing);
+            pluginSettingsWnd.Show();
+        }
+
+        private void settingsWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            btnPlugSettings.Enabled = true;
+        }
+
         //- plugin info window ------------------------------------------------
 
         private void btnPlugInfo_Click(object sender, EventArgs e)
@@ -317,7 +348,7 @@ namespace Audimat.UI
         private void btnPlugParam_Click(object sender, EventArgs e)
         {
             btnPlugParam.Enabled = false;
-            paramEditorWnd = new ParamEditor(this);
+            paramEditorWnd = new ParamEditorWnd(this);
             paramEditorWnd.Text = plugName + " parameters";
             paramEditorWnd.Icon = audiwin.Icon;
             paramEditorWnd.FormClosing += new FormClosingEventHandler(paramWindow_FormClosing);

@@ -90,8 +90,8 @@ namespace Audimat.UI
         public bool loadPlugin(String plugPath)
         {
             VSTPanel panel = new VSTPanel(this, panels.Count);
-            //bool result = panel.loadPlugin(plugPath);
-            bool result = true;
+            bool result = panel.loadPlugin(plugPath);
+            //bool result = true;
             if (result)
             {
                 panels.Add(panel);
