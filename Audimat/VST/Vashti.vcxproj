@@ -21,7 +21,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -40,6 +40,9 @@
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -47,6 +50,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -64,9 +68,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Vashti.cpp" />
+    <ClCompile Include="VSTHost.cpp" />
+    <ClCompile Include="VSTPlugin.cpp" />
+    <ClCompile Include="WaveBuffer.cpp" />
+    <ClCompile Include="WaveOutDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vashti.h" />
+    <ClInclude Include="VSTHost.h" />
+    <ClInclude Include="VSTPlugin.h" />
+    <ClInclude Include="WaveBuffer.h" />
+    <ClInclude Include="WaveOutDevice.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -155,8 +155,6 @@
     <Content Include="Icon1.ico" />
     <Content Include="Midi\draft\api.txt" />
     <Content Include="Midi\draft\cakewalk.txt" />
-    <Content Include="VST\Vashti.cpp" />
-    <Content Include="VST\Vashti.h" />
     <Content Include="VST\Vashti.vcxproj.filters" />
     <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>
