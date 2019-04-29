@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2017  George E Greaney
+Copyright (C) 2005-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -25,8 +25,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 using Audimat.UI;
+using Transonic.VST;
+using Transonic.MIDI.System;
 
 namespace Audimat
 {
@@ -35,6 +38,10 @@ namespace Audimat
         public VSTRack rack;
 
         public PatchWindow patchWin;
+
+        public Vashti vashti;
+        public WaveDevices waveDevices;
+        public MidiSystem midiDevices;
 
         public AudimatWindow()
         {
@@ -52,6 +59,12 @@ namespace Audimat
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
 
             patchWin = new PatchWindow(this);
+
+            vashti = new Vashti();
+            waveDevices = new WaveDevices();
+            midiDevices = new MidiSystem();
+
+            lblAudimatStatus.Text = "Engine is stopped";
         }
 
         protected override void OnResize(EventArgs e)
@@ -76,6 +89,8 @@ namespace Audimat
         public void loadPlugin()
         {
             String pluginPath = "";
+            string[] vstlist = File.ReadAllLines("vst.list");
+            pluginPath = vstlist[0];
             //loadPluginDialog.InitialDirectory = Application.StartupPath;
             //loadPluginDialog.ShowDialog();
             //pluginPath = loadPluginDialog.FileName;
@@ -103,23 +118,18 @@ namespace Audimat
             loadPlugin();
         }
 
-        private void unloadPlugin_Click(object sender, EventArgs e)
-        {
-            rack.unloadPlugin(0);
-        }
-
-
-
         //- host menu -----------------------------------------------------------------
 
         private void StartHost_Click(object sender, EventArgs e)
         {
-
+            vashti.startEngine();
+            lblAudimatStatus.Text = "Engine is running";
         }
 
         private void StopHost_Click(object sender, EventArgs e)
         {
-
+            vashti.stopEngine();
+            lblAudimatStatus.Text = "Engine is stopped";
         }
         
         //- help menu -----------------------------------------------------------------

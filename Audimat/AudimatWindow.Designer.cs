@@ -51,8 +51,10 @@
             this.panicToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
             this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
+            this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.AudimatMenu.SuspendLayout();
             this.AudimatToolbar.SuspendLayout();
+            this.AudimatStatus.SuspendLayout();
             this.SuspendLayout();
             // 
             // AudimatMenu
@@ -97,7 +99,7 @@
             // 
             this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
             this.loadPluginMenuItem.Text = "&Load Plugin";
             this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
@@ -236,11 +238,19 @@
             // AudimatStatus
             // 
             this.AudimatStatus.BackColor = System.Drawing.SystemColors.Control;
+            this.AudimatStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblAudimatStatus});
             this.AudimatStatus.Location = new System.Drawing.Point(0, 339);
             this.AudimatStatus.Name = "AudimatStatus";
             this.AudimatStatus.Size = new System.Drawing.Size(384, 22);
             this.AudimatStatus.TabIndex = 2;
             this.AudimatStatus.Text = "statusStrip1";
+            // 
+            // lblAudimatStatus
+            // 
+            this.lblAudimatStatus.Name = "lblAudimatStatus";
+            this.lblAudimatStatus.Size = new System.Drawing.Size(100, 17);
+            this.lblAudimatStatus.Text = "Engine is stopped";
             // 
             // AudimatWindow
             // 
@@ -259,6 +269,8 @@
             this.AudimatMenu.PerformLayout();
             this.AudimatToolbar.ResumeLayout(false);
             this.AudimatToolbar.PerformLayout();
+            this.AudimatStatus.ResumeLayout(false);
+            this.AudimatStatus.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -288,6 +300,7 @@
         private System.Windows.Forms.ToolStripButton panicToolStripButton;
         private System.Windows.Forms.ToolStripButton loadToolStripButton;
         private System.Windows.Forms.OpenFileDialog loadPluginDialog;
+        private System.Windows.Forms.ToolStripStatusLabel lblAudimatStatus;
     }
 }
 
