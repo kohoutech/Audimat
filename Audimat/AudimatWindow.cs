@@ -62,9 +62,7 @@ namespace Audimat
 
             vashti = new Vashti();
             waveDevices = new WaveDevices();
-            midiDevices = new MidiSystem();
-
-            lblAudimatStatus.Text = "Engine is stopped";
+            midiDevices = new MidiSystem();            
         }
 
         protected override void OnResize(EventArgs e)
