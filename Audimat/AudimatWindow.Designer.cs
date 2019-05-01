@@ -37,21 +37,22 @@
             this.hostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StartHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StopHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.devicesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudimatToolbar = new System.Windows.Forms.ToolStrip();
             this.loadToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.patchToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.startToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.stopToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.keysToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.keyboardToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.panicToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
-            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.keyboardBarHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.panicHostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudimatMenu.SuspendLayout();
             this.AudimatToolbar.SuspendLayout();
             this.AudimatStatus.SuspendLayout();
@@ -61,9 +62,8 @@
             // 
             this.AudimatMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuItem,
-            this.pluginMenuItem,
             this.hostMenuItem,
-            this.devicesMenuItem,
+            this.pluginMenuItem,
             this.helpMenuItem});
             this.AudimatMenu.Location = new System.Drawing.Point(0, 0);
             this.AudimatMenu.Name = "AudimatMenu";
@@ -82,7 +82,7 @@
             // exitFileMenuItem
             // 
             this.exitFileMenuItem.Name = "exitFileMenuItem";
-            this.exitFileMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitFileMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitFileMenuItem.Text = "E&xit";
             this.exitFileMenuItem.Click += new System.EventHandler(this.exitFileMenuItem_Click);
             // 
@@ -99,7 +99,7 @@
             // 
             this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
             this.loadPluginMenuItem.Text = "&Load Plugin";
             this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
@@ -107,7 +107,10 @@
             // 
             this.hostMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StartHostMenuItem,
-            this.StopHostMenuItem});
+            this.StopHostMenuItem,
+            this.toolStripSeparator3,
+            this.keyboardBarHostMenuItem,
+            this.panicHostMenuItem});
             this.hostMenuItem.Name = "hostMenuItem";
             this.hostMenuItem.Size = new System.Drawing.Size(44, 20);
             this.hostMenuItem.Text = "H&ost";
@@ -115,22 +118,16 @@
             // StartHostMenuItem
             // 
             this.StartHostMenuItem.Name = "StartHostMenuItem";
-            this.StartHostMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.StartHostMenuItem.Size = new System.Drawing.Size(182, 22);
             this.StartHostMenuItem.Text = "&Start Engine";
             this.StartHostMenuItem.Click += new System.EventHandler(this.StartHost_Click);
             // 
             // StopHostMenuItem
             // 
             this.StopHostMenuItem.Name = "StopHostMenuItem";
-            this.StopHostMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.StopHostMenuItem.Size = new System.Drawing.Size(182, 22);
             this.StopHostMenuItem.Text = "Sto&p Engine";
             this.StopHostMenuItem.Click += new System.EventHandler(this.StopHost_Click);
-            // 
-            // devicesMenuItem
-            // 
-            this.devicesMenuItem.Name = "devicesMenuItem";
-            this.devicesMenuItem.Size = new System.Drawing.Size(59, 20);
-            this.devicesMenuItem.Text = "&Devices";
             // 
             // helpMenuItem
             // 
@@ -143,7 +140,7 @@
             // aboutHelpMenuItem
             // 
             this.aboutHelpMenuItem.Name = "aboutHelpMenuItem";
-            this.aboutHelpMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.aboutHelpMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutHelpMenuItem.Text = "&About...";
             this.aboutHelpMenuItem.Click += new System.EventHandler(this.aboutHelpMenuItem_Click);
             // 
@@ -152,12 +149,11 @@
             this.AudimatToolbar.BackColor = System.Drawing.SystemColors.Control;
             this.AudimatToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadToolStripButton,
-            this.patchToolStripButton,
             this.toolStripSeparator1,
             this.startToolStripButton,
             this.stopToolStripButton,
             this.toolStripSeparator2,
-            this.keysToolStripButton,
+            this.keyboardToolStripButton,
             this.panicToolStripButton});
             this.AudimatToolbar.Location = new System.Drawing.Point(0, 24);
             this.AudimatToolbar.Name = "AudimatToolbar";
@@ -174,16 +170,6 @@
             this.loadToolStripButton.Size = new System.Drawing.Size(37, 22);
             this.loadToolStripButton.Text = "&Load";
             this.loadToolStripButton.Click += new System.EventHandler(this.loadPlugin_Click);
-            // 
-            // patchToolStripButton
-            // 
-            this.patchToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.patchToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("patchToolStripButton.Image")));
-            this.patchToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.patchToolStripButton.Name = "patchToolStripButton";
-            this.patchToolStripButton.Size = new System.Drawing.Size(41, 22);
-            this.patchToolStripButton.Text = "&Patch";
-            this.patchToolStripButton.Click += new System.EventHandler(this.patchButton_Click);
             // 
             // toolStripSeparator1
             // 
@@ -215,15 +201,15 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
-            // keysToolStripButton
+            // keyboardToolStripButton
             // 
-            this.keysToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.keysToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("keysToolStripButton.Image")));
-            this.keysToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.keysToolStripButton.Name = "keysToolStripButton";
-            this.keysToolStripButton.Size = new System.Drawing.Size(35, 22);
-            this.keysToolStripButton.Text = "&Keys";
-            this.keysToolStripButton.Click += new System.EventHandler(this.keysButton_Click);
+            this.keyboardToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.keyboardToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("keyboardToolStripButton.Image")));
+            this.keyboardToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.keyboardToolStripButton.Name = "keyboardToolStripButton";
+            this.keyboardToolStripButton.Size = new System.Drawing.Size(35, 22);
+            this.keyboardToolStripButton.Text = "&Keys";
+            this.keyboardToolStripButton.Click += new System.EventHandler(this.keysButton_Click);
             // 
             // panicToolStripButton
             // 
@@ -251,6 +237,25 @@
             this.lblAudimatStatus.Name = "lblAudimatStatus";
             this.lblAudimatStatus.Size = new System.Drawing.Size(100, 17);
             this.lblAudimatStatus.Text = "Engine is stopped";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(179, 6);
+            // 
+            // keyboardBarHostMenuItem
+            // 
+            this.keyboardBarHostMenuItem.Name = "keyboardBarHostMenuItem";
+            this.keyboardBarHostMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.keyboardBarHostMenuItem.Text = "&Keyboard Bar";
+            this.keyboardBarHostMenuItem.Click += new System.EventHandler(this.keysButton_Click);
+            // 
+            // panicHostMenuItem
+            // 
+            this.panicHostMenuItem.Name = "panicHostMenuItem";
+            this.panicHostMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.panicHostMenuItem.Text = "Panic (All Notes Off)";
+            this.panicHostMenuItem.Click += new System.EventHandler(this.panicButton_Click);
             // 
             // AudimatWindow
             // 
@@ -290,17 +295,18 @@
         private System.Windows.Forms.ToolStripMenuItem StopHostMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutHelpMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem devicesMenuItem;
-        private System.Windows.Forms.ToolStripButton patchToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton startToolStripButton;
         private System.Windows.Forms.ToolStripButton stopToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton keysToolStripButton;
+        private System.Windows.Forms.ToolStripButton keyboardToolStripButton;
         private System.Windows.Forms.ToolStripButton panicToolStripButton;
         private System.Windows.Forms.ToolStripButton loadToolStripButton;
         private System.Windows.Forms.OpenFileDialog loadPluginDialog;
         private System.Windows.Forms.ToolStripStatusLabel lblAudimatStatus;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem keyboardBarHostMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem panicHostMenuItem;
     }
 }
 

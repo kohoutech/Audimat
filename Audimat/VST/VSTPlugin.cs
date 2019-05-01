@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Transonic VST Library
-Copyright (C) 2005-2018  George E Greaney
+Copyright (C) 2005-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,117 +28,107 @@ namespace Transonic.VST
 {
     public class VSTPlugin
     {
-        //REFACTOR!
-        //public VSTPanel panel;
-        //public Auditor auditorA;
-        //public String filename;
-        //public int plugnum;        
+        public Vashti vashti;
+        public String filename;
 
+        //these are supplied by the plugin
         public int id;
         public String name;
-        public String filename;
         public String vendor;
         public int version; 
         public int numPrograms;
         public int numParams;
         public int numInputs;
         public int numOutputs;
-        //public int flags;
-        //public int uniqueID;
+        public int flags;
+        public int uniqueID;
 
         public bool hasEditor;
         public int editorWidth;
         public int editorHeight;
 
-        //public VSTParam[] parameters;
-        //public String[] programs;
-        //int curProgramNum;
+        public VSTParam[] parameters;
+        public String[] programs;
+        int curProgramNum;
 
-        //public VSTPlugin(VSTPanel _panel, Auditor _auditorA, int _plugnum, String _filename)
-        //{
-        //    panel = _panel;
-        //    auditorA = _auditorA;
-        //    plugnum = _plugnum;
-        //    filename = _filename;        
-        //}
+        public VSTPlugin(Vashti _vashti, String _filename)
+        {
+            vashti = _vashti;
+            filename = _filename;        
+        }
 
-        //public bool load()
-        //{
-        //    bool result = auditorA.loadPlugin(plugnum, filename);
-        //    if (result)
-        //    {
-        //        PluginInfo pluginfo = new PluginInfo();
-        //        auditorA.getPluginInfo(plugnum, ref pluginfo);
-        //        name = pluginfo.name;
-        //        vendor = pluginfo.vendor;
-        //        version = pluginfo.version;
-        //        numPrograms = pluginfo.numPrograms;
-        //        numParams = pluginfo.numParameters;
-        //        numInputs = pluginfo.numInputs;
-        //        numOutputs = pluginfo.numOutputs;
-        //        flags = pluginfo.flags;
-        //        uniqueID = pluginfo.uniqueID;
-        //        editorWidth = pluginfo.editorWidth;
-        //        editorHeight = pluginfo.editorHeight;
+        public bool load()
+        {
+            id = vashti.loadPlugin(filename);
+            bool result = (id != -1);
+            if (result)
+            {
+                PluginInfo pluginfo = new PluginInfo();
+                vashti.getPluginInfo(id, ref pluginfo);
+                name = pluginfo.name;
+                vendor = pluginfo.vendor;
+                version = pluginfo.version;
+                numPrograms = pluginfo.numPrograms;
+                numParams = pluginfo.numParameters;
+                numInputs = pluginfo.numInputs;
+                numOutputs = pluginfo.numOutputs;
+                flags = pluginfo.flags;
+                uniqueID = pluginfo.uniqueID;
+                editorWidth = pluginfo.editorWidth;
+                editorHeight = pluginfo.editorHeight;
 
-        //        parameters = new VSTParam[numParams];
-        //        for (int i = 0; i < numParams; i++)
-        //        {
-        //            String paramName = auditorA.getPluginParamName(plugnum, i);
-        //            float paramVal = auditorA.getPluginParamValue(plugnum, i);
-        //            parameters[i] = new VSTParam(i, paramName, paramVal);                    
-        //        }
+                parameters = new VSTParam[numParams];
+                for (int i = 0; i < numParams; i++)
+                {
+                    String paramName = vashti.getPluginParamName(id, i);
+                    float paramVal = vashti.getPluginParamValue(id, i);
+                    parameters[i] = new VSTParam(i, paramName, paramVal);                    
+                }
 
-        //        if (numPrograms > 0)
-        //        {
-        //            programs = new String[numPrograms];
-        //            for (int i = 0; i < numPrograms; i++)
-        //            {
-        //                String progName = auditorA.getPluginProgramName(plugnum, i);
-        //                programs[i] = progName;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            programs = new String[]{"no programs"};
-        //        }
-        //        curProgramNum = 0;
+                if (numPrograms > 0)
+                {
+                    programs = new String[numPrograms];
+                    for (int i = 0; i < numPrograms; i++)
+                    {
+                        String progName = vashti.getPluginProgramName(id, i);
+                        programs[i] = progName;
+                    }
+                }
+                else
+                {
+                    programs = new String[]{"no programs"};
+                }
+                curProgramNum = 0;
+            }
+            return result;
+        }
 
-        //    }
-        //    return result;
-        //}
+        public void unload()
+        {
+            vashti.unloadPlugin(id);
+        }
 
-        //public void unload()
-        //{
-        //    auditorA.unloadPlugin(plugnum);
-        //}
+        public void setParamValue(int paramNum, float paramVal) 
+        {
+            parameters[paramNum].value = paramVal;
+            vashti.setPluginParamValue(id, paramNum, paramVal);
+        }
 
-        //public void setCurrent()
-        //{
-        //    auditorA.selectPlugin(plugnum);
-        //}
+        public void setProgram(int progNum)
+        {
+            curProgramNum = progNum;
+            vashti.setPluginProgram(id, progNum);
+        }
 
-        //public void setParamValue(int paramNum, float paramVal) 
-        //{
-        //    parameters[paramNum].value = paramVal;
-        //    auditorA.setPluginParam(plugnum, paramNum, paramVal);
-        //}
+        public void openEditorWindow(IntPtr editorWindow)
+        {
+            vashti.openEditorWindow(id, editorWindow);
+        }
 
-        //public void setProgram(int progNum)
-        //{
-        //    curProgramNum = progNum;
-        //    auditorA.setPluginProgram(plugnum, progNum);
-        //}
-
-        //public void openEditorWindow(IntPtr editorWindow)
-        //{
-        //    auditorA.openEditorWindow(plugnum, editorWindow);
-        //}
-
-        //public void closeEditorWindow()
-        //{
-        //    auditorA.closeEditorWindow(plugnum);
-        //}
+        public void closeEditorWindow()
+        {
+            vashti.closeEditorWindow(id);
+        }
     }
 
 //-----------------------------------------------------------------------------

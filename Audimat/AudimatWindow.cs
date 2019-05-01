@@ -38,6 +38,7 @@ namespace Audimat
         public VSTRack rack;
 
         public PatchWindow patchWin;
+        public KeyboardWnd keyboardWnd;
 
         public Vashti vashti;
         public WaveDevices waveDevices;
@@ -82,7 +83,46 @@ namespace Audimat
             Application.Exit();
         }
 
-//- plugin menu -------------------------------------------------------
+        //- host menu -----------------------------------------------------------------
+
+        private void StartHost_Click(object sender, EventArgs e)
+        {
+            vashti.startEngine();
+            lblAudimatStatus.Text = "Engine is running";
+        }
+
+        private void StopHost_Click(object sender, EventArgs e)
+        {
+            vashti.stopEngine();
+            lblAudimatStatus.Text = "Engine is stopped";
+        }
+
+        public void enableKeyboardBarMenuItem(bool enable)
+        {
+            keyboardBarHostMenuItem.Enabled = enable;
+            keyboardToolStripButton.Enabled = enable;
+        }
+
+        private void keysButton_Click(object sender, EventArgs e)
+        {
+            keyboardWnd = new KeyboardWnd(this);
+            keyboardWnd.Icon = this.Icon;
+            keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
+            keyboardWnd.Show();
+            enableKeyboardBarMenuItem(false);
+        }
+
+        private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            enableKeyboardBarMenuItem(true);
+        }
+
+        private void panicButton_Click(object sender, EventArgs e)
+        {
+            //not implemented yet
+        }
+
+        //- plugin menu -------------------------------------------------------
 
         public void loadPlugin()
         {
@@ -116,20 +156,6 @@ namespace Audimat
             loadPlugin();
         }
 
-        //- host menu -----------------------------------------------------------------
-
-        private void StartHost_Click(object sender, EventArgs e)
-        {
-            vashti.startEngine();
-            lblAudimatStatus.Text = "Engine is running";
-        }
-
-        private void StopHost_Click(object sender, EventArgs e)
-        {
-            vashti.stopEngine();
-            lblAudimatStatus.Text = "Engine is stopped";
-        }
-        
         //- help menu -----------------------------------------------------------------
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
@@ -137,24 +163,6 @@ namespace Audimat
             String msg = "Audimat\nversion 1.1.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
-
-        //- toolbar -----------------------------------------------------------------
-
-        private void patchButton_Click(object sender, EventArgs e)
-        {
-            patchWin.Show();
-        }
-
-        private void keysButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panicButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
     }
 }
 
