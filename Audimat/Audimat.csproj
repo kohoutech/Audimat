@@ -79,7 +79,16 @@
     <Compile Include="Patch\PatchPanel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\ParamEditorWnd.cs">
+    <Compile Include="UI\KeyboardWnd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MixerWnd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MixerWnd.Designer.cs">
+      <DependentUpon>MixerWnd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PluginParamWnd.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\PatchWindow.cs">
@@ -122,8 +131,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="UI\ParamEditorWnd.resx">
-      <DependentUpon>ParamEditorWnd.cs</DependentUpon>
+    <EmbeddedResource Include="UI\KeyboardWnd.resx">
+      <DependentUpon>KeyboardWnd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PluginParamWnd.resx">
+      <DependentUpon>PluginParamWnd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PluginInfoWnd.resx">
       <DependentUpon>PluginInfoWnd.cs</DependentUpon>

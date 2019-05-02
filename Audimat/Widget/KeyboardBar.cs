@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Transonic Widget Library
-Copyright (C) 1996-2017  George E Greaney
+Copyright (C) 1996-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@ namespace Transonic.Widget
 
         public Color selectedColor = Color.Red;
 
-        IKeyboardWindow window;
+        IKeyboardWindow window;         //parent window for event notifications
 
         Key[] keys;
         Key[] whitekeys;
@@ -76,13 +76,22 @@ namespace Transonic.Widget
         {
         }
 
+        public KeyboardBar(IKeyboardWindow _window, Range range)
+            : this(_window, range, KeyboardBar.KeySize.FULL)
+        {
+        }
+
         public KeyboardBar(IKeyboardWindow _window, Range range, KeySize size)
+            : this(_window, range, KeyboardBar.KeySize.FULL, KeyMode.SELECTING)
+        {            
+        }
+
+        public KeyboardBar(IKeyboardWindow _window, Range _range, KeySize _size, KeyMode _mode)
         {
             window = _window;
-            mode = KeyMode.SELECTING;
-            InitDimensions(range, size);
+            mode = _mode;
             InitializeComponent();
-            initKeyboard();
+            setKeyboardSize(_range, _size);
 
             mouseKey = null;
         }
@@ -131,7 +140,7 @@ namespace Transonic.Widget
             keytop = 10;                //keyboard margins in widget
             keyleft = 10;
             keyright = 10;
-            keybottom = 10;
+            keybottom = 15;             //a litte extra room at the bottom to rest our wrists on
 
             whitekeycount = whiteKeyCounts[(int)range];         
             whitekeywidth = whiteKeyWidths[(int)size];
@@ -151,8 +160,7 @@ namespace Transonic.Widget
 
         private void initKeyboard()
         {
-            //doesn't this depend on keyboard size?
-            this.ClientSize = new System.Drawing.Size(10 + 576 + 10, 113);
+            this.ClientSize = new System.Drawing.Size(keyleft + keywidth + keyright, keytop + whitekeyheight + keybottom);
             keyframe = new Rectangle(keyleft, keytop, keywidth, whitekeyheight);
 
             //midi keys
@@ -267,6 +275,18 @@ namespace Transonic.Widget
                 blackkeyrect.Offset(blackKeySpacings[(int)size, 2], 0);
             }
         }
+
+        public void setKeyboardSize(Range _range, KeySize _size)
+        {
+            if (keys != null)
+            {
+                allKeysUp();
+            }
+            InitDimensions(_range, _size);
+            initKeyboard();
+            Invalidate();
+        }
+        
 
 //- i/o -----------------------------------------------------------------------
 
@@ -604,6 +624,7 @@ namespace Transonic.Widget
 
 //-----------------------------------------------------------------------------
 
+    //parent window implements this iface to receive keyboard events
     public interface IKeyboardWindow
     {
         void onKeyPress(int keyNumber);

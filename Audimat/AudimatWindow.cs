@@ -30,6 +30,7 @@ using System.IO;
 using Audimat.UI;
 using Transonic.VST;
 using Transonic.MIDI.System;
+using Transonic.Widget;
 
 namespace Audimat
 {
@@ -43,6 +44,13 @@ namespace Audimat
         public Vashti vashti;
         public WaveDevices waveDevices;
         public MidiSystem midiDevices;
+
+        public bool isRunning;
+
+        //for saving keyboard window settings
+        public Point keyWindowPos;
+        public int keyWindowSize;
+        public VSTPlugin keyWindowPlugin;
 
         public AudimatWindow()
         {
@@ -63,7 +71,13 @@ namespace Audimat
 
             vashti = new Vashti();
             waveDevices = new WaveDevices();
-            midiDevices = new MidiSystem();            
+            midiDevices = new MidiSystem();
+
+            isRunning = false;
+
+            keyWindowPos = new Point(0, 0);
+            keyWindowSize = -1;
+            keyWindowPlugin = null;
         }
 
         protected override void OnResize(EventArgs e)
@@ -74,9 +88,9 @@ namespace Audimat
                 rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
             }
         }
-        
 
-//- file menu -----------------------------------------------------------------
+
+        //- file menu -----------------------------------------------------------------
 
         private void exitFileMenuItem_Click(object sender, EventArgs e)
         {
@@ -88,12 +102,14 @@ namespace Audimat
         private void StartHost_Click(object sender, EventArgs e)
         {
             vashti.startEngine();
+            isRunning = true;
             lblAudimatStatus.Text = "Engine is running";
         }
 
         private void StopHost_Click(object sender, EventArgs e)
         {
             vashti.stopEngine();
+            isRunning = false;
             lblAudimatStatus.Text = "Engine is stopped";
         }
 
@@ -108,12 +124,27 @@ namespace Audimat
             keyboardWnd = new KeyboardWnd(this);
             keyboardWnd.Icon = this.Icon;
             keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
+            //restore previous keyboard vals, if set
+            if (keyWindowSize != -1)
+            {
+                keyboardWnd.setSize(keyWindowSize);
+            }
+            keyboardWnd.setCurrentPlugin(keyWindowPlugin);
             keyboardWnd.Show();
+
+            if (keyWindowPos.X != 0 && keyWindowPos.Y != 0)
+            {
+                keyboardWnd.Location = keyWindowPos;
+            }
+
             enableKeyboardBarMenuItem(false);
         }
 
         private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            keyWindowPos = keyboardWnd.Location;
+            keyWindowSize = keyboardWnd.cbxKeySize.SelectedIndex;
+            keyWindowPlugin = keyboardWnd.currentPlugin;
             enableKeyboardBarMenuItem(true);
         }
 

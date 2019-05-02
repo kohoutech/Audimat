@@ -48,6 +48,8 @@ public:
 
 	int loadPlugin(LPCSTR fileName);
 	void unloadPlugin(int vstNum);
+	void setSampleRate(int rate);
+	void setBlockSize(int size);
 
 	//plugin 
 	void getPlugInfo(int vstnum, PlugInfo* pinfo);
@@ -64,7 +66,7 @@ public:
 protected:
 	float * emptyBuf[2];
 	int sampleRate;
-    long blockSize;
+	long blockSize;
 
 	DWORD dwRest;
 	DWORD dwLastTime;
@@ -72,7 +74,7 @@ protected:
 	UINT timerID;
 	TIMECAPS tc;
 
-    BOOL bNoSave;
+	BOOL bNoSave;
 	DWORD dwStartStamp;
 	BOOL isRunning;
 

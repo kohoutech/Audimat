@@ -25,38 +25,50 @@ using System.Windows.Forms;
 using System.Drawing;
 
 using Transonic.Widget;
+using Transonic.VST;
+using Transonic.MIDI;
 
 namespace Audimat.UI
 {
     public class KeyboardWnd : Form, IKeyboardWindow
     {
+        String[] keySizeStrings = { "25 keys", "37 keys", "49 keys", "61 keys", "76 keys", "88 keys"};
+        KeyboardBar.Range[] keySizeVals = { KeyboardBar.Range.TWENTYFIVE, KeyboardBar.Range.THIRTYSEVEN, KeyboardBar.Range.FORTYNINE,
+                                              KeyboardBar.Range.SIXTYONE, KeyboardBar.Range.SEVENTYSIX, KeyboardBar.Range.EIGHTYEIGHT};
+
         public AudimatWindow auditwin;
+        public List<VSTPlugin> plugins;
+        public VSTPlugin currentPlugin;
+
         private ComboBox cbxPlugin;
+        public ComboBox cbxKeySize;
         public KeyboardBar keyboardBar;
+
+        public KeyboardBar.Range keySize;
 
         public KeyboardWnd(AudimatWindow _auditwin)
         {
+            auditwin = _auditwin;
+            currentPlugin = null;
+
             InitializeComponent();
 
-            keyboardBar = new KeyboardBar(this, KeyboardBar.Range.SIXTYONE, KeyboardBar.KeySize.FULL);
+            keySize = KeyboardBar.Range.SIXTYONE;
+            keyboardBar = new KeyboardBar(this, keySize, KeyboardBar.KeySize.FULL, KeyboardBar.KeyMode.PLAYING);
             keyboardBar.Location = new Point(0, cbxPlugin.Bottom);
             keyboardBar.BackColor = Color.FromArgb(63, 255, 0);
-            this.Controls.Add(keyboardBar);
+            this.Controls.Add(keyboardBar);            
 
-            this.ClientSize = new Size(keyboardBar.Width, keyboardBar.Height + keyboardBar.Top);
-        }
+            cbxKeySize.Items.AddRange(keySizeStrings);
+            cbxKeySize.SelectedIndex = 3;
 
-        public void onKeyPress(int keyNumber)
-        {
-        }
-
-        public void onKeyRelease(int keyNumber)
-        {
+            setPluginList();
         }
 
         private void InitializeComponent()
         {
             this.cbxPlugin = new System.Windows.Forms.ComboBox();
+            this.cbxKeySize = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // cbxPlugin
@@ -65,19 +77,97 @@ namespace Audimat.UI
             this.cbxPlugin.FormattingEnabled = true;
             this.cbxPlugin.Location = new System.Drawing.Point(12, 12);
             this.cbxPlugin.Name = "cbxPlugin";
-            this.cbxPlugin.Size = new System.Drawing.Size(212, 21);
+            this.cbxPlugin.Size = new System.Drawing.Size(150, 21);
             this.cbxPlugin.TabIndex = 6;
+            this.cbxPlugin.SelectedIndexChanged += new System.EventHandler(this.cbxPlugin_SelectedIndexChanged);
+            // 
+            // cbxKeySize
+            // 
+            this.cbxKeySize.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxKeySize.FormattingEnabled = true;
+            this.cbxKeySize.Location = new System.Drawing.Point(341, 12);
+            this.cbxKeySize.Name = "cbxKeySize";
+            this.cbxKeySize.Size = new System.Drawing.Size(80, 21);
+            this.cbxKeySize.TabIndex = 7;
+            this.cbxKeySize.SelectedIndexChanged += new System.EventHandler(this.cbxKeySize_SelectedIndexChanged);
             // 
             // KeyboardWnd
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.ClientSize = new System.Drawing.Size(433, 44);
+            this.ClientSize = new System.Drawing.Size(434, 46);
+            this.Controls.Add(this.cbxKeySize);
             this.Controls.Add(this.cbxPlugin);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "KeyboardWnd";
             this.ShowInTaskbar = false;
             this.Text = "Audimat Keyboard";
             this.ResumeLayout(false);
+        }
 
+        public void setSize(int keySize)
+        {
+            cbxKeySize.SelectedIndex = keySize;
+        }
+
+        public void setPluginList()
+        {
+            plugins = auditwin.rack.getPluginList();
+            if (plugins.Count > 0)
+            {
+                cbxPlugin.DisplayMember = "name";
+                cbxPlugin.DataSource = plugins;
+                cbxPlugin.Enabled = true;
+            }
+            else
+            {
+                cbxPlugin.Items.Add("no plugins loaded");
+                cbxPlugin.SelectedIndex = 0;
+                cbxPlugin.Enabled = false;
+            }
+        }
+
+        public void setCurrentPlugin(VSTPlugin keyWindowPlugin)
+        {
+            //previous cur plugin maybe have been been unloaded, so check for it in plugin list
+            for (int i = 0; i < plugins.Count; i++)
+            {
+                if (plugins[i] == keyWindowPlugin)
+                {
+                    cbxPlugin.SelectedIndex = i;
+                }
+            }
+        }
+
+        //- event handlers ----------------------------------------------------
+
+        public void onKeyPress(int keyNumber)
+        {
+            currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x40));
+        }
+
+        public void onKeyRelease(int keyNumber)
+        {
+            currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x40));
+        }
+
+        private void cbxPlugin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (plugins.Count > 0)
+            {
+                currentPlugin = (VSTPlugin)cbxPlugin.SelectedItem;
+            }
+            else
+            {
+                currentPlugin = null;
+            }
+        }
+
+        private void cbxKeySize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            keySize = keySizeVals[cbxKeySize.SelectedIndex];
+            keyboardBar.setKeyboardSize(keySize, KeyboardBar.KeySize.FULL);
+            ClientSize = new Size(keyboardBar.Width, keyboardBar.Height + keyboardBar.Top);
+            cbxKeySize.Location = new Point(this.ClientSize.Width - cbxKeySize.Width - 12, cbxKeySize.Top);                    
         }
     }
 }

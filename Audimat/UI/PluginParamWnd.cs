@@ -28,7 +28,7 @@ using Transonic.VST;
 
 namespace Audimat.UI
 {
-    class ParamEditorWnd : Form
+    class PluginParamWnd : Form
     {
         VSTPanel panel;
         VSTParam[] parameters;
@@ -39,7 +39,7 @@ namespace Audimat.UI
         private Panel pnlParams;
         const int PARAMVSPACE = 25;
 
-        public ParamEditorWnd(VSTPanel _panel)
+        public PluginParamWnd(VSTPanel _panel)
         {
             InitializeComponent();
 
