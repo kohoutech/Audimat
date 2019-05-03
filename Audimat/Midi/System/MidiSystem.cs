@@ -99,11 +99,11 @@ namespace Transonic.MIDI.System
         public List<String> getInDevNameList()
         {
             List<String> nameList = new List<String>();
+            nameList.Add("no input");
             foreach (InputDevice indev in inputDevices) 
             {
                 nameList.Add(indev.devName);
-            }
-            if (nameList.Count == 0) nameList.Add("none");
+            }            
             return nameList;
         }
 
@@ -123,11 +123,11 @@ namespace Transonic.MIDI.System
         public List<String> getOutDevNameList()
         {
             List<String> nameList = new List<String>();
+            nameList.Add("no output");
             foreach (OutputDevice outdev in outputDevices)
             {
                 nameList.Add(outdev.devName);
             }
-            if (nameList.Count == 0) nameList.Add("none");
             return nameList;
         }
 

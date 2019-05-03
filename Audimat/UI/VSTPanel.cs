@@ -233,6 +233,7 @@ namespace Audimat.UI
                 plugName = (plugin._name.Length > 0) ? plugin._name : fileName;
                 lblPlugName.Text = plugName;
                 editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
+                cbxProgList.DisplayMember = "name";
                 cbxProgList.DataSource = plugin.programs;
             }
             return result;

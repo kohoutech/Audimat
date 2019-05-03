@@ -25,6 +25,8 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
+using Transonic.VST;
+
 namespace Audimat.UI
 {
     public class VSTRack : UserControl
@@ -91,7 +93,7 @@ namespace Audimat.UI
         {
             VSTPanel panel = new VSTPanel(this, panels.Count);
             bool result = panel.loadPlugin(plugPath);
-            //bool result = true;
+            
             if (result)
             {
                 panels.Add(panel);
@@ -150,6 +152,16 @@ namespace Audimat.UI
                 g.FillEllipse(Brushes.Black, rightOfs, rackofs + SCREWHOLE, SCREWHOLE, SCREWHOLE);
                 g.FillEllipse(Brushes.Black, rightOfs, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);
             }
+        }
+
+        public List<VSTPlugin> getPluginList()
+        {
+            List<VSTPlugin> result = new List<VSTPlugin>();
+            foreach (VSTPanel panel in panels)
+            {
+                result.Add(panel.plugin);
+            }
+            return result;
         }
     }
 }

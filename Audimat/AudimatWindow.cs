@@ -52,6 +52,8 @@ namespace Audimat
         public int keyWindowSize;
         public VSTPlugin keyWindowPlugin;
 
+        int vstnum;
+
         public AudimatWindow()
         {
             InitializeComponent();
@@ -78,6 +80,8 @@ namespace Audimat
             keyWindowPos = new Point(0, 0);
             keyWindowSize = -1;
             keyWindowPlugin = null;
+
+            vstnum = 0;
         }
 
         protected override void OnResize(EventArgs e)
@@ -158,8 +162,12 @@ namespace Audimat
         public void loadPlugin()
         {
             String pluginPath = "";
-            string[] vstlist = File.ReadAllLines("vst.list");
-            pluginPath = vstlist[0];
+
+            //useful for testing, don't have to go through the FileOPen dialog over & over
+            string[] vstlist = File.ReadAllLines("vst.lst");
+            pluginPath = vstlist[vstnum++];
+            if (vstnum >= vstlist.Length) vstnum = 0;       //wrap it around
+
             //loadPluginDialog.InitialDirectory = Application.StartupPath;
             //loadPluginDialog.ShowDialog();
             //pluginPath = loadPluginDialog.FileName;
@@ -191,7 +199,7 @@ namespace Audimat
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.1.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion 1.2.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
     }

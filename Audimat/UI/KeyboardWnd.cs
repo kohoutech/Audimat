@@ -142,12 +142,12 @@ namespace Audimat.UI
 
         public void onKeyPress(int keyNumber)
         {
-            currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x40));
+            currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x60));
         }
 
         public void onKeyRelease(int keyNumber)
         {
-            currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x40));
+            currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x60));
         }
 
         private void cbxPlugin_SelectedIndexChanged(object sender, EventArgs e)

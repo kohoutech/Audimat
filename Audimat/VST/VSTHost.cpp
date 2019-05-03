@@ -45,6 +45,8 @@ VSTHost::~VSTHost()
 
 	for (int i = 0; i < 2; i++)
 		delete[] pOutputs[i];
+
+	DeleteCriticalSection(&cs);
 }
 
 void VSTHost::setSampleRate(int rate) 
@@ -115,7 +117,7 @@ void VSTHost::unloadAll()
 
 void VSTHost::processAudio(float **pBuffer, int nLength, int nChannels, DWORD dwStamp)
 {
-	VSTPlugin *pEff, *pNextEff;
+	VSTPlugin *pEff;
 	float *pBuf1, *pBuf2;
 
 	if (nLength > blockSize)               
@@ -137,7 +139,13 @@ void VSTHost::processAudio(float **pBuffer, int nLength, int nChannels, DWORD dw
 	for (int i = 0; i < pluginCount; i++) {
 
 		pEff = getPlugin(i);
-		pEff->enterCritical();              
+		pEff->enterCritical();
+
+		pEff->buildMIDIEvents();
+		if (pEff->pEvents) {
+			pEff->processEvents();	    
+		}
+
 		pEff->doProcessReplacing(nLength);	
 
 		//sum plugin output
