@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <stdio.h>                      
 #include <math.h>                       
 
-#define OUTPUTBUFSIZE 22050		//0.5 sec @ 44.1 KHz
+#define MIDIBUFFERSIZE 1000 * 4		//space for 1000 short midi msgs (3 bytes + timestamp)
+#define OUTPUTBUFSIZE 22050			//0.5 sec @ 44.1 KHz
 
 typedef struct PluginInfo
 {
@@ -55,6 +56,9 @@ public:
     void unload();
 
 //processing
+	void storeMidiShortMsg(int b1, int b2, int b3);
+	void buildMIDIEvents();
+
 	float * getOutputBuffer(int bufIdx);
     void doProcess(long sampleFrames);
     void doProcessReplacing(long sampleFrames);	
@@ -82,7 +86,8 @@ public:
     long editOpen(void *ptr);
     void editClose();
 
-    long getProgramNameIndexed(long category, long index, char* text);
+	long processEvents();
+	long getProgramNameIndexed(long category, long index, char* text);
     long getVendorString(char *ptr);
     long getProductString(char *ptr);
     long getVstVersion();
@@ -98,6 +103,8 @@ public:
 	AEffect* pEffect;    
     HMODULE hModule;
 
+	VstEvents *pEvents;			//midi events
+
 	int inBufCount;
     int outBufCount;
 	float** inBufs;
@@ -105,6 +112,8 @@ public:
 
 protected:
 	CRITICAL_SECTION cs;
+	int midiBufCount;
+	int midiBuffer[MIDIBUFFERSIZE];
 };
 
 #endif // VSTPLUGIN_H

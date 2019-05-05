@@ -31,6 +31,8 @@ namespace Audimat.UI
     class PluginSettingsWnd : Form
     {
         VSTPanel panel;
+        VSTPlugin plugin;
+
         WaveDevices waveDevices;
         MidiSystem midiDevices;
 
@@ -51,6 +53,7 @@ namespace Audimat.UI
             InitializeComponent();
 
             panel = _panel;
+            plugin = panel.plugin;
             waveDevices = panel.audiwin.waveDevices;
             midiDevices = panel.audiwin.midiDevices;
 
@@ -196,6 +199,11 @@ namespace Audimat.UI
 
         private void btnOK_Click(object sender, EventArgs e)
         {
+            plugin.setAudioIn(cbxAudioIn.SelectedIndex - 1);
+            plugin.setAudioOut(cbxAudioOut.SelectedIndex - 1);
+            plugin.setMidiIn(cbxMidiIn.SelectedIndex - 1);
+            plugin.setMidiOut(cbxMidiOut.SelectedIndex - 1);
+
             this.Close();
         }
     }

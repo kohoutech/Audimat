@@ -41,6 +41,7 @@ namespace Audimat
         public PatchWindow patchWin;
         public KeyboardWnd keyboardWnd;
 
+        //backend & i/o
         public Vashti vashti;
         public WaveDevices waveDevices;
         public MidiSystem midiDevices;
@@ -52,7 +53,8 @@ namespace Audimat
         public int keyWindowSize;
         public VSTPlugin keyWindowPlugin;
 
-        int vstnum;
+        String curpluginPath;
+        int vstnum;         //for debugging
 
         public AudimatWindow()
         {
@@ -80,6 +82,7 @@ namespace Audimat
             keyWindowSize = -1;
             keyWindowPlugin = null;
 
+            curpluginPath = "";
             vstnum = 0;
         }
 
@@ -197,10 +200,13 @@ namespace Audimat
             if (vstnum >= vstlist.Length) vstnum = 0;       //wrap it around
 
 #else
-            loadPluginDialog.InitialDirectory = Application.StartupPath;
-            loadPluginDialog.ShowDialog();
+            loadPluginDialog.Title = "load a VST";
+            loadPluginDialog.InitialDirectory = curpluginPath;
+            loadPluginDialog.Filter =  "VST plugins (*.dll)|*.dll|All files (*.*)|*.*";
+            loadPluginDialog.ShowDialog();            
             pluginPath = loadPluginDialog.FileName;
             if (pluginPath.Length == 0) return;
+            curpluginPath = Path.GetDirectoryName(pluginPath);
 #endif
             bool result = rack.addPanel(pluginPath);
 
