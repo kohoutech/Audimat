@@ -89,7 +89,7 @@ namespace Audimat.UI
 
         //- panel management ----------------------------------------------------------
 
-        public bool loadPlugin(String plugPath)
+        public bool addPanel(String plugPath)
         {
             VSTPanel panel = new VSTPanel(this, panels.Count);
             bool result = panel.loadPlugin(plugPath);
@@ -101,11 +101,13 @@ namespace Audimat.UI
                 panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panels.Count - 1));
                 panelSpace.Controls.Add(panel);
                 updateScrollBar();
+                auditwin.rackChanged();
             }
             return result;
         }
 
-        public void unloadPlugin(int plugNum)
+        //remove panel from rack, shutting down plugin is handled by panel
+        public void removePanel(int plugNum)
         {
             VSTPanel panel = panels[plugNum];
             panelSpace.Controls.Remove(panel);
@@ -118,6 +120,26 @@ namespace Audimat.UI
             }
             updateScrollBar();
             Invalidate();
+            auditwin.rackChanged();
+        }
+
+        public List<VSTPlugin> getPluginList()
+        {
+            List<VSTPlugin> result = new List<VSTPlugin>();
+            foreach (VSTPanel panel in panels)
+            {
+                result.Add(panel.plugin);
+            }
+            return result;
+        }
+
+        public void shutdown()
+        {
+            List<VSTPanel> temp = new List<VSTPanel>(panels);
+            foreach (VSTPanel panel in temp)
+            {
+                panel.unloadPlugin();
+            }
         }
 
         //- painting ------------------------------------------------------------------
@@ -152,16 +174,6 @@ namespace Audimat.UI
                 g.FillEllipse(Brushes.Black, rightOfs, rackofs + SCREWHOLE, SCREWHOLE, SCREWHOLE);
                 g.FillEllipse(Brushes.Black, rightOfs, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);
             }
-        }
-
-        public List<VSTPlugin> getPluginList()
-        {
-            List<VSTPlugin> result = new List<VSTPlugin>();
-            foreach (VSTPanel panel in panels)
-            {
-                result.Add(panel.plugin);
-            }
-            return result;
         }
     }
 }

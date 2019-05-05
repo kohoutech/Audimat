@@ -56,7 +56,7 @@ protected:
 	WaveOutDevice* waveOut;
 
 	float * pOutputs[2];
-	CRITICAL_SECTION cs;
+	//CRITICAL_SECTION cs;
 };
 
 #endif // VSTHOST_H

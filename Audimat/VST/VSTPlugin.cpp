@@ -30,6 +30,9 @@ VSTPlugin::VSTPlugin(VSTHost *_pHost)
 	outBufs = NULL;
 	outBufCount = 0;
 
+	midiBufCount = 0;
+	pEvents = NULL;
+
 	InitializeCriticalSection(&cs);
 }
 
@@ -105,8 +108,12 @@ bool VSTPlugin::load(const char *filename)
 void VSTPlugin::unload()
 {
 	close();
+
+	if (pEvents)
+		delete pEvents;
 	pEffect = NULL;
 
+	//unload DLL from memory
 	if (hModule)
 	{
 		::FreeLibrary(hModule);
@@ -115,6 +122,69 @@ void VSTPlugin::unload()
 }
 
 //- processing methods --------------------------------------------------------
+
+void VSTPlugin::storeMidiShortMsg(int b1, int b2, int b3)
+{
+	if (b1 >= 0xf0)         //ignore realtime or sysex msgs
+		return;                          
+
+	//printf("storing midi msg = %i\n",b1);
+	EnterCriticalSection(&cs);
+	int timestamp = 0;
+	if (midiBufCount < (MIDIBUFFERSIZE - 4))
+	{	
+		midiBuffer[midiBufCount++] = b1;
+		midiBuffer[midiBufCount++] = b2;
+		midiBuffer[midiBufCount++] = b3;
+		midiBuffer[midiBufCount++] = timestamp;
+	}
+	LeaveCriticalSection(&cs);
+}
+
+void VSTPlugin::buildMIDIEvents()
+{
+	if (pEvents)
+		delete[] pEvents;
+	pEvents = NULL;
+
+	if (midiBufCount == 0)          //no events in buf
+		return;
+
+	//enterCritical();
+	int eventCount = midiBufCount / 4;
+
+	int hdrSize = sizeof(VstEvents) + (eventCount * sizeof(VstMidiEvent *));
+	int eventSize = hdrSize + (eventCount * sizeof(VstMidiEvent));
+	BYTE* eventData = new BYTE[eventSize];								//alloc event data struct
+
+	if (eventData)                            
+	{           
+		//set event hdr data
+		pEvents = (VstEvents *) eventData;
+		memset(pEvents, 0, eventSize);
+		pEvents->numEvents = eventCount;
+			
+		//store event data
+		VstMidiEvent* pEvent = ((VstMidiEvent *)(eventData + hdrSize));
+		int midiBufPos = 0;
+		for (int i = 0; i < eventCount; i ++)     
+		{
+			pEvents->events[i] = (VstEvent *)&pEvent[i];		//set next event ptr to VstEvent rec
+
+			pEvent[i].type = kVstMidiType;
+			pEvent[i].byteSize = sizeof(VstMidiEvent);
+			pEvent[i].midiData[0] = (char)midiBuffer[midiBufPos++];
+			pEvent[i].midiData[1] = (char)midiBuffer[midiBufPos++];
+			pEvent[i].midiData[2] = (char)midiBuffer[midiBufPos++];			
+			midiBufPos++;												//skip timestamp for now
+			pEvent[i].deltaFrames = 0;
+			pEvent[i].flags = kVstMidiEventIsRealtime;			
+		}
+	}
+
+	midiBufCount = 0;				//clear out midi buf
+	//leaveCritical();
+}
 
 float * VSTPlugin::getOutputBuffer(int bufIdx)
 {
@@ -198,7 +268,8 @@ void VSTPlugin::close()
 	dispatch(effClose); 
 }
 
-void VSTPlugin::setProgram(long lValue) { 
+void VSTPlugin::setProgram(long lValue) 
+{ 
 	dispatch(effSetProgram, 0, lValue); 
 }
 
@@ -242,12 +313,19 @@ long VSTPlugin::editGetRect(ERect **ptr)
 	return dispatch(effEditGetRect, 0, 0, ptr); 
 }
 
-long VSTPlugin::editOpen(void *ptr) { 
+long VSTPlugin::editOpen(void *ptr) 
+{ 
 	return dispatch(effEditOpen, 0, 0, ptr); 
 }
 
-void VSTPlugin::editClose() { 
+void VSTPlugin::editClose() 
+{ 
 	dispatch(effEditClose); 
+}
+
+long VSTPlugin::processEvents() 
+{ 
+	return dispatch(effProcessEvents, 0, 0, pEvents); 
 }
 
 long VSTPlugin::getProgramNameIndexed(long category, long index, char* text) { 
@@ -316,4 +394,3 @@ void VSTPlugin::leaveCritical()
 {
 	LeaveCriticalSection(&cs);
 }
-

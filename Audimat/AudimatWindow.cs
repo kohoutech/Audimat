@@ -60,7 +60,6 @@ namespace Audimat
 
             //rack control fills up entire client area between menu/tool & status bars
             rack = new VSTRack(this);
-            //rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
             rack.Location = new Point(this.ClientRectangle.Left, AudimatToolbar.Bottom);
             this.Controls.Add(rack);
 
@@ -93,6 +92,24 @@ namespace Audimat
             }
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            stopHost();
+            rack.shutdown();            //unload all plugins in rack
+            midiDevices.shutdown();     //close midi devices
+            vashti.shutDown();          //shut down back end
+        }
+
+        //callback when rack's contents have increased or decreased
+        public void rackChanged()
+        {
+            if (keyboardWnd != null)
+            {
+                keyboardWnd.updatePluginList();
+            }
+        }
 
         //- file menu -----------------------------------------------------------------
 
@@ -103,18 +120,28 @@ namespace Audimat
 
         //- host menu -----------------------------------------------------------------
 
-        private void StartHost_Click(object sender, EventArgs e)
+        public void startHost()
         {
             vashti.startEngine();
             isRunning = true;
             lblAudimatStatus.Text = "Engine is running";
         }
 
-        private void StopHost_Click(object sender, EventArgs e)
+        public void stopHost()
         {
             vashti.stopEngine();
             isRunning = false;
             lblAudimatStatus.Text = "Engine is stopped";
+        }
+
+        private void StartHost_Click(object sender, EventArgs e)
+        {
+            startHost();
+        }
+
+        private void StopHost_Click(object sender, EventArgs e)
+        {
+            stopHost();
         }
 
         public void enableKeyboardBarMenuItem(bool enable)
@@ -133,7 +160,7 @@ namespace Audimat
             {
                 keyboardWnd.setSize(keyWindowSize);
             }
-            keyboardWnd.setCurrentPlugin(keyWindowPlugin);
+            keyboardWnd.setSelectedPlugin(keyWindowPlugin);
             keyboardWnd.Show();
 
             if (keyWindowPos.X != 0 && keyWindowPos.Y != 0)
@@ -163,25 +190,24 @@ namespace Audimat
         {
             String pluginPath = "";
 
+#if (DEBUG)
             //useful for testing, don't have to go through the FileOPen dialog over & over
             string[] vstlist = File.ReadAllLines("vst.lst");
             pluginPath = vstlist[vstnum++];
             if (vstnum >= vstlist.Length) vstnum = 0;       //wrap it around
 
-            //loadPluginDialog.InitialDirectory = Application.StartupPath;
-            //loadPluginDialog.ShowDialog();
-            //pluginPath = loadPluginDialog.FileName;
-            //if (pluginPath.Length == 0) return;
-
-            bool result = rack.loadPlugin(pluginPath);
+#else
+            loadPluginDialog.InitialDirectory = Application.StartupPath;
+            loadPluginDialog.ShowDialog();
+            pluginPath = loadPluginDialog.FileName;
+            if (pluginPath.Length == 0) return;
+#endif
+            bool result = rack.addPanel(pluginPath);
 
             if (result)
             {
                 //plugLoaded[plugNum] = true;
                 //plugloadItems[plugNum].Text = "Unload Plugin " + pluginLetters[plugNum];
-                //plugselectItems[plugNum].Enabled = true;
-                //plugselectButtons[plugNum].Enabled = true;
-                //setCurrentPlugin(plugNum);
             }
             else
             {
@@ -201,6 +227,33 @@ namespace Audimat
         {
             String msg = "Audimat\nversion 1.2.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
+        }
+
+        //- i/o connections ---------------------------------------------------
+
+        public void connectMidiInput(int idx, PluginMidiIn pluginMidiIn)
+        {
+            InputDevice indev = midiDevices.inputDevices[idx];
+            try
+            {
+                indev.open();
+                indev.connectUnit(pluginMidiIn);
+                indev.start();                
+            }
+            catch
+            {
+                //Console.WriteLine("error connecting midi input");
+            }
+        }
+
+        public void disconnectMidiInput(int idx, PluginMidiIn pluginMidiIn)
+        {
+            InputDevice indev = midiDevices.inputDevices[idx];
+            indev.disconnectUnit(pluginMidiIn);
+        }
+
+        public void connectMidiOutput(int idx, PluginMidiIn pluginMidiIn)
+        {
         }
     }
 }
