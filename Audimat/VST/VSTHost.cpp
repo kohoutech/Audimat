@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 VSTHost::VSTHost()
 {
 	sampleRate = 44100.0f;
-	blockSize = 1024;
+	blockSize = 2205;
 
 	for (int i = 0; i < 2; i++)
 		pOutputs[i] = new float[22050];			//0.5 sec @ 44.1 kHz
@@ -34,7 +34,7 @@ VSTHost::VSTHost()
 	plugins = (VSTPlugin**)malloc(pluginMax * sizeof(VSTPlugin*));
 	pluginCount = 0;
 
-	InitializeCriticalSection(&cs);
+	//InitializeCriticalSection(&cs);
 }
 
 //destuct
@@ -46,7 +46,7 @@ VSTHost::~VSTHost()
 	for (int i = 0; i < 2; i++)
 		delete[] pOutputs[i];
 
-	DeleteCriticalSection(&cs);
+	//DeleteCriticalSection(&cs);
 }
 
 void VSTHost::setSampleRate(int rate) 
@@ -139,6 +139,9 @@ void VSTHost::processAudio(float **pBuffer, int nLength, int nChannels, DWORD dw
 	for (int i = 0; i < pluginCount; i++) {
 
 		pEff = getPlugin(i);
+		if (pEff == NULL)
+			continue;
+
 		pEff->enterCritical();
 
 		pEff->buildMIDIEvents();

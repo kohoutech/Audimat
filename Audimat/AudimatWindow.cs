@@ -210,12 +210,7 @@ namespace Audimat
 #endif
             bool result = rack.addPanel(pluginPath);
 
-            if (result)
-            {
-                //plugLoaded[plugNum] = true;
-                //plugloadItems[plugNum].Text = "Unload Plugin " + pluginLetters[plugNum];
-            }
-            else
+            if (!result)
             {
                 MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);

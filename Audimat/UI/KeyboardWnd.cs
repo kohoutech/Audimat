@@ -114,19 +114,22 @@ namespace Audimat.UI
             plugins = auditwin.rack.getPluginList();
             if (plugins.Count > 0)
             {
+                if (cbxPlugin.DataSource == null) cbxPlugin.Items.Clear();      //remove "no plugins loaded"
                 cbxPlugin.DisplayMember = "name";
                 cbxPlugin.DataSource = plugins;
                 cbxPlugin.Enabled = true;
             }
             else
             {
+                cbxPlugin.DisplayMember = null;
+                cbxPlugin.DataSource = null;
                 cbxPlugin.Items.Add("no plugins loaded");
                 cbxPlugin.SelectedIndex = 0;
                 cbxPlugin.Enabled = false;
             }
         }
 
-        public void setCurrentPlugin(VSTPlugin keyWindowPlugin)
+        public void setSelectedPlugin(VSTPlugin keyWindowPlugin)
         {
             //previous cur plugin maybe have been been unloaded, so check for it in plugin list
             for (int i = 0; i < plugins.Count; i++)
@@ -142,12 +145,18 @@ namespace Audimat.UI
 
         public void onKeyPress(int keyNumber)
         {
-            currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x60));
+            if (currentPlugin != null)
+            {
+                currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x60));
+            }
         }
 
         public void onKeyRelease(int keyNumber)
         {
-            currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x60));
+            if (currentPlugin != null)
+            {
+                currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x60));
+            }
         }
 
         private void cbxPlugin_SelectedIndexChanged(object sender, EventArgs e)
@@ -168,6 +177,15 @@ namespace Audimat.UI
             keyboardBar.setKeyboardSize(keySize, KeyboardBar.KeySize.FULL);
             ClientSize = new Size(keyboardBar.Width, keyboardBar.Height + keyboardBar.Top);
             cbxKeySize.Location = new Point(this.ClientSize.Width - cbxKeySize.Width - 12, cbxKeySize.Top);                    
+        }
+
+        public void updatePluginList()
+        {
+            setPluginList();
+            if (currentPlugin != null)
+            {
+                setSelectedPlugin(currentPlugin);
+            }
         }
     }
 }

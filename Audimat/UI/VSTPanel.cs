@@ -196,7 +196,7 @@ namespace Audimat.UI
             this.btnPlugSettings.Size = new System.Drawing.Size(24, 24);
             this.btnPlugSettings.TabIndex = 4;
             this.btnPlugSettings.Text = "S";
-            this.paneltoolTip.SetToolTip(this.btnPlugSettings, "show plugin info");
+            this.paneltoolTip.SetToolTip(this.btnPlugSettings, "change plugin settings");
             this.btnPlugSettings.UseVisualStyleBackColor = true;
             this.btnPlugSettings.Click += new System.EventHandler(this.btnPlugSettings_Click);
             // 
@@ -217,7 +217,6 @@ namespace Audimat.UI
             this.Size = new System.Drawing.Size(400, 75);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         //- panel management ----------------------------------------------------------
@@ -226,7 +225,7 @@ namespace Audimat.UI
         {
             plugPath = _plugPath;
             fileName = Path.GetFileNameWithoutExtension(plugPath);
-            plugin = new VSTPlugin(vashti, plugPath);
+            plugin = new VSTPlugin(this, vashti, plugPath);
             bool result = plugin.load();
             if (result)
             {
@@ -234,14 +233,21 @@ namespace Audimat.UI
                 lblPlugName.Text = plugName;
                 editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
                 cbxProgList.DisplayMember = "name";
-                cbxProgList.DataSource = plugin.programs;
+                cbxProgList.DataSource = plugin.programs;                
             }
             return result;
         }
 
-        public void shutDownPlugin()
+        public void unloadPlugin()
         {
-            if (editorWindow != null) editorWindow.Close();
+            //close child windows
+            if (pluginSettingsWnd != null)  { pluginSettingsWnd.Close(); }
+            if (pluginInfoWnd != null)      { pluginInfoWnd.Close(); }
+            if (paramEditorWnd != null)     { paramEditorWnd.Close(); }
+            if (editorWindow != null)       { editorWindow.Close(); }
+
+            rack.removePanel(plugNum);      //remove from rack
+            plugin.unload();                //disconnect and unload back end
         }
 
         //- painting ------------------------------------------------------------------
@@ -272,13 +278,6 @@ namespace Audimat.UI
             drawRackScrew(g, VSTRack.SCREWOFS, bottomofs);
             drawRackScrew(g, rightOfs, VSTRack.SCREWHOLE);
             drawRackScrew(g, rightOfs, bottomofs);
-
-            //running LED
-            //Color LEDColor = isCurrent ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
-            //Brush LEDBrush = new SolidBrush(LEDColor);
-            //g.FillEllipse(LEDBrush, 34, 12, 16, 16);
-            //g.DrawEllipse(Pens.White, 34, 12, 16, 16);
-            //LEDBrush.Dispose();
         }
 
         //- event handlers ------------------------------------------------------------
@@ -385,12 +384,7 @@ namespace Audimat.UI
 
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
-            if (editorWindow != null)
-            {
-                editorWindow.Close();
-            }
-            rack.unloadPlugin(plugNum);
-            plugin.unload();
+            unloadPlugin();
         }
     }
 }
