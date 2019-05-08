@@ -46,6 +46,8 @@ public:
 	void stopEngine();
 	BOOL isEngineRunning() { return isRunning; }
 
+	void setPlugAudioIn(int vstnum, int idx);
+	void setPlugAudioOut(int vstnum, int idx);
 	int loadPlugin(LPCSTR fileName);
 	void unloadPlugin(int vstNum);
 	void setSampleRate(int rate);
@@ -61,7 +63,7 @@ public:
 
 	void openEditor(int vstNum, void * hwnd);
 	void closeEditor(int vstNum);
-	void handleMidiShortMsg(int b1, int b2, int b3);
+	void handleMidiShortMsg(int vstnum, int b1, int b2, int b3);
 
 protected:
 	float * emptyBuf[2];

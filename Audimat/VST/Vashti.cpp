@@ -23,8 +23,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "VSTHost.h"
 #include "WaveOutDevice.h"
 
-#define WAVEBUFCOUNT  10
-#define WAVEBUFDURATION   100		//buf duration in ms
+#define DEFAULTSAMPLERATE 44100
+#define WAVEBUFCOUNT  20			//num buffers / sec
+#define WAVEBUFDURATION   50		//buf duration in ms
 
 Vashti* Vashti::vashtiB;
 
@@ -62,7 +63,27 @@ extern "C" __declspec(dllexport) void VashtiUnloadPlugin(int vstnum) {
 	Vashti::vashtiB->unloadPlugin(vstnum);
 }
 
+extern "C" __declspec(dllexport) void VashtiSetSampleRate(int rate) {
+
+	Vashti::vashtiB->setSampleRate(rate);
+}
+
+extern "C" __declspec(dllexport) void VashtiSetBlockSize(int size) {
+
+	Vashti::vashtiB->setBlockSize(size);
+}
+
 //- plugin exports ------------------------------------------------------------
+
+extern "C" __declspec(dllexport) void VashtiSetPluginAudioIn(int vstnum, int idx) {
+
+	Vashti::vashtiB->setPlugAudioIn(vstnum, idx);
+}
+
+extern "C" __declspec(dllexport) void VashtiSetPluginAudioOut(int vstnum, int idx) {
+
+	Vashti::vashtiB->setPlugAudioOut(vstnum, idx);
+}
 
 extern "C" __declspec(dllexport) void VashtiGetPluginInfo(int vstnum, PlugInfo* pinfo) {
 
@@ -106,7 +127,7 @@ extern "C" __declspec(dllexport) void VashtiCloseEditor(int vstnum) {
 
 extern "C" __declspec(dllexport) void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3) {
 
-	Vashti::vashtiB->handleMidiShortMsg(b1,b2,b3);
+	Vashti::vashtiB->handleMidiShortMsg(vstnum, b1, b2, b3);
 }
 
 //---------------------------------------------------------------------------
@@ -116,19 +137,21 @@ Vashti::Vashti()
 	vstHost = new VSTHost();
 
 	timerID = 0;                              
-	timeGetDevCaps(&tc, sizeof(tc));       
+	timeGetDevCaps(&tc, sizeof(tc));		//get timer capabilities
+	dwRest = 0;
+	dwLastTime = 0;
 
 	for (int i = 0; i < 2; i++)            
 	{
-		emptyBuf[i] = new float[44100];
+		emptyBuf[i] = new float[DEFAULTSAMPLERATE];
 		if (emptyBuf[i])
-			for (int j = 0; j < 44100; j++)
+			for (int j = 0; j < DEFAULTSAMPLERATE; j++)
 				emptyBuf[i][j] = 0.0f;
 	}
 
 	//default vals
-	sampleRate = 44100;
-	blockSize = sampleRate / 10;		//default duration = 100ms
+	sampleRate = DEFAULTSAMPLERATE;
+	blockSize = sampleRate / WAVEBUFCOUNT;		//default duration = 100ms
 	timerDuration = WAVEBUFDURATION;
 
 	//use default in & out for now
@@ -161,7 +184,7 @@ void Vashti::startEngine()
 
 	//start output device and timer to send track data to it
 	waveOut->start();		
-	int timerDuration = (blockSize * 1000) / sampleRate;
+	int timerDuration = (blockSize * 1000) / sampleRate;		//timer len in msec
 	startTimer(timerDuration);
 
 	isRunning = TRUE;
@@ -190,7 +213,9 @@ BOOL Vashti::startTimer(UINT msSec)
 	int resolution = timerDuration / 10;
 	timeBeginPeriod(resolution);        
 
-	timerID = timeSetEvent(timerDuration, (resolution > 1) ? resolution / 2 : 1, timerCallback, (DWORD)this, TIME_PERIODIC);
+	//timer will call <timerCallback> func every <timerDuration> millisecs
+	timerID = timeSetEvent(timerDuration, (resolution > 1) ? resolution / 2 : 1, timerCallback, (DWORD)this, 
+		TIME_PERIODIC || TIME_KILL_SYNCHRONOUS);
 
 	return (timerID != NULL);
 }
@@ -208,30 +233,29 @@ void Vashti::stopTimer()
 void CALLBACK Vashti::timerCallback(UINT uID,	UINT uMsg,	DWORD dwUser,	DWORD dw1,	DWORD dw2)
 {
 	if (dwUser)                             
-		((Vashti *)dwUser)->handleTimer();
+		((Vashti *)dwUser)->handleTimer();		//use dwUser field to xlate Windows call back to class method
 }
 
 void Vashti::handleTimer()
 {
 	static DWORD now;                
 	static DWORD dwOffset;                 
-	static WORD  wClocks;                  
 	static WORD  i;                        
 
 	now = timeGetTime();             
-	dwOffset = now - dwLastTime;
+	dwOffset = now - dwLastTime;			//time since last timer call
 	if (dwOffset > now)              
 	{
 		dwLastTime = 0;                    
 		dwOffset = now;              
 	}                                   
 
-	dwOffset += dwRest;                 
-	if (dwOffset > timerDuration)         
+	dwOffset += dwRest;						//ofs from last timer duration - compensate for timer drift
+	if (dwOffset > timerDuration)			//if we've passed the next timer duration
 	{
 		dwLastTime = now;            
 		dwRest = dwOffset - timerDuration;     
-		vstHost->audioOut(emptyBuf, (44100 * timerDuration / 1000), 2, now - dwStartStamp);
+		vstHost->processAudio(emptyBuf, (sampleRate * timerDuration / 1000), 2, now - dwStartStamp);
 	}
 }
 
@@ -244,10 +268,10 @@ BOOL Vashti::loadWaveOutDevice	(int devID)
 	waveOut = new WaveOutDevice();
 	waveOut->setBufferCount(WAVEBUFCOUNT);
 	waveOut->setBufferDuration(WAVEBUFDURATION);
-	result = waveOut->open(devID, 44100, 16, 2);		//stereo out
+	result = waveOut->open(devID, sampleRate, 16, 2);		//stereo out
 
 	vstHost->setWaveOut(waveOut);
-	vstHost->setBlockSize(4410);
+	vstHost->setBlockSize(blockSize);
 
 	return result;
 }
@@ -268,34 +292,66 @@ int Vashti::loadPlugin(LPCSTR fileName)
 
 void Vashti::unloadPlugin(int vstNum) 
 {
+	BOOL wasEngineRunning = isRunning;         
+
+	if (isRunning) stopEngine();                           
+
+	vstHost->unloadPlugin(vstNum);
+
+	if (wasEngineRunning) startEngine();
 }
+
+void Vashti::setSampleRate(int rate)
+{
+	if (isRunning) stopEngine();                           
+
+	vstHost->setSampleRate(rate);
+}
+
+void Vashti::setBlockSize(int size)
+{
+	if (isRunning) stopEngine();                           
+
+	vstHost->setBlockSize(size);
+}
+
+//- plugin methods ------------------------------------------------------------
+
+void Vashti::setPlugAudioIn(int vstnum, int idx)
+{
+}
+
+void Vashti::setPlugAudioOut(int vstnum, int idx)
+{
+}
+
 
 void Vashti::getPlugInfo(int vstnum, PlugInfo* pinfo) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst == NULL)
-		return;
+	if (vst != NULL)
+	{
+		pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getProductString(pinfo->name);
+		pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getVendorString(pinfo->vendor);
+		pinfo->version = vst->getVstVersion();
+		pinfo->numPrograms = vst->pEffect->numPrograms;
+		pinfo->numParameters = vst->pEffect->numParams;
+		pinfo->numInputs = vst->pEffect->numInputs;
+		pinfo->numOutputs = vst->pEffect->numOutputs;
+		pinfo->flags = vst->pEffect->flags;
+		pinfo->uniqueID = vst->pEffect->uniqueID;
 
-	pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-	vst->getProductString(pinfo->name);
-	pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-	vst->getVendorString(pinfo->vendor);
-	pinfo->version = vst->getVstVersion();
-	pinfo->numPrograms = vst->pEffect->numPrograms;
-	pinfo->numParameters = vst->pEffect->numParams;
-	pinfo->numInputs = vst->pEffect->numInputs;
-	pinfo->numOutputs = vst->pEffect->numOutputs;
-	pinfo->flags = vst->pEffect->flags;
-	pinfo->uniqueID = vst->pEffect->uniqueID;
-
-	if (vst->pEffect->flags && effFlagsHasEditor != 0) {
-		ERect* pRect;
-		vst->editGetRect(&pRect);
-		pinfo->editorWidth = pRect->right - pRect->left;
-		pinfo->editorHeight = pRect->bottom - pRect->top;
-	} else {
-		pinfo->editorWidth = 0;
-		pinfo->editorHeight = 0;
+		if (vst->pEffect->flags && effFlagsHasEditor != 0) {
+			ERect* pRect;
+			vst->editGetRect(&pRect);
+			pinfo->editorWidth = pRect->right - pRect->left;
+			pinfo->editorHeight = pRect->bottom - pRect->top;
+		} else {
+			pinfo->editorWidth = 0;
+			pinfo->editorHeight = 0;
+		}
 	}
 }
 
@@ -304,21 +360,30 @@ void Vashti::getPlugInfo(int vstnum, PlugInfo* pinfo)
 char* Vashti::getParamName(int vstnum, int paramnum) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-	vst->getParamName(paramnum, paramname);
-	return paramname;
+	if (vst) 
+	{
+		char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getParamName(paramnum, paramname);
+		return paramname;
+	}
 }
 
 float Vashti::getParamVal(int vstnum, int paramnum) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	return vst->getParameter(paramnum);
+	if (vst) 
+	{
+		return vst->getParameter(paramnum);
+	}
 }
 
 void Vashti::setParamVal(int vstnum, int paramnum, float paramval) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	vst->setParameter(paramnum, paramval);
+	if (vst) 
+	{	
+		vst->setParameter(paramnum, paramval);
+	}
 }
 
 //- plugin programs -----------------------------------------------------------
@@ -326,15 +391,21 @@ void Vashti::setParamVal(int vstnum, int paramnum, float paramval)
 char* Vashti::getProgramName(int vstNum, int prognum) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	char* progname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-	vst->getProgramNameIndexed(0, prognum, progname);		
-	return progname;
+	if (vst) 
+	{
+		char* progname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getProgramNameIndexed(0, prognum, progname);		
+		return progname;
+	}
 }
 
 void Vashti::setProgram(int vstNum, int prognum) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	vst->setProgram(prognum);
+	if (vst) 
+	{
+		vst->setProgram(prognum);
+	}
 }
 
 //- plugin editor -------------------------------------------------------------
@@ -342,17 +413,28 @@ void Vashti::setProgram(int vstNum, int prognum)
 void Vashti::openEditor(int vstNum, void * hwnd) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	vst->editOpen(hwnd);
+	if (vst) 
+	{
+		vst->editOpen(hwnd);
+	}
 }
 
 void Vashti::closeEditor(int vstNum) 
 {
 	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	vst->editClose();
+	if (vst) 
+	{
+		vst->editClose();
+	}
 }
 
-void Vashti::handleMidiShortMsg(int b1, int b2, int b3) 
+void Vashti::handleMidiShortMsg(int vstnum, int b1, int b2, int b3) 
 {
+	VSTPlugin* vst = vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		vst->storeMidiShortMsg(b1, b2, b3);
+	}
 }
 
 //printf("there's no sun in the shadow of the wizard.\n");

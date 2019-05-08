@@ -48,8 +48,20 @@ namespace Transonic.VST
         [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
         public static extern void VashtiUnloadPlugin(int vstnum);
 
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetSampleRate(int rate);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetBlockSize(int size);
+
         //- plugin exports ------------------------------------------------------------
 
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetPluginAudioIn(int vstnum, int audioidx);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetPluginAudioOut(int vstnum, int audioidx);
+        
         [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
         public static extern void VashtiGetPluginInfo(int vstnum, ref PluginInfo pinfo);
 
@@ -83,12 +95,12 @@ namespace Transonic.VST
 
         public Vashti()
         {
-            VashtiInit();
+            VashtiInit();               //create VashtiB obj in backend
         }
 
         public void shutDown()
         {
-            VashtiShutDown();
+            VashtiShutDown();           //delete VashtiB obj 
         }
 
         //- host methods ----------------------------------------------------------
@@ -117,7 +129,24 @@ namespace Transonic.VST
             VashtiUnloadPlugin(plugid);
         }
 
+        public void setSampleRate(int rate)
+        {
+        }
+
+        public void setBlockSize(int blocksize)
+        {
+        }
+
+
         //- plugin methods ----------------------------------------------------------
+
+        public void setPluginAudioIn(int plugid, int audioidx)
+        {
+        }
+
+        public void setPluginAudioOut(int plugid, int audioidx)
+        {
+        }
 
         public void getPluginInfo(int plugid, ref PluginInfo pluginfo)
         {
@@ -134,7 +163,7 @@ namespace Transonic.VST
             return VashtiGetParamValue(plugid, paramnum);
         }
 
-        public void setPluginParam(int plugid, int paramnum, float paramval)
+        public void setPluginParamValue(int plugid, int paramnum, float paramval)
         {
             VashtiSetParamValue(plugid, paramnum, paramval);
         }
@@ -159,7 +188,7 @@ namespace Transonic.VST
             VashtiCloseEditor(plugid);
         }
 
-        public void sendMidiMsg(int plugid, int b1, int b2, int b3)
+        public void sendMidiMessage(int plugid, int b1, int b2, int b3)
         {
             VashtiHandleMidiMsg(plugid, b1, b2, b3);
         }
