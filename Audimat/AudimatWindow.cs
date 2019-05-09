@@ -36,8 +36,10 @@ namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
+        public ControlPanel controlPanel;
         public VSTRack rack;
 
+        //child windows
         public PatchWindow patchWin;
         public KeyboardWnd keyboardWnd;
 
@@ -60,12 +62,20 @@ namespace Audimat
         {
             InitializeComponent();
 
-            //rack control fills up entire client area between menu/tool & status bars
-            rack = new VSTRack(this);
-            rack.Location = new Point(this.ClientRectangle.Left, AudimatToolbar.Bottom);
-            this.Controls.Add(rack);
+            //control panel goes just below menubar
+            controlPanel = new ControlPanel(this);
+            this.Controls.Add(controlPanel);
+            controlPanel.Location = new Point(this.ClientRectangle.Left, AudimatMenu.Bottom);
+            //controlPanel.Anchor = AnchorStyles.Top;
+            this.Controls.Add(controlPanel);
 
-            int minHeight = this.AudimatMenu.Height + this.AudimatToolbar.Height + this.AudimatStatus.Height;
+            //rack control fills up entire client area between control panel & status bar
+            rack = new VSTRack(this);
+            rack.Location = new Point(this.ClientRectangle.Left, controlPanel.Bottom);
+            this.Controls.Add(rack);
+            controlPanel.Width = rack.Width;
+
+            int minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
             this.ClientSize = new System.Drawing.Size(rack.Size.Width, rack.Size.Height + minHeight);
             this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - VSTPanel.PANELHEIGHT);
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
@@ -91,7 +101,7 @@ namespace Audimat
             base.OnResize(e);
             if (rack != null)
             {
-                rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - AudimatToolbar.Bottom);
+                rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - controlPanel.Bottom);
             }
         }
 
@@ -150,10 +160,10 @@ namespace Audimat
         public void enableKeyboardBarMenuItem(bool enable)
         {
             keyboardBarHostMenuItem.Enabled = enable;
-            keyboardToolStripButton.Enabled = enable;
+            controlPanel.btnKeys.Enabled = enable;
         }
 
-        private void keysButton_Click(object sender, EventArgs e)
+        public void showKeyboardWindow()
         {
             keyboardWnd = new KeyboardWnd(this);
             keyboardWnd.Icon = this.Icon;
@@ -172,6 +182,11 @@ namespace Audimat
             }
 
             enableKeyboardBarMenuItem(false);
+        }
+
+        private void keysButton_Click(object sender, EventArgs e)
+        {
+            showKeyboardWindow();
         }
 
         private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)

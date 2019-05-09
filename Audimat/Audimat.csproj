@@ -137,6 +137,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UI\ControlPanel.resx">
+      <DependentUpon>ControlPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\KeyboardWnd.resx">
       <DependentUpon>KeyboardWnd.cs</DependentUpon>
     </EmbeddedResource>

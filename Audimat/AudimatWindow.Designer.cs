@@ -42,19 +42,10 @@
             this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.AudimatToolbar = new System.Windows.Forms.ToolStrip();
-            this.loadToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.startToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.stopToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.keyboardToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.panicToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
             this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.AudimatMenu.SuspendLayout();
-            this.AudimatToolbar.SuspendLayout();
             this.AudimatStatus.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -163,83 +154,6 @@
             this.aboutHelpMenuItem.Text = "&About...";
             this.aboutHelpMenuItem.Click += new System.EventHandler(this.aboutHelpMenuItem_Click);
             // 
-            // AudimatToolbar
-            // 
-            this.AudimatToolbar.BackColor = System.Drawing.SystemColors.Control;
-            this.AudimatToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadToolStripButton,
-            this.toolStripSeparator1,
-            this.startToolStripButton,
-            this.stopToolStripButton,
-            this.toolStripSeparator2,
-            this.keyboardToolStripButton,
-            this.panicToolStripButton});
-            this.AudimatToolbar.Location = new System.Drawing.Point(0, 24);
-            this.AudimatToolbar.Name = "AudimatToolbar";
-            this.AudimatToolbar.Size = new System.Drawing.Size(384, 25);
-            this.AudimatToolbar.TabIndex = 1;
-            this.AudimatToolbar.Text = "toolStrip1";
-            // 
-            // loadToolStripButton
-            // 
-            this.loadToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.loadToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("loadToolStripButton.Image")));
-            this.loadToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.loadToolStripButton.Name = "loadToolStripButton";
-            this.loadToolStripButton.Size = new System.Drawing.Size(37, 22);
-            this.loadToolStripButton.Text = "&Load";
-            this.loadToolStripButton.Click += new System.EventHandler(this.loadPlugin_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // startToolStripButton
-            // 
-            this.startToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.startToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("startToolStripButton.Image")));
-            this.startToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.startToolStripButton.Name = "startToolStripButton";
-            this.startToolStripButton.Size = new System.Drawing.Size(35, 22);
-            this.startToolStripButton.Text = "&Start";
-            this.startToolStripButton.Click += new System.EventHandler(this.StartHost_Click);
-            // 
-            // stopToolStripButton
-            // 
-            this.stopToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.stopToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("stopToolStripButton.Image")));
-            this.stopToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.stopToolStripButton.Name = "stopToolStripButton";
-            this.stopToolStripButton.Size = new System.Drawing.Size(35, 22);
-            this.stopToolStripButton.Text = "St&op";
-            this.stopToolStripButton.Click += new System.EventHandler(this.StopHost_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // keyboardToolStripButton
-            // 
-            this.keyboardToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.keyboardToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("keyboardToolStripButton.Image")));
-            this.keyboardToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.keyboardToolStripButton.Name = "keyboardToolStripButton";
-            this.keyboardToolStripButton.Size = new System.Drawing.Size(35, 22);
-            this.keyboardToolStripButton.Text = "&Keys";
-            this.keyboardToolStripButton.Click += new System.EventHandler(this.keysButton_Click);
-            // 
-            // panicToolStripButton
-            // 
-            this.panicToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.panicToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("panicToolStripButton.Image")));
-            this.panicToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.panicToolStripButton.Name = "panicToolStripButton";
-            this.panicToolStripButton.Size = new System.Drawing.Size(40, 22);
-            this.panicToolStripButton.Text = "Pani&c";
-            this.panicToolStripButton.Click += new System.EventHandler(this.panicButton_Click);
-            // 
             // AudimatStatus
             // 
             this.AudimatStatus.BackColor = System.Drawing.SystemColors.Control;
@@ -263,7 +177,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 361);
             this.Controls.Add(this.AudimatStatus);
-            this.Controls.Add(this.AudimatToolbar);
             this.Controls.Add(this.AudimatMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.AudimatMenu;
@@ -272,8 +185,6 @@
             this.Text = "Audimat";
             this.AudimatMenu.ResumeLayout(false);
             this.AudimatMenu.PerformLayout();
-            this.AudimatToolbar.ResumeLayout(false);
-            this.AudimatToolbar.PerformLayout();
             this.AudimatStatus.ResumeLayout(false);
             this.AudimatStatus.PerformLayout();
             this.ResumeLayout(false);
@@ -284,7 +195,6 @@
         #endregion
 
         private System.Windows.Forms.MenuStrip AudimatMenu;
-        private System.Windows.Forms.ToolStrip AudimatToolbar;
         private System.Windows.Forms.StatusStrip AudimatStatus;
         private System.Windows.Forms.ToolStripMenuItem fileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitFileMenuItem;
@@ -295,13 +205,6 @@
         private System.Windows.Forms.ToolStripMenuItem StopHostMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutHelpMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton startToolStripButton;
-        private System.Windows.Forms.ToolStripButton stopToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton keyboardToolStripButton;
-        private System.Windows.Forms.ToolStripButton panicToolStripButton;
-        private System.Windows.Forms.ToolStripButton loadToolStripButton;
         private System.Windows.Forms.OpenFileDialog loadPluginDialog;
         private System.Windows.Forms.ToolStripStatusLabel lblAudimatStatus;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
