@@ -40,9 +40,7 @@ namespace Audimat.UI
         {
             auditwin = _auditwin;
 
-            InitializeComponent();
-
-            //this.BackColor = Color.FromArgb(63, 255, 0);
+            InitializeComponent();            
         }
 
         private void InitializeComponent()
@@ -56,7 +54,7 @@ namespace Audimat.UI
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(13, 12);
+            this.btnLoad.Location = new System.Drawing.Point(13, 8);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(39, 24);
             this.btnLoad.TabIndex = 8;
@@ -66,7 +64,7 @@ namespace Audimat.UI
             // 
             // btnPanic
             // 
-            this.btnPanic.Location = new System.Drawing.Point(173, 12);
+            this.btnPanic.Location = new System.Drawing.Point(173, 8);
             this.btnPanic.Name = "btnPanic";
             this.btnPanic.Size = new System.Drawing.Size(42, 24);
             this.btnPanic.TabIndex = 9;
@@ -76,7 +74,7 @@ namespace Audimat.UI
             // 
             // btnKeys
             // 
-            this.btnKeys.Location = new System.Drawing.Point(132, 12);
+            this.btnKeys.Location = new System.Drawing.Point(132, 8);
             this.btnKeys.Name = "btnKeys";
             this.btnKeys.Size = new System.Drawing.Size(38, 24);
             this.btnKeys.TabIndex = 10;
@@ -86,7 +84,7 @@ namespace Audimat.UI
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(93, 12);
+            this.btnStop.Location = new System.Drawing.Point(93, 8);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(37, 24);
             this.btnStop.TabIndex = 11;
@@ -96,7 +94,7 @@ namespace Audimat.UI
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(54, 12);
+            this.btnStart.Location = new System.Drawing.Point(54, 8);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(37, 24);
             this.btnStart.TabIndex = 12;
@@ -113,10 +111,12 @@ namespace Audimat.UI
             this.Controls.Add(this.btnPanic);
             this.Controls.Add(this.btnLoad);
             this.Name = "ControlPanel";
-            this.Size = new System.Drawing.Size(400, 50);
+            this.Size = new System.Drawing.Size(400, 40);
             this.ResumeLayout(false);
 
         }
+
+        //- event handlers ----------------------------------------------------
 
         private void btnLoad_Click(object sender, EventArgs e)
         {

@@ -135,14 +135,14 @@ namespace Audimat
 
         public void startHost()
         {
-            vashti.startEngine();
+            host.startEngine();
             isRunning = true;
             lblAudimatStatus.Text = "Engine is running";
         }
 
         public void stopHost()
         {
-            vashti.stopEngine();
+            host.stopEngine();
             isRunning = false;
             lblAudimatStatus.Text = "Engine is stopped";
         }

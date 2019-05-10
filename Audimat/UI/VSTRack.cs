@@ -32,6 +32,7 @@ namespace Audimat.UI
     public class VSTRack : UserControl
     {
         public AudimatWindow auditwin;
+        public VSTHost host;
 
         private VScrollBar scrollbar;
         private Panel panelSpace;
@@ -42,6 +43,7 @@ namespace Audimat.UI
         public VSTRack(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
+            host = auditwin.vashti.host;
 
             scrollbar = new VScrollBar();
             scrollbar.Minimum = 0;

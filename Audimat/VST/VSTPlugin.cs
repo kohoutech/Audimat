@@ -25,17 +25,52 @@ using System.Runtime.InteropServices;
 
 using Audimat;
 using Audimat.UI;
-using Transonic.MIDI;
-using Transonic.MIDI.System;
 
 namespace Transonic.VST
 {
     public class VSTPlugin
     {
+        //- plugin exports ------------------------------------------------------------
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetPluginAudioIn(int vstnum, int audioidx);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetPluginAudioOut(int vstnum, int audioidx);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiGetPluginInfo(int vstnum, ref PluginInfo pinfo);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern String VashtiGetParamName(int vstnum, int paramnum);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern float VashtiGetParamValue(int vstnum, int paramnum);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetParamValue(int vstnum, int paramnum, float paramval);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern String VashtiGetProgramName(int vstnum, int prognum);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiSetProgram(int vstnum, int prognum);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiOpenEditor(int vstnum, IntPtr hwnd);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiCloseEditor(int vstnum);
+
+        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3);
+
+        //---------------------------------------------------------------------
+        
         public VSTPanel panel;
         public AudimatWindow audiwin;
 
-        public Vashti vashti;
+        public VSTHost host;
         public String filename;
 
         public int audioInIdx;
@@ -65,11 +100,11 @@ namespace Transonic.VST
         public int editorHeight;
 
 
-        public VSTPlugin(VSTPanel _panel, Vashti _vashti, String _filename)
+        public VSTPlugin(VSTPanel _panel, VSTHost _host, String _filename)
         {
             panel = _panel;
             audiwin = panel.audiwin;
-            vashti = _vashti;
+            host = _host;
             filename = _filename;
 
             //-1 == not set yet
@@ -82,12 +117,12 @@ namespace Transonic.VST
 
         public bool load()
         {
-            id = vashti.loadPlugin(filename);
+            id = host.loadPlugin(filename);
             bool result = (id != -1);
             if (result)
             {
                 PluginInfo pluginfo = new PluginInfo();
-                vashti.getPluginInfo(id, ref pluginfo);
+                host.getPluginInfo(id, ref pluginfo);
                 _name = pluginfo.name;
                 vendor = pluginfo.vendor;
                 version = pluginfo.version;
@@ -103,8 +138,8 @@ namespace Transonic.VST
                 parameters = new VSTParam[numParams];
                 for (int i = 0; i < numParams; i++)
                 {
-                    String paramName = vashti.getPluginParamName(id, i);
-                    float paramVal = vashti.getPluginParamValue(id, i);
+                    String paramName = host.getPluginParamName(id, i);
+                    float paramVal = host.getPluginParamValue(id, i);
                     parameters[i] = new VSTParam(i, paramName, paramVal);
                 }
 
@@ -113,7 +148,7 @@ namespace Transonic.VST
                     programs = new VSTProgram[numPrograms];
                     for (int i = 0; i < numPrograms; i++)
                     {
-                        String progName = vashti.getPluginProgramName(id, i);
+                        String progName = host.getPluginProgramName(id, i);
                         programs[i] = new VSTProgram(i, progName);
                     }
                 }
@@ -130,7 +165,7 @@ namespace Transonic.VST
         public void unload()
         {
             setMidiIn(-1);                  //disconnect midi inptu listener
-            vashti.unloadPlugin(id);
+            host.unloadPlugin(id);
         }
 
         public String name
@@ -185,59 +220,88 @@ namespace Transonic.VST
             }
         }
 
+        //- plugin methods ----------------------------------------------------------
+
+        public void setPluginAudioIn(int plugid, int audioidx)
+        {
+        }
+
+        public void setPluginAudioOut(int plugid, int audioidx)
+        {
+        }
+
+        public void getPluginInfo(int plugid, ref PluginInfo pluginfo)
+        {
+            VashtiGetPluginInfo(plugid, ref pluginfo);
+        }
+
+        public String getPluginParamName(int plugid, int paramnum)
+        {
+            return VashtiGetParamName(plugid, paramnum);
+        }
+
+        public float getPluginParamValue(int plugid, int paramnum)
+        {
+            return VashtiGetParamValue(plugid, paramnum);
+        }
+
+        public void setPluginParamValue(int plugid, int paramnum, float paramval)
+        {
+            VashtiSetParamValue(plugid, paramnum, paramval);
+        }
+
+        public String getPluginProgramName(int plugid, int prognum)
+        {
+            return VashtiGetProgramName(plugid, prognum);
+        }
+
+        public void setPluginProgram(int plugid, int prognum)
+        {
+            VashtiSetProgram(plugid, prognum);
+        }
+
+        public void openEditorWindow(int plugid, IntPtr hwnd)
+        {
+            VashtiOpenEditor(plugid, hwnd);
+        }
+
+        public void closeEditorWindow(int plugid)
+        {
+            VashtiCloseEditor(plugid);
+        }
+
+        public void sendMidiMessage(int plugid, int b1, int b2, int b3)
+        {
+            VashtiHandleMidiMsg(plugid, b1, b2, b3);
+        }
+
         //- backend communication ---------------------------------------------
 
         public void setParamValue(int paramNum, float paramVal)
         {
             parameters[paramNum].value = paramVal;
-            vashti.setPluginParamValue(id, paramNum, paramVal);
+            host.setPluginParamValue(id, paramNum, paramVal);
         }
 
         public void setProgram(int progNum)
         {
             curProgramNum = progNum;
-            vashti.setPluginProgram(id, progNum);
+            host.setPluginProgram(id, progNum);
         }
 
         public void openEditorWindow(IntPtr editorWindow)
         {
-            vashti.openEditorWindow(id, editorWindow);
+            host.openEditorWindow(id, editorWindow);
         }
 
         public void closeEditorWindow()
         {
-            vashti.closeEditorWindow(id);
-        }
-
-        public void sendMidiMessage(Message msg)
-        {
-            byte[] bytes = msg.getDataBytes();
-            vashti.sendMidiMessage(id, bytes[0], bytes[1], bytes[2]);
+            host.closeEditorWindow(id);
         }
 
         public void sendMidiMessage(byte b1, byte b2, byte b3)
         {
-            vashti.sendMidiMessage(id, b1, b2, b3);
-        }
-    }
-
-    //-----------------------------------------------------------------------------
-
-    //midi input listener unit
-    public class PluginMidiIn : SystemUnit
-    {
-        public VSTPlugin plugin;
-
-        public PluginMidiIn(VSTPlugin _plugin)
-            : base(_plugin.name)
-        {
-            plugin = _plugin;
-        }
-
-        public override void receiveMessage(byte[] msg)
-        {
-            Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
-            plugin.sendMidiMessage(msg[0], msg[1], msg[2]);
+            host.sendMidiMessage(id, b1, b2, b3);
         }
     }
 

@@ -34,163 +34,20 @@ namespace Transonic.VST
         [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
         public static extern void VashtiShutDown();
 
-        //- host exports ------------------------------------------------------------
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiStartEngine();
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiStopEngine();
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int VashtiLoadPlugin(string filename);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiUnloadPlugin(int vstnum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetSampleRate(int rate);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetBlockSize(int size);
-
-        //- plugin exports ------------------------------------------------------------
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetPluginAudioIn(int vstnum, int audioidx);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetPluginAudioOut(int vstnum, int audioidx);
-        
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiGetPluginInfo(int vstnum, ref PluginInfo pinfo);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern String VashtiGetParamName(int vstnum, int paramnum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern float VashtiGetParamValue(int vstnum, int paramnum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetParamValue(int vstnum, int paramnum, float paramval);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern String VashtiGetProgramName(int vstnum, int prognum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiSetProgram(int vstnum, int prognum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiOpenEditor(int vstnum, IntPtr hwnd);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiCloseEditor(int vstnum);
-
-        [DllImport("Vashti.DLL", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3);
-
 //-----------------------------------------------------------------------------
 
-        public bool isEngineRunning;
+        public VSTHost host;
 
         public Vashti()
         {
-            VashtiInit();               //create VashtiB obj in backend
+            VashtiInit();                   //create VashtiB obj in backend
+            host = new VSTHost(this);       //create host obj in frontend
         }
 
         public void shutDown()
         {
+            host.shutdown();
             VashtiShutDown();           //delete VashtiB obj 
-        }
-
-        //- host methods ----------------------------------------------------------
-
-        public void startEngine()
-        {
-            VashtiStartEngine();
-            isEngineRunning = true;
-        }
-
-        public void stopEngine()
-        {
-            VashtiStopEngine();
-            isEngineRunning = false;
-        }
-
-        public int loadPlugin(string filename)
-        {
-            Console.WriteLine("vashti loading plugin " + filename);
-            int plugid = VashtiLoadPlugin(filename);
-            return plugid;
-        }
-
-        public void unloadPlugin(int plugid)
-        {
-            VashtiUnloadPlugin(plugid);
-        }
-
-        public void setSampleRate(int rate)
-        {
-        }
-
-        public void setBlockSize(int blocksize)
-        {
-        }
-
-
-        //- plugin methods ----------------------------------------------------------
-
-        public void setPluginAudioIn(int plugid, int audioidx)
-        {
-        }
-
-        public void setPluginAudioOut(int plugid, int audioidx)
-        {
-        }
-
-        public void getPluginInfo(int plugid, ref PluginInfo pluginfo)
-        {
-            VashtiGetPluginInfo(plugid, ref pluginfo);
-        }
-
-        public String getPluginParamName(int plugid, int paramnum)
-        {
-            return VashtiGetParamName(plugid, paramnum);
-        }
-
-        public float getPluginParamValue(int plugid, int paramnum)
-        {
-            return VashtiGetParamValue(plugid, paramnum);
-        }
-
-        public void setPluginParamValue(int plugid, int paramnum, float paramval)
-        {
-            VashtiSetParamValue(plugid, paramnum, paramval);
-        }
-
-        public String getPluginProgramName(int plugid, int prognum)
-        {
-            return VashtiGetProgramName(plugid, prognum);
-        }
-
-        public void setPluginProgram(int plugid, int prognum)
-        {
-            VashtiSetProgram(plugid, prognum);
-        }
-
-        public void openEditorWindow(int plugid, IntPtr hwnd)
-        {
-            VashtiOpenEditor(plugid, hwnd);
-        }
-
-        public void closeEditorWindow(int plugid)
-        {
-            VashtiCloseEditor(plugid);
-        }
-
-        public void sendMidiMessage(int plugid, int b1, int b2, int b3)
-        {
-            VashtiHandleMidiMsg(plugid, b1, b2, b3);
         }
     }
 }

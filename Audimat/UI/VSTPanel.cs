@@ -28,6 +28,8 @@ using System.Drawing.Drawing2D;
 
 using Audimat;
 using Transonic.VST;
+using Transonic.MIDI;
+using Transonic.MIDI.System;
 
 namespace Audimat.UI
 {
@@ -385,6 +387,26 @@ namespace Audimat.UI
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
             unloadPlugin();
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+
+    //midi input listener unit
+    public class PluginMidiIn : SystemUnit
+    {
+        public VSTPlugin plugin;
+
+        public PluginMidiIn(VSTPlugin _plugin)
+            : base(_plugin.name)
+        {
+            plugin = _plugin;
+        }
+
+        public override void receiveMessage(byte[] msg)
+        {
+            Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
+            plugin.sendMidiMessage(msg[0], msg[1], msg[2]);
         }
     }
 }
