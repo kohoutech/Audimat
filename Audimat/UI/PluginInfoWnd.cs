@@ -58,7 +58,7 @@ namespace Audimat.UI
             Array.Reverse(idchars);
             idstr = new String(idchars);
 
-            String infotext = plugin._name + "\n" +
+            String infotext = plugin.name + "\n" +
                 plugin.vendor + "\n\n" +
                 //plugin.version + "\n" +
                 plugin.numPrograms + " programs\n" +

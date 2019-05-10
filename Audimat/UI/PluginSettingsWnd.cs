@@ -54,8 +54,8 @@ namespace Audimat.UI
 
             panel = _panel;
             plugin = panel.plugin;
-            waveDevices = panel.audiwin.waveDevices;
-            midiDevices = panel.audiwin.midiDevices;
+            waveDevices = panel.rack.host.waveDevices;
+            midiDevices = panel.rack.midiDevices;
 
             cbxAudioIn.DataSource = waveDevices.getInDevNameList();
             cbxAudioOut.DataSource = waveDevices.getOutDevNameList();
@@ -201,8 +201,8 @@ namespace Audimat.UI
         {
             plugin.setAudioIn(cbxAudioIn.SelectedIndex - 1);
             plugin.setAudioOut(cbxAudioOut.SelectedIndex - 1);
-            plugin.setMidiIn(cbxMidiIn.SelectedIndex - 1);
-            plugin.setMidiOut(cbxMidiOut.SelectedIndex - 1);
+            panel.setMidiIn(cbxMidiIn.SelectedIndex - 1);
+            panel.setMidiOut(cbxMidiOut.SelectedIndex - 1);
 
             this.Close();
         }

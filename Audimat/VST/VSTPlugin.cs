@@ -66,22 +66,19 @@ namespace Transonic.VST
         public static extern void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3);
 
         //---------------------------------------------------------------------
-        
-        public VSTPanel panel;
-        public AudimatWindow audiwin;
 
         public VSTHost host;
         public String filename;
 
         public int audioInIdx;
         public int audioOutIdx;
-        public int midiInDeviceNum;
-        public PluginMidiIn midiInUnit;
-        public int midiOutIdx;
+        //public int midiInDeviceNum;
+        //public PluginMidiIn midiInUnit;
+        //public int midiOutIdx;
 
         //these are supplied by the plugin
         public int id;
-        public String _name;
+        public String name { set; get; }
         public String vendor;
         public int version;
         public int numPrograms;
@@ -99,78 +96,55 @@ namespace Transonic.VST
         public int editorWidth;
         public int editorHeight;
 
-
-        public VSTPlugin(VSTPanel _panel, VSTHost _host, String _filename)
+        //cons
+        public VSTPlugin(VSTHost _host, String _filename, int _id)
         {
-            panel = _panel;
-            audiwin = panel.audiwin;
             host = _host;
             filename = _filename;
+            id = _id;
 
             //-1 == not set yet
             audioInIdx = -1;
             audioOutIdx = -1;
-            midiInDeviceNum = -1;
-            midiInUnit = null;
-            midiOutIdx = -1;
-        }
 
-        public bool load()
-        {
-            id = host.loadPlugin(filename);
-            bool result = (id != -1);
-            if (result)
+            //get info from plugin
+            PluginInfo pluginfo = new PluginInfo();
+            getPluginInfo(ref pluginfo);
+            name = pluginfo.name;
+            vendor = pluginfo.vendor;
+            version = pluginfo.version;
+            numPrograms = pluginfo.numPrograms;
+            numParams = pluginfo.numParameters;
+            numInputs = pluginfo.numInputs;
+            numOutputs = pluginfo.numOutputs;
+            flags = pluginfo.flags;
+            uniqueID = pluginfo.uniqueID;
+            editorWidth = pluginfo.editorWidth;
+            editorHeight = pluginfo.editorHeight;
+
+            parameters = new VSTParam[numParams];
+            for (int i = 0; i < numParams; i++)
             {
-                PluginInfo pluginfo = new PluginInfo();
-                host.getPluginInfo(id, ref pluginfo);
-                _name = pluginfo.name;
-                vendor = pluginfo.vendor;
-                version = pluginfo.version;
-                numPrograms = pluginfo.numPrograms;
-                numParams = pluginfo.numParameters;
-                numInputs = pluginfo.numInputs;
-                numOutputs = pluginfo.numOutputs;
-                flags = pluginfo.flags;
-                uniqueID = pluginfo.uniqueID;
-                editorWidth = pluginfo.editorWidth;
-                editorHeight = pluginfo.editorHeight;
-
-                parameters = new VSTParam[numParams];
-                for (int i = 0; i < numParams; i++)
-                {
-                    String paramName = host.getPluginParamName(id, i);
-                    float paramVal = host.getPluginParamValue(id, i);
-                    parameters[i] = new VSTParam(i, paramName, paramVal);
-                }
-
-                if (numPrograms > 0)
-                {
-                    programs = new VSTProgram[numPrograms];
-                    for (int i = 0; i < numPrograms; i++)
-                    {
-                        String progName = host.getPluginProgramName(id, i);
-                        programs[i] = new VSTProgram(i, progName);
-                    }
-                }
-                else
-                {
-                    programs = new VSTProgram[1];
-                    programs[0] = new VSTProgram(0, "no programs");
-                }
-                curProgramNum = 0;
+                String paramName = getParamName(i);
+                float paramVal = getParamValue(i);
+                parameters[i] = new VSTParam(i, paramName, paramVal);
             }
-            return result;
-        }
 
-        public void unload()
-        {
-            setMidiIn(-1);                  //disconnect midi inptu listener
-            host.unloadPlugin(id);
-        }
-
-        public String name
-        {
-            get { return _name; }
+            if (numPrograms > 0)
+            {
+                programs = new VSTProgram[numPrograms];
+                for (int i = 0; i < numPrograms; i++)
+                {
+                    String progName = getProgramName(i);
+                    programs[i] = new VSTProgram(i, progName);
+                }
+            }
+            else
+            {
+                programs = new VSTProgram[1];
+                programs[0] = new VSTProgram(0, "no programs");
+            }
+            curProgramNum = 0;
         }
 
         //- settings ----------------------------------------------------------
@@ -191,117 +165,53 @@ namespace Transonic.VST
             }
         }
 
-        public void setMidiIn(int deviceNum)
+        //- backend methods ----------------------------------------------------------
+
+        public void getPluginInfo(ref PluginInfo pluginfo)
         {
-            if (midiInDeviceNum != deviceNum)
-            {
-                if (midiInUnit != null)
-                {
-                    audiwin.disconnectMidiInput(midiInDeviceNum, midiInUnit);
-                }
-                midiInDeviceNum = deviceNum;
-                if (deviceNum != -1)
-                {
-                    midiInUnit = new PluginMidiIn(this);
-                    audiwin.connectMidiInput(deviceNum, midiInUnit);
-                }
-                else
-                {
-                    midiInUnit = null;
-                }
-            }
+            VashtiGetPluginInfo(id, ref pluginfo);
         }
 
-        public void setMidiOut(int idx)
+        public String getParamName(int paramnum)
         {
-            if (midiOutIdx != idx)
-            {
-                midiOutIdx = idx;
-            }
+            return VashtiGetParamName(id, paramnum);
         }
 
-        //- plugin methods ----------------------------------------------------------
-
-        public void setPluginAudioIn(int plugid, int audioidx)
+        public float getParamValue(int paramnum)
         {
+            return VashtiGetParamValue(id, paramnum);
         }
 
-        public void setPluginAudioOut(int plugid, int audioidx)
+        public void setParamValue(int paramnum, float paramval)
         {
+            parameters[paramnum].value = paramval;
+            VashtiSetParamValue(id, paramnum, paramval);
         }
 
-        public void getPluginInfo(int plugid, ref PluginInfo pluginfo)
+        public String getProgramName(int prognum)
         {
-            VashtiGetPluginInfo(plugid, ref pluginfo);
+            return VashtiGetProgramName(id, prognum);
         }
 
-        public String getPluginParamName(int plugid, int paramnum)
+        public void setProgram(int prognum)
         {
-            return VashtiGetParamName(plugid, paramnum);
+            curProgramNum = prognum;
+            VashtiSetProgram(id, prognum);
         }
 
-        public float getPluginParamValue(int plugid, int paramnum)
+        public void openEditorWindow(IntPtr hwnd)
         {
-            return VashtiGetParamValue(plugid, paramnum);
-        }
-
-        public void setPluginParamValue(int plugid, int paramnum, float paramval)
-        {
-            VashtiSetParamValue(plugid, paramnum, paramval);
-        }
-
-        public String getPluginProgramName(int plugid, int prognum)
-        {
-            return VashtiGetProgramName(plugid, prognum);
-        }
-
-        public void setPluginProgram(int plugid, int prognum)
-        {
-            VashtiSetProgram(plugid, prognum);
-        }
-
-        public void openEditorWindow(int plugid, IntPtr hwnd)
-        {
-            VashtiOpenEditor(plugid, hwnd);
-        }
-
-        public void closeEditorWindow(int plugid)
-        {
-            VashtiCloseEditor(plugid);
-        }
-
-        public void sendMidiMessage(int plugid, int b1, int b2, int b3)
-        {
-            VashtiHandleMidiMsg(plugid, b1, b2, b3);
-        }
-
-        //- backend communication ---------------------------------------------
-
-        public void setParamValue(int paramNum, float paramVal)
-        {
-            parameters[paramNum].value = paramVal;
-            host.setPluginParamValue(id, paramNum, paramVal);
-        }
-
-        public void setProgram(int progNum)
-        {
-            curProgramNum = progNum;
-            host.setPluginProgram(id, progNum);
-        }
-
-        public void openEditorWindow(IntPtr editorWindow)
-        {
-            host.openEditorWindow(id, editorWindow);
+            VashtiOpenEditor(id, hwnd);
         }
 
         public void closeEditorWindow()
         {
-            host.closeEditorWindow(id);
+            VashtiCloseEditor(id);
         }
 
-        public void sendMidiMessage(byte b1, byte b2, byte b3)
+        public void sendShortMidiMessage(int b1, int b2, int b3)
         {
-            host.sendMidiMessage(id, b1, b2, b3);
+            VashtiHandleMidiMsg(id, b1, b2, b3);
         }
     }
 

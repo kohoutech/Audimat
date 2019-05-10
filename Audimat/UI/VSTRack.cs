@@ -26,6 +26,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 
 using Transonic.VST;
+using Transonic.MIDI.System;
 
 namespace Audimat.UI
 {
@@ -33,6 +34,7 @@ namespace Audimat.UI
     {
         public AudimatWindow auditwin;
         public VSTHost host;
+        public MidiSystem midiDevices;
 
         private VScrollBar scrollbar;
         private Panel panelSpace;
@@ -40,10 +42,12 @@ namespace Audimat.UI
         public List<VSTPanel> panels;
 
         //cons
-        public VSTRack(AudimatWindow _auditwin)
+        public VSTRack(AudimatWindow _auditwin, VSTHost _host)
         {
             auditwin = _auditwin;
-            host = auditwin.vashti.host;
+            host = _host;
+
+            midiDevices = new MidiSystem();
 
             scrollbar = new VScrollBar();
             scrollbar.Minimum = 0;
@@ -89,13 +93,35 @@ namespace Audimat.UI
             updateScrollBar();
         }
 
+        public void shutdown()
+        {
+            List<VSTPanel> temp = new List<VSTPanel>(panels);
+            foreach (VSTPanel panel in temp)
+            {
+                panel.unloadPlugin();
+            }
+            midiDevices.shutdown();     //close midi devices
+        }
+
+        //- host management ----------------------------------------------------------
+
+        public void startEngine()
+        {
+            host.startEngine();
+        }
+
+        public void stopEngine()
+        {
+            host.stopEngine();
+        }
+
         //- panel management ----------------------------------------------------------
 
         public bool addPanel(String plugPath)
         {
             VSTPanel panel = new VSTPanel(this, panels.Count);
             bool result = panel.loadPlugin(plugPath);
-            
+
             if (result)
             {
                 panels.Add(panel);
@@ -103,7 +129,7 @@ namespace Audimat.UI
                 panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panels.Count - 1));
                 panelSpace.Controls.Add(panel);
                 updateScrollBar();
-                auditwin.rackChanged();
+                auditwin.rackChanged();         //broadcast rack change
             }
             return result;
         }
@@ -122,26 +148,39 @@ namespace Audimat.UI
             }
             updateScrollBar();
             Invalidate();
-            auditwin.rackChanged();
+            auditwin.rackChanged();         //broadcast rack change
         }
 
         public List<VSTPlugin> getPluginList()
         {
-            List<VSTPlugin> result = new List<VSTPlugin>();
-            foreach (VSTPanel panel in panels)
-            {
-                result.Add(panel.plugin);
-            }
-            return result;
+            return host.plugins;
         }
 
-        public void shutdown()
+        //- i/o connections ---------------------------------------------------
+
+        public void connectMidiInput(int idx, PluginMidiIn pluginMidiIn)
         {
-            List<VSTPanel> temp = new List<VSTPanel>(panels);
-            foreach (VSTPanel panel in temp)
+            InputDevice indev = midiDevices.inputDevices[idx];
+            try
             {
-                panel.unloadPlugin();
+                indev.open();
+                indev.connectUnit(pluginMidiIn);
+                indev.start();
             }
+            catch
+            {
+                //Console.WriteLine("error connecting midi input");
+            }
+        }
+
+        public void disconnectMidiInput(int idx, PluginMidiIn pluginMidiIn)
+        {
+            InputDevice indev = midiDevices.inputDevices[idx];
+            indev.disconnectUnit(pluginMidiIn);
+        }
+
+        public void connectMidiOutput(int idx, PluginMidiIn pluginMidiIn)
+        {
         }
 
         //- painting ------------------------------------------------------------------

@@ -147,7 +147,7 @@ namespace Audimat.UI
         {
             if (currentPlugin != null)
             {
-                currentPlugin.sendMidiMessage(new NoteOnMessage(0, keyNumber, 0x60));
+                currentPlugin.sendShortMidiMessage(0x90, keyNumber, 0x60);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Audimat.UI
         {
             if (currentPlugin != null)
             {
-                currentPlugin.sendMidiMessage(new NoteOffMessage(0, keyNumber, 0x60));
+                currentPlugin.sendShortMidiMessage(0x80, keyNumber, 0x60);
             }
         }
 

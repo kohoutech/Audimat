@@ -36,8 +36,7 @@ namespace Audimat.UI
     public class VSTPanel : UserControl
     {
         public VSTRack rack;                //container
-        public AudimatWindow audiwin;       //container's container
-        public Vashti vashti;
+        public AudimatWindow audiwin;       //container's container - for using main window icon for panel child windows
 
         public VSTPlugin plugin;
         public int plugNum;
@@ -50,20 +49,21 @@ namespace Audimat.UI
         public const int PANELWIDTH = 400;
         private Label lblPlugName;
         private ComboBox cbxProgList;
-        private Button btnPlugClose;
+        private Button btnNextProg;
+        private Button btnPrevProg;
+        private Button btnPlugSettings;
         private Button btnPlugInfo;
         private Button btnPlugParam;
         private Button btnPlugEditor;
+        private Button btnPlugClose;
         private ToolTip paneltoolTip;
         private System.ComponentModel.IContainer components;
 
+        //child windows
         PluginSettingsWnd pluginSettingsWnd;
         PluginInfoWnd pluginInfoWnd;
         PluginParamWnd paramEditorWnd;
         Form editorWindow;
-        private Button btnNextProg;
-        private Button btnPrevProg;
-        private Button btnPlugSettings;
         Size editorWindowSize;
 
         //cons
@@ -73,7 +73,6 @@ namespace Audimat.UI
 
             rack = _rack;
             audiwin = rack.auditwin;
-            vashti = audiwin.vashti;
 
             plugNum = _plugNum;
             this.lblPlugName.Text = plugName;
@@ -227,29 +226,29 @@ namespace Audimat.UI
         {
             plugPath = _plugPath;
             fileName = Path.GetFileNameWithoutExtension(plugPath);
-            plugin = new VSTPlugin(this, vashti, plugPath);
-            bool result = plugin.load();
-            if (result)
+            plugin = rack.host.loadPlugin(plugPath);
+            if (plugin != null)
             {
-                plugName = (plugin._name.Length > 0) ? plugin._name : fileName;
+                plugName = (plugin.name.Length > 0) ? plugin.name : fileName;
                 lblPlugName.Text = plugName;
                 editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
                 cbxProgList.DisplayMember = "name";
-                cbxProgList.DataSource = plugin.programs;                
+                cbxProgList.DataSource = plugin.programs;
+                return true;
             }
-            return result;
+            return false;
         }
 
         public void unloadPlugin()
         {
             //close child windows
-            if (pluginSettingsWnd != null)  { pluginSettingsWnd.Close(); }
-            if (pluginInfoWnd != null)      { pluginInfoWnd.Close(); }
-            if (paramEditorWnd != null)     { paramEditorWnd.Close(); }
-            if (editorWindow != null)       { editorWindow.Close(); }
+            if (pluginSettingsWnd != null) { pluginSettingsWnd.Close(); }
+            if (pluginInfoWnd != null) { pluginInfoWnd.Close(); }
+            if (paramEditorWnd != null) { paramEditorWnd.Close(); }
+            if (editorWindow != null) { editorWindow.Close(); }
 
-            rack.removePanel(plugNum);      //remove from rack
-            plugin.unload();                //disconnect and unload back end
+            rack.removePanel(plugNum);          //remove from rack
+            rack.host.unloadPlugin(plugin);     //disconnect and unload back end
         }
 
         //- painting ------------------------------------------------------------------
@@ -309,6 +308,8 @@ namespace Audimat.UI
             }
         }
 
+        //- plugin settings window ------------------------------------------------
+
         private void btnPlugSettings_Click(object sender, EventArgs e)
         {
             btnPlugSettings.Enabled = false;
@@ -322,6 +323,35 @@ namespace Audimat.UI
         private void settingsWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             btnPlugSettings.Enabled = true;
+        }
+
+        public void setMidiIn(int deviceNum)
+        {
+            //    if (midiInDeviceNum != deviceNum)
+            //    {
+            //        if (midiInUnit != null)
+            //        {
+            //            audiwin.disconnectMidiInput(midiInDeviceNum, midiInUnit);
+            //        }
+            //        midiInDeviceNum = deviceNum;
+            //        if (deviceNum != -1)
+            //        {
+            //            midiInUnit = new PluginMidiIn(this);
+            //            audiwin.connectMidiInput(deviceNum, midiInUnit);
+            //        }
+            //        else
+            //        {
+            //            midiInUnit = null;
+            //        }
+            //    }
+        }
+
+        public void setMidiOut(int idx)
+        {
+            //    if (midiOutIdx != idx)
+            //    {
+            //        midiOutIdx = idx;
+            //    }
         }
 
         //- plugin info window ------------------------------------------------
@@ -405,8 +435,8 @@ namespace Audimat.UI
 
         public override void receiveMessage(byte[] msg)
         {
-            Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
-            plugin.sendMidiMessage(msg[0], msg[1], msg[2]);
+            //Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
+            plugin.sendShortMidiMessage(msg[0], msg[1], msg[2]);
         }
     }
 }

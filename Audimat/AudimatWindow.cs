@@ -29,7 +29,6 @@ using System.IO;
 
 using Audimat.UI;
 using Transonic.VST;
-using Transonic.MIDI.System;
 using Transonic.Widget;
 
 namespace Audimat
@@ -45,8 +44,6 @@ namespace Audimat
 
         //backend & i/o
         public Vashti vashti;
-        public WaveDevices waveDevices;
-        public MidiSystem midiDevices;
 
         public bool isRunning;
 
@@ -60,6 +57,8 @@ namespace Audimat
 
         public AudimatWindow()
         {
+            vashti = new Vashti();
+
             InitializeComponent();
 
             //control panel goes just below menubar
@@ -70,7 +69,7 @@ namespace Audimat
             this.Controls.Add(controlPanel);
 
             //rack control fills up entire client area between control panel & status bar
-            rack = new VSTRack(this);
+            rack = new VSTRack(this, vashti.host);
             rack.Location = new Point(this.ClientRectangle.Left, controlPanel.Bottom);
             this.Controls.Add(rack);
             controlPanel.Width = rack.Width;
@@ -81,10 +80,6 @@ namespace Audimat
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
 
             patchWin = new PatchWindow(this);
-
-            vashti = new Vashti();
-            waveDevices = new WaveDevices();
-            midiDevices = new MidiSystem();
 
             isRunning = false;
 
@@ -109,13 +104,11 @@ namespace Audimat
         {
             base.OnFormClosing(e);
 
-            stopHost();
             rack.shutdown();            //unload all plugins in rack
-            midiDevices.shutdown();     //close midi devices
             vashti.shutDown();          //shut down back end
         }
 
-        //callback when rack's contents have increased or decreased
+        //callback when plugins have been added or removed from the rack
         public void rackChanged()
         {
             if (keyboardWnd != null)
@@ -135,14 +128,14 @@ namespace Audimat
 
         public void startHost()
         {
-            host.startEngine();
+            rack.startEngine();
             isRunning = true;
             lblAudimatStatus.Text = "Engine is running";
         }
 
         public void stopHost()
         {
-            host.stopEngine();
+            rack.stopEngine();
             isRunning = false;
             lblAudimatStatus.Text = "Engine is stopped";
         }
@@ -243,33 +236,6 @@ namespace Audimat
         {
             String msg = "Audimat\nversion 1.2.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
-        }
-
-        //- i/o connections ---------------------------------------------------
-
-        public void connectMidiInput(int idx, PluginMidiIn pluginMidiIn)
-        {
-            InputDevice indev = midiDevices.inputDevices[idx];
-            try
-            {
-                indev.open();
-                indev.connectUnit(pluginMidiIn);
-                indev.start();                
-            }
-            catch
-            {
-                //Console.WriteLine("error connecting midi input");
-            }
-        }
-
-        public void disconnectMidiInput(int idx, PluginMidiIn pluginMidiIn)
-        {
-            InputDevice indev = midiDevices.inputDevices[idx];
-            indev.disconnectUnit(pluginMidiIn);
-        }
-
-        public void connectMidiOutput(int idx, PluginMidiIn pluginMidiIn)
-        {
         }
     }
 }

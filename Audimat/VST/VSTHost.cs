@@ -50,6 +50,7 @@ namespace Transonic.VST
         //- host methods ----------------------------------------------------------
 
         public Vashti vashti;
+        public WaveDevices waveDevices;
         public bool isEngineRunning;
 
         public List<VSTPlugin> plugins;
@@ -57,6 +58,8 @@ namespace Transonic.VST
         public VSTHost(Vashti _vashti)
         {
             vashti = _vashti;
+            waveDevices = new WaveDevices();
+
             isEngineRunning = false;
             plugins = new List<VSTPlugin>();
         }
@@ -67,25 +70,38 @@ namespace Transonic.VST
 
         public void startEngine()
         {
-            VashtiStartEngine();
-            isEngineRunning = true;
+            if (!isEngineRunning)
+            {
+                VashtiStartEngine();
+                isEngineRunning = true;
+            }
         }
 
         public void stopEngine()
         {
-            VashtiStopEngine();
-            isEngineRunning = false;
+            if (isEngineRunning)
+            {
+                VashtiStopEngine();
+                isEngineRunning = false;
+            }
         }
 
-        public int loadPlugin(string filename)
+        public VSTPlugin loadPlugin(string filename)
         {
-            int plugid = VashtiLoadPlugin(filename);
-            return plugid;
+            VSTPlugin plugin = null;
+            int plugid = VashtiLoadPlugin(filename);        //load plugin in backend, returns -1 if load failed
+            if (plugid != -1)
+            {
+                plugin = new VSTPlugin(this, filename, plugid);
+                plugins.Add(plugin);
+            }
+            return plugin;
         }
 
-        public void unloadPlugin(int plugid)
+        public void unloadPlugin(VSTPlugin plugin)
         {
-            VashtiUnloadPlugin(plugid);
+            plugins.Remove(plugin);
+            VashtiUnloadPlugin(plugin.id);
         }
 
         public void setSampleRate(int rate)
