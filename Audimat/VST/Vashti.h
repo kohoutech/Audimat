@@ -39,22 +39,11 @@ public:
 
 	VSTHost* vstHost;
 
-	WaveOutDevice* waveOut;
-
 	//host
-	void startEngine();
-	void stopEngine();
-	BOOL isEngineRunning() { return isRunning; }
-
 	void setPlugAudioIn(int vstnum, int idx);
 	void setPlugAudioOut(int vstnum, int idx);
-	int loadPlugin(LPCSTR fileName);
-	void unloadPlugin(int vstNum);
-	void setSampleRate(int rate);
-	void setBlockSize(int size);
 
 	//plugin 
-	void getPlugInfo(int vstnum, PlugInfo* pinfo);
 	char* getParamName(int vstnum, int paramnum);
 	float getParamVal(int vstnum, int paramnum);
 	void setParamVal(int vstNum, int paramnum, float paramval);
@@ -63,30 +52,6 @@ public:
 
 	void openEditor(int vstNum, void * hwnd);
 	void closeEditor(int vstNum);
-	void handleMidiShortMsg(int vstnum, int b1, int b2, int b3);
-
-protected:
-	float * emptyBuf[2];
-	int sampleRate;
-	long blockSize;
-
-	DWORD dwRest;
-	DWORD dwLastTime;
-	UINT timerDuration;
-	UINT timerID;
-	TIMECAPS tc;
-
-	BOOL bNoSave;
-	DWORD dwStartStamp;
-	BOOL isRunning;
-
-	BOOL loadWaveOutDevice(int devID);
-
-	//timing
-	BOOL startTimer(UINT msSec=0);
-	void stopTimer();
-	static void CALLBACK timerCallback(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2);
-	void handleTimer();
 };
 
 #endif // Vashti_H

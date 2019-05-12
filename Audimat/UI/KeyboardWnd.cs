@@ -39,6 +39,7 @@ namespace Audimat.UI
         public AudimatWindow auditwin;
         public List<VSTPlugin> plugins;
         public VSTPlugin currentPlugin;
+        public String currentPluginName;
 
         private ComboBox cbxPlugin;
         public ComboBox cbxKeySize;
@@ -49,7 +50,6 @@ namespace Audimat.UI
         public KeyboardWnd(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
-            currentPlugin = null;
 
             InitializeComponent();
 
@@ -63,6 +63,7 @@ namespace Audimat.UI
             cbxKeySize.SelectedIndex = 3;
 
             setPluginList();
+            cbxPlugin.SelectedIndex = 0;        //this triggers selected index change listener
         }
 
         private void InitializeComponent()
@@ -104,44 +105,77 @@ namespace Audimat.UI
             this.ResumeLayout(false);
         }
 
+        //- key size ----------------------------------------------------------
+
         public void setSize(int keySize)
         {
-            cbxKeySize.SelectedIndex = keySize;
+            cbxKeySize.SelectedIndex = keySize;         //triggers size change listener
         }
+
+        private void cbxKeySize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            keySize = keySizeVals[cbxKeySize.SelectedIndex];
+            keyboardBar.setKeyboardSize(keySize, KeyboardBar.KeySize.FULL);
+            ClientSize = new Size(keyboardBar.Width, keyboardBar.Height + keyboardBar.Top);
+            cbxKeySize.Location = new Point(this.ClientSize.Width - cbxKeySize.Width - 12, cbxKeySize.Top);
+        }
+
+        //- plugin list -------------------------------------------------------
 
         public void setPluginList()
         {
             plugins = auditwin.rack.getPluginList();
+            cbxPlugin.Items.Clear();
             if (plugins.Count > 0)
             {
-                if (cbxPlugin.DataSource == null) cbxPlugin.Items.Clear();      //remove "no plugins loaded"
-                cbxPlugin.DisplayMember = "name";
-                cbxPlugin.DataSource = plugins;
+                for (int i = 0; i < plugins.Count; i++)
+                {
+                    cbxPlugin.Items.Add(plugins[i].name);
+                }
                 cbxPlugin.Enabled = true;
             }
             else
-            {
-                cbxPlugin.DisplayMember = null;
-                cbxPlugin.DataSource = null;
+            {                
                 cbxPlugin.Items.Add("no plugins loaded");
-                cbxPlugin.SelectedIndex = 0;
                 cbxPlugin.Enabled = false;
             }
         }
 
-        public void setSelectedPlugin(VSTPlugin keyWindowPlugin)
+        public void setSelectedPlugin(VSTPlugin plugin)
         {
-            //previous cur plugin maybe have been been unloaded, so check for it in plugin list
-            for (int i = 0; i < plugins.Count; i++)
-            {
-                if (plugins[i] == keyWindowPlugin)
-                {
-                    cbxPlugin.SelectedIndex = i;
-                }
-            }
+            currentPlugin = plugin;
+            currentPluginName = (plugin != null) ? plugin.name : null;
         }
 
-        //- event handlers ----------------------------------------------------
+        private void cbxPlugin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            VSTPlugin plugin = (plugins.Count > 0) ? plugins[cbxPlugin.SelectedIndex] : null; 
+            setSelectedPlugin(plugin);
+        }
+
+        public void updatePluginList()
+        {
+            setPluginList();
+            
+            //previous cur plugin maybe have been been unloaded, so check for it's name in plugin list
+            //default to first plugin in list is not found (ie it was unloaded)
+            int nameIdx = 0;
+            if (currentPluginName != null)
+            {
+                for (int i = 0; i < plugins.Count; i++)
+                {
+                    if (currentPluginName.Equals(plugins[i].name))
+                    {
+                        nameIdx = i;
+                        break;
+                    }                    
+                }                
+            }
+            cbxPlugin.SelectedIndex = nameIdx;
+            Invalidate();
+        }
+
+        //- MIDI ----------------------------------------------------
 
         public void onKeyPress(int keyNumber)
         {
@@ -159,33 +193,5 @@ namespace Audimat.UI
             }
         }
 
-        private void cbxPlugin_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (plugins.Count > 0)
-            {
-                currentPlugin = (VSTPlugin)cbxPlugin.SelectedItem;
-            }
-            else
-            {
-                currentPlugin = null;
-            }
-        }
-
-        private void cbxKeySize_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            keySize = keySizeVals[cbxKeySize.SelectedIndex];
-            keyboardBar.setKeyboardSize(keySize, KeyboardBar.KeySize.FULL);
-            ClientSize = new Size(keyboardBar.Width, keyboardBar.Height + keyboardBar.Top);
-            cbxKeySize.Location = new Point(this.ClientSize.Width - cbxKeySize.Width - 12, cbxKeySize.Top);                    
-        }
-
-        public void updatePluginList()
-        {
-            setPluginList();
-            if (currentPlugin != null)
-            {
-                setSelectedPlugin(currentPlugin);
-            }
-        }
     }
 }

@@ -73,12 +73,18 @@ namespace Transonic.MIDI.System
 
         public void connectUnit(SystemUnit unit)
         {
-            unitList.Add(unit);
+            if (unit != null)
+            {
+                unitList.Add(unit);
+            }
         }
 
         public void disconnectUnit(SystemUnit unit)
         {
-            unitList.Remove(unit);
+            if (unit != null)
+            {
+                unitList.Remove(unit);
+            }
         }
         
 // midi funcs -----------------------------------------------------------------

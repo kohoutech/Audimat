@@ -45,32 +45,32 @@ extern "C" __declspec(dllexport) void VashtiShutDown() {
 
 extern "C" __declspec(dllexport) void VashtiStartEngine() {
 
-	Vashti::vashtiB->startEngine();
+	Vashti::vashtiB->vstHost->startEngine();
 }
 
 extern "C" __declspec(dllexport) void VashtiStopEngine() {
 
-	Vashti::vashtiB->stopEngine();
+	Vashti::vashtiB->vstHost->stopEngine();
 }
 
 extern "C" __declspec(dllexport) int VashtiLoadPlugin(char* name) {
 
-	return Vashti::vashtiB->loadPlugin(name);
+	return Vashti::vashtiB->vstHost->loadPlugin(name);
 }
 
 extern "C" __declspec(dllexport) void VashtiUnloadPlugin(int vstnum) {
 
-	Vashti::vashtiB->unloadPlugin(vstnum);
+	Vashti::vashtiB->vstHost->unloadPlugin(vstnum);
 }
 
 extern "C" __declspec(dllexport) void VashtiSetSampleRate(int rate) {
 
-	Vashti::vashtiB->setSampleRate(rate);
+	Vashti::vashtiB->vstHost->setSampleRate(rate);
 }
 
 extern "C" __declspec(dllexport) void VashtiSetBlockSize(int size) {
 
-	Vashti::vashtiB->setBlockSize(size);
+	Vashti::vashtiB->vstHost->setBlockSize(size);
 }
 
 //- plugin exports ------------------------------------------------------------
@@ -87,7 +87,11 @@ extern "C" __declspec(dllexport) void VashtiSetPluginAudioOut(int vstnum, int id
 
 extern "C" __declspec(dllexport) void VashtiGetPluginInfo(int vstnum, PlugInfo* pinfo) {
 
-	Vashti::vashtiB->getPlugInfo(vstnum, pinfo);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		vst->getPlugInfo(pinfo);
+	}
 }
 
 extern "C" __declspec(dllexport) char* VashtiGetParamName(int vstnum, int paramnum){
@@ -127,7 +131,11 @@ extern "C" __declspec(dllexport) void VashtiCloseEditor(int vstnum) {
 
 extern "C" __declspec(dllexport) void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3) {
 
-	Vashti::vashtiB->handleMidiShortMsg(vstnum, b1, b2, b3);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		vst->storeMidiShortMsg(b1, b2, b3);
+	}	
 }
 
 //---------------------------------------------------------------------------
@@ -135,184 +143,11 @@ extern "C" __declspec(dllexport) void VashtiHandleMidiMsg(int vstnum, int b1, in
 Vashti::Vashti() 
 {
 	vstHost = new VSTHost();
-
-	timerID = 0;                              
-	timeGetDevCaps(&tc, sizeof(tc));		//get timer capabilities
-	dwRest = 0;
-	dwLastTime = 0;
-
-	for (int i = 0; i < 2; i++)            
-	{
-		emptyBuf[i] = new float[DEFAULTSAMPLERATE];
-		if (emptyBuf[i])
-			for (int j = 0; j < DEFAULTSAMPLERATE; j++)
-				emptyBuf[i][j] = 0.0f;
-	}
-
-	//default vals
-	sampleRate = DEFAULTSAMPLERATE;
-	blockSize = sampleRate / WAVEBUFCOUNT;		//default duration = 100ms
-	timerDuration = WAVEBUFDURATION;
-
-	//use default in & out for now
-	loadWaveOutDevice(WAVE_MAPPER);		// open output device
-
-	isRunning = false;
 }
 
 Vashti::~Vashti() 
 {
-	stopEngine();
-	waveOut->close();
-
-	isRunning = false;
-	vstHost->unloadAll();  
-
-	for (int i = 0; i < 2; i++)             //delete empty buffers
-		if (emptyBuf[i])
-			delete[] emptyBuf[i];
-
 	delete vstHost;
-}
-
-//- host engine methods -------------------------------------------------------
-
-void Vashti::startEngine() 
-{
-	if (isRunning)
-		return;
-
-	//start output device and timer to send track data to it
-	waveOut->start();		
-	int timerDuration = (blockSize * 1000) / sampleRate;		//timer len in msec
-	startTimer(timerDuration);
-
-	isRunning = TRUE;
-}
-
-void Vashti::stopEngine() 
-{
-	if (!isRunning)
-		return;
-
-	//stop output device
-	stopTimer(); 
-	waveOut->stop();
-
-	isRunning = FALSE;
-}
-
-//- timer methods -------------------------------------------------------------
-
-BOOL Vashti::startTimer(UINT msSec)
-{
-	if (msSec < tc.wPeriodMin)          
-		msSec = tc.wPeriodMin;
-
-	timerDuration = msSec;
-	int resolution = timerDuration / 10;
-	timeBeginPeriod(resolution);        
-
-	//timer will call <timerCallback> func every <timerDuration> millisecs
-	timerID = timeSetEvent(timerDuration, (resolution > 1) ? resolution / 2 : 1, timerCallback, (DWORD)this, 
-		TIME_PERIODIC || TIME_KILL_SYNCHRONOUS);
-
-	return (timerID != NULL);
-}
-
-void Vashti::stopTimer() 
-{
-	if (timerID != NULL)
-	{
-		timeKillEvent(timerID);
-		timerID = 0;
-		timeEndPeriod(tc.wPeriodMin);
-	}
-}
-
-void CALLBACK Vashti::timerCallback(UINT uID,	UINT uMsg,	DWORD dwUser,	DWORD dw1,	DWORD dw2)
-{
-	if (dwUser)                             
-		((Vashti *)dwUser)->handleTimer();		//use dwUser field to xlate Windows call back to class method
-}
-
-void Vashti::handleTimer()
-{
-	static DWORD now;                
-	static DWORD dwOffset;                 
-	static WORD  i;                        
-
-	now = timeGetTime();             
-	dwOffset = now - dwLastTime;			//time since last timer call
-	if (dwOffset > now)              
-	{
-		dwLastTime = 0;                    
-		dwOffset = now;              
-	}                                   
-
-	dwOffset += dwRest;						//ofs from last timer duration - compensate for timer drift
-	if (dwOffset > timerDuration)			//if we've passed the next timer duration
-	{
-		dwLastTime = now;            
-		dwRest = dwOffset - timerDuration;     
-		vstHost->processAudio(emptyBuf, (sampleRate * timerDuration / 1000), 2, now - dwStartStamp);
-	}
-}
-
-//- device methods ------------------------------------------------------------
-
-BOOL Vashti::loadWaveOutDevice	(int devID)
-{
-	BOOL result = FALSE;
-
-	waveOut = new WaveOutDevice();
-	waveOut->setBufferCount(WAVEBUFCOUNT);
-	waveOut->setBufferDuration(WAVEBUFDURATION);
-	result = waveOut->open(devID, sampleRate, 16, 2);		//stereo out
-
-	vstHost->setWaveOut(waveOut);
-	vstHost->setBlockSize(blockSize);
-
-	return result;
-}
-
-//- plugin methods ------------------------------------------------------------
-
-int Vashti::loadPlugin(LPCSTR fileName) 
-{ 
-	BOOL wasEngineRunning = isRunning;         
-
-	if (isRunning) stopEngine();                           
-
-	int plugid = vstHost->loadPlugin(fileName);
-
-	if (wasEngineRunning) startEngine();
-	return plugid;
-}
-
-void Vashti::unloadPlugin(int vstNum) 
-{
-	BOOL wasEngineRunning = isRunning;         
-
-	if (isRunning) stopEngine();                           
-
-	vstHost->unloadPlugin(vstNum);
-
-	if (wasEngineRunning) startEngine();
-}
-
-void Vashti::setSampleRate(int rate)
-{
-	if (isRunning) stopEngine();                           
-
-	vstHost->setSampleRate(rate);
-}
-
-void Vashti::setBlockSize(int size)
-{
-	if (isRunning) stopEngine();                           
-
-	vstHost->setBlockSize(size);
 }
 
 //- plugin methods ------------------------------------------------------------
@@ -323,36 +158,6 @@ void Vashti::setPlugAudioIn(int vstnum, int idx)
 
 void Vashti::setPlugAudioOut(int vstnum, int idx)
 {
-}
-
-
-void Vashti::getPlugInfo(int vstnum, PlugInfo* pinfo) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst != NULL)
-	{
-		pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-		vst->getProductString(pinfo->name);
-		pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-		vst->getVendorString(pinfo->vendor);
-		pinfo->version = vst->getVstVersion();
-		pinfo->numPrograms = vst->pEffect->numPrograms;
-		pinfo->numParameters = vst->pEffect->numParams;
-		pinfo->numInputs = vst->pEffect->numInputs;
-		pinfo->numOutputs = vst->pEffect->numOutputs;
-		pinfo->flags = vst->pEffect->flags;
-		pinfo->uniqueID = vst->pEffect->uniqueID;
-
-		if (vst->pEffect->flags && effFlagsHasEditor != 0) {
-			ERect* pRect;
-			vst->editGetRect(&pRect);
-			pinfo->editorWidth = pRect->right - pRect->left;
-			pinfo->editorHeight = pRect->bottom - pRect->top;
-		} else {
-			pinfo->editorWidth = 0;
-			pinfo->editorHeight = 0;
-		}
-	}
 }
 
 //- plugin params -------------------------------------------------------------
@@ -425,15 +230,6 @@ void Vashti::closeEditor(int vstNum)
 	if (vst) 
 	{
 		vst->editClose();
-	}
-}
-
-void Vashti::handleMidiShortMsg(int vstnum, int b1, int b2, int b3) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst) 
-	{
-		vst->storeMidiShortMsg(b1, b2, b3);
 	}
 }
 

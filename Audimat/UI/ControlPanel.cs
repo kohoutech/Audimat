@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Audimat.UI
 {
@@ -34,6 +35,8 @@ namespace Audimat.UI
         public Button btnPanic;
         public Button btnKeys;
         public Button btnStop;
+        private ToolTip controlPanelToolTip;
+        private System.ComponentModel.IContainer components;
         public Button btnStart;
 
         public ControlPanel(AudimatWindow _auditwin)
@@ -45,11 +48,13 @@ namespace Audimat.UI
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnPanic = new System.Windows.Forms.Button();
             this.btnKeys = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
+            this.controlPanelToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // btnLoad
@@ -59,6 +64,7 @@ namespace Audimat.UI
             this.btnLoad.Size = new System.Drawing.Size(39, 24);
             this.btnLoad.TabIndex = 8;
             this.btnLoad.Text = "Load";
+            this.controlPanelToolTip.SetToolTip(this.btnLoad, "load plugin");
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
@@ -69,6 +75,7 @@ namespace Audimat.UI
             this.btnPanic.Size = new System.Drawing.Size(42, 24);
             this.btnPanic.TabIndex = 9;
             this.btnPanic.Text = "Panic";
+            this.controlPanelToolTip.SetToolTip(this.btnPanic, "panic button!");
             this.btnPanic.UseVisualStyleBackColor = true;
             this.btnPanic.Click += new System.EventHandler(this.btnPanic_Click);
             // 
@@ -79,6 +86,7 @@ namespace Audimat.UI
             this.btnKeys.Size = new System.Drawing.Size(38, 24);
             this.btnKeys.TabIndex = 10;
             this.btnKeys.Text = "Keys";
+            this.controlPanelToolTip.SetToolTip(this.btnKeys, "show keyboard window");
             this.btnKeys.UseVisualStyleBackColor = true;
             this.btnKeys.Click += new System.EventHandler(this.btnKeys_Click);
             // 
@@ -89,6 +97,7 @@ namespace Audimat.UI
             this.btnStop.Size = new System.Drawing.Size(37, 24);
             this.btnStop.TabIndex = 11;
             this.btnStop.Text = "Stop";
+            this.controlPanelToolTip.SetToolTip(this.btnStop, "stop engine");
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
@@ -99,6 +108,7 @@ namespace Audimat.UI
             this.btnStart.Size = new System.Drawing.Size(37, 24);
             this.btnStart.TabIndex = 12;
             this.btnStart.Text = "Start";
+            this.controlPanelToolTip.SetToolTip(this.btnStart, "start engine");
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
@@ -141,6 +151,19 @@ namespace Audimat.UI
         private void btnPanic_Click(object sender, EventArgs e)
         {
             //not implemented yet
+        }
+
+        //- painting ------------------------------------------------------------------
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            //beveled edge
+            g.DrawLine(Pens.SteelBlue, 1, this.Height - 1, this.Width - 1, this.Height - 1);        //bottom
+            g.DrawLine(Pens.SteelBlue, this.Width - 1, 1, this.Width - 1, this.Height - 1);         //right
         }
     }
 }

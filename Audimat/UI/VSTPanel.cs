@@ -66,6 +66,11 @@ namespace Audimat.UI
         Form editorWindow;
         Size editorWindowSize;
 
+        public int midiInDeviceNum;
+        public PanelMidiIn midiInUnit;
+        public int midiOutDeviceNum;
+
+
         //cons
         public VSTPanel(VSTRack _rack, int _plugNum)
         {
@@ -85,6 +90,10 @@ namespace Audimat.UI
             pluginInfoWnd = null;
             paramEditorWnd = null;
             editorWindow = null;
+
+            midiInDeviceNum = -1;
+            midiInUnit = null;
+            midiOutDeviceNum = -1;
         }
 
         private void InitializeComponent()
@@ -242,12 +251,33 @@ namespace Audimat.UI
         public void unloadPlugin()
         {
             //close child windows
-            if (pluginSettingsWnd != null) { pluginSettingsWnd.Close(); }
-            if (pluginInfoWnd != null) { pluginInfoWnd.Close(); }
-            if (paramEditorWnd != null) { paramEditorWnd.Close(); }
-            if (editorWindow != null) { editorWindow.Close(); }
+            if (pluginSettingsWnd != null)
+            {
+                pluginSettingsWnd.Close();
+                pluginSettingsWnd = null;
+            }
+            if (pluginInfoWnd != null)
+            {
+                pluginInfoWnd.Close();
+                pluginInfoWnd = null;
+            }
+            if (paramEditorWnd != null)
+            {
+                paramEditorWnd.Close();
+                paramEditorWnd = null;
+            }
+            if (editorWindow != null)
+            {
+                editorWindow.Close();
+                editorWindow = null;
+            }
 
-            rack.removePanel(plugNum);          //remove from rack
+            //disconnect midi i/o
+            if (midiInDeviceNum != -1)
+            {
+                rack.disconnectMidiInput(midiInDeviceNum, midiInUnit);
+            }
+
             rack.host.unloadPlugin(plugin);     //disconnect and unload back end
         }
 
@@ -327,31 +357,31 @@ namespace Audimat.UI
 
         public void setMidiIn(int deviceNum)
         {
-            //    if (midiInDeviceNum != deviceNum)
-            //    {
-            //        if (midiInUnit != null)
-            //        {
-            //            audiwin.disconnectMidiInput(midiInDeviceNum, midiInUnit);
-            //        }
-            //        midiInDeviceNum = deviceNum;
-            //        if (deviceNum != -1)
-            //        {
-            //            midiInUnit = new PluginMidiIn(this);
-            //            audiwin.connectMidiInput(deviceNum, midiInUnit);
-            //        }
-            //        else
-            //        {
-            //            midiInUnit = null;
-            //        }
-            //    }
+            if (midiInDeviceNum != deviceNum)
+            {
+                if (midiInUnit != null)
+                {
+                    rack.disconnectMidiInput(midiInDeviceNum, midiInUnit);
+                }
+                midiInDeviceNum = deviceNum;
+                if (deviceNum != -1)
+                {
+                    midiInUnit = new PanelMidiIn(this);
+                    rack.connectMidiInput(deviceNum, midiInUnit);
+                }
+                else
+                {
+                    midiInUnit = null;
+                }
+            }
         }
 
         public void setMidiOut(int idx)
         {
-            //    if (midiOutIdx != idx)
-            //    {
-            //        midiOutIdx = idx;
-            //    }
+            if (midiOutDeviceNum != idx)
+            {
+                midiOutDeviceNum = idx;
+            }
         }
 
         //- plugin info window ------------------------------------------------
@@ -416,27 +446,27 @@ namespace Audimat.UI
 
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
-            unloadPlugin();
+            rack.removePanel(this);
         }
     }
 
-    //-----------------------------------------------------------------------------
+    //- midi listener ---------------------------------------------------------
 
     //midi input listener unit
-    public class PluginMidiIn : SystemUnit
+    public class PanelMidiIn : SystemUnit
     {
-        public VSTPlugin plugin;
+        public VSTPanel panel;
 
-        public PluginMidiIn(VSTPlugin _plugin)
-            : base(_plugin.name)
+        public PanelMidiIn(VSTPanel _panel)
+            : base(_panel.plugName)
         {
-            plugin = _plugin;
+            panel = _panel;
         }
 
         public override void receiveMessage(byte[] msg)
         {
             //Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
-            plugin.sendShortMidiMessage(msg[0], msg[1], msg[2]);
+            panel.plugin.sendShortMidiMessage(msg[0], msg[1], msg[2]);
         }
     }
 }

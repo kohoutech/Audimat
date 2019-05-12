@@ -72,13 +72,10 @@ namespace Transonic.VST
 
         public int audioInIdx;
         public int audioOutIdx;
-        //public int midiInDeviceNum;
-        //public PluginMidiIn midiInUnit;
-        //public int midiOutIdx;
 
         //these are supplied by the plugin
         public int id;
-        public String name { set; get; }
+        public String name;
         public String vendor;
         public int version;
         public int numPrograms;

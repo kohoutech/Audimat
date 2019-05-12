@@ -85,6 +85,9 @@
     <Compile Include="UI\ControlPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="UI\HostSettingsWnd.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\KeyboardWnd.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -139,6 +142,9 @@
     </Compile>
     <EmbeddedResource Include="UI\ControlPanel.resx">
       <DependentUpon>ControlPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\HostSettingsWnd.resx">
+      <DependentUpon>HostSettingsWnd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\KeyboardWnd.resx">
       <DependentUpon>KeyboardWnd.cs</DependentUpon>

@@ -54,6 +54,7 @@ public:
 
     bool load(const char *name);
     void unload();
+	void getPlugInfo(PlugInfo* pinfo);
 
 //processing
 	void storeMidiShortMsg(int b1, int b2, int b3);

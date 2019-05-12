@@ -60,6 +60,7 @@ namespace Audimat.UI
             cbxAudioIn.DataSource = waveDevices.getInDevNameList();
             cbxAudioOut.DataSource = waveDevices.getOutDevNameList();
             cbxMidiIn.DataSource = midiDevices.getInDevNameList();
+            cbxMidiIn.SelectedIndex = panel.midiInDeviceNum + 1;
             cbxMidiOut.DataSource = midiDevices.getOutDevNameList();
         }
 

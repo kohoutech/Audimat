@@ -34,27 +34,46 @@ public:
 
 	void setSampleRate(int rate);
 	void setBlockSize (int size);
-	void setWaveOut (WaveOutDevice* _waveOut) { waveOut = _waveOut; }
+
+	void startEngine();
+	void stopEngine();
+	BOOL isEngineRunning() { return isRunning; }
 
 	//plugin
 	int loadPlugin(const char * filename);
-	VSTPlugin* getPlugin(int idx);
     void unloadPlugin(int idx);
     void unloadAll();
-
-	//audio
-	void processAudio(float **pBuffer, int nLength, int nChannels = 2, DWORD dwStamp = 0);
+	VSTPlugin* getPlugin(int idx);
 
 protected:
-    float sampleRate;
+    int sampleRate;
     long blockSize;
+	float * emptyBuf[2];
+	BOOL isRunning;
 
 	VSTPlugin** plugins;		//array of plugins
 	int pluginMax;				//array size
 	int pluginCount;			//num of loaded plugins
 
-	WaveOutDevice* waveOut;
+	//timing
+	UINT timerDuration;
+	UINT timerID;
+	TIMECAPS tc;
+	DWORD dwRest;
+	DWORD dwLastTime;
+	DWORD dwStartStamp;
 
+	void initTimer();
+	BOOL startTimer();
+	void stopTimer();
+	static void CALLBACK timerCallback(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2);
+	void handleTimer();
+
+	//audio
+	int waveOutDevId;
+	WaveOutDevice* waveOut;
+	BOOL resetWaveOutDevice();
+	void processAudio(float **pBuffer, int nLength, int nChannels = 2, DWORD dwStamp = 0);
 	float * pOutputs[2];
 	//CRITICAL_SECTION cs;
 };

@@ -95,7 +95,8 @@ namespace Audimat.UI
 
         public void shutdown()
         {
-            List<VSTPanel> temp = new List<VSTPanel>(panels);
+            host.stopEngine();
+            List<VSTPanel> temp = new List<VSTPanel>(panels);       //remove panels from rack
             foreach (VSTPanel panel in temp)
             {
                 panel.unloadPlugin();
@@ -135,9 +136,8 @@ namespace Audimat.UI
         }
 
         //remove panel from rack, shutting down plugin is handled by panel
-        public void removePanel(int plugNum)
+        public void removePanel(VSTPanel panel)
         {
-            VSTPanel panel = panels[plugNum];
             panelSpace.Controls.Remove(panel);
             panels.Remove(panel);
             panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panels.Count);
@@ -148,6 +148,7 @@ namespace Audimat.UI
             }
             updateScrollBar();
             Invalidate();
+            panel.unloadPlugin();           //disconnect panel & shut down plugin
             auditwin.rackChanged();         //broadcast rack change
         }
 
@@ -158,7 +159,7 @@ namespace Audimat.UI
 
         //- i/o connections ---------------------------------------------------
 
-        public void connectMidiInput(int idx, PluginMidiIn pluginMidiIn)
+        public void connectMidiInput(int idx, PanelMidiIn pluginMidiIn)
         {
             InputDevice indev = midiDevices.inputDevices[idx];
             try
@@ -173,13 +174,13 @@ namespace Audimat.UI
             }
         }
 
-        public void disconnectMidiInput(int idx, PluginMidiIn pluginMidiIn)
+        public void disconnectMidiInput(int idx, PanelMidiIn pluginMidiIn)
         {
             InputDevice indev = midiDevices.inputDevices[idx];
             indev.disconnectUnit(pluginMidiIn);
         }
 
-        public void connectMidiOutput(int idx, PluginMidiIn pluginMidiIn)
+        public void connectMidiOutput(int idx, PanelMidiIn pluginMidiIn)
         {
         }
 

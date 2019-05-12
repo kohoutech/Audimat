@@ -64,8 +64,8 @@ protected:
 
 	WaveBuffer **buffers;
 	int bufferSize;
-	int bufferCount;
-	int bufferDuration;
+	int bufferCount;				
+	int bufferDuration;				//buf duration in ms
 
 	void allocateBuffers();
 	void freeBuffers();

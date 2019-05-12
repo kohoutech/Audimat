@@ -46,11 +46,7 @@ namespace Audimat
         public Vashti vashti;
 
         public bool isRunning;
-
-        //for saving keyboard window settings
-        public Point keyWindowPos;
-        public int keyWindowSize;
-        public VSTPlugin keyWindowPlugin;
+        public bool mainShutdown;
 
         String curpluginPath;
         int vstnum;         //for debugging
@@ -82,10 +78,17 @@ namespace Audimat
             patchWin = new PatchWindow(this);
 
             isRunning = false;
+            mainShutdown = false;
 
-            keyWindowPos = new Point(0, 0);
-            keyWindowSize = -1;
-            keyWindowPlugin = null;
+            //child windows
+            keyboardWnd = new KeyboardWnd(this);
+            keyboardWnd.Icon = this.Icon;
+            keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
+            keyboardWnd.Hide();
+
+            //keyWindowPos = new Point(0, 0);
+            //keyWindowSize = -1;
+            //keyWindowPlugin = null;
 
             curpluginPath = "";
             vstnum = 0;
@@ -104,6 +107,9 @@ namespace Audimat
         {
             base.OnFormClosing(e);
 
+            mainShutdown = true;
+            keyboardWnd.Close();
+
             rack.shutdown();            //unload all plugins in rack
             vashti.shutDown();          //shut down back end
         }
@@ -111,10 +117,7 @@ namespace Audimat
         //callback when plugins have been added or removed from the rack
         public void rackChanged()
         {
-            if (keyboardWnd != null)
-            {
-                keyboardWnd.updatePluginList();
-            }
+            keyboardWnd.updatePluginList();
         }
 
         //- file menu -----------------------------------------------------------------
@@ -158,22 +161,8 @@ namespace Audimat
 
         public void showKeyboardWindow()
         {
-            keyboardWnd = new KeyboardWnd(this);
-            keyboardWnd.Icon = this.Icon;
-            keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
-            //restore previous keyboard vals, if set
-            if (keyWindowSize != -1)
-            {
-                keyboardWnd.setSize(keyWindowSize);
-            }
-            keyboardWnd.setSelectedPlugin(keyWindowPlugin);
+            keyboardWnd.updatePluginList();
             keyboardWnd.Show();
-
-            if (keyWindowPos.X != 0 && keyWindowPos.Y != 0)
-            {
-                keyboardWnd.Location = keyWindowPos;
-            }
-
             enableKeyboardBarMenuItem(false);
         }
 
@@ -184,15 +173,24 @@ namespace Audimat
 
         private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            keyWindowPos = keyboardWnd.Location;
-            keyWindowSize = keyboardWnd.cbxKeySize.SelectedIndex;
-            keyWindowPlugin = keyboardWnd.currentPlugin;
-            enableKeyboardBarMenuItem(true);
+            if (!mainShutdown)
+            {
+                e.Cancel = true;
+                keyboardWnd.currentPlugin = null;
+                keyboardWnd.Hide();
+                enableKeyboardBarMenuItem(true);
+            }
         }
 
         private void panicButton_Click(object sender, EventArgs e)
         {
             //not implemented yet
+        }
+
+        private void settingsHostMenuItem_Click(object sender, EventArgs e)
+        {
+            HostSettingsWnd hostsettings = new HostSettingsWnd();
+            hostsettings.ShowDialog(this);
         }
 
         //- plugin menu -------------------------------------------------------

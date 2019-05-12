@@ -121,6 +121,31 @@ void VSTPlugin::unload()
 	}
 }
 
+void VSTPlugin::getPlugInfo(PlugInfo* pinfo) 
+{
+		pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		getProductString(pinfo->name);
+		pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		getVendorString(pinfo->vendor);
+		pinfo->version = getVstVersion();
+		pinfo->numPrograms = pEffect->numPrograms;
+		pinfo->numParameters = pEffect->numParams;
+		pinfo->numInputs = pEffect->numInputs;
+		pinfo->numOutputs = pEffect->numOutputs;
+		pinfo->flags = pEffect->flags;
+		pinfo->uniqueID = pEffect->uniqueID;
+
+		if (pEffect->flags && effFlagsHasEditor != 0) {
+			ERect* pRect;
+			editGetRect(&pRect);
+			pinfo->editorWidth = pRect->right - pRect->left;
+			pinfo->editorHeight = pRect->bottom - pRect->top;
+		} else {
+			pinfo->editorWidth = 0;
+			pinfo->editorHeight = 0;
+		}
+}
+
 //- processing methods --------------------------------------------------------
 
 void VSTPlugin::storeMidiShortMsg(int b1, int b2, int b3)
