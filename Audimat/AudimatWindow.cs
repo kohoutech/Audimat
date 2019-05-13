@@ -45,6 +45,8 @@ namespace Audimat
         //backend & i/o
         public Vashti vashti;
 
+        public Settings settings;
+
         public bool isRunning;
         public bool mainShutdown;
 
@@ -54,8 +56,10 @@ namespace Audimat
         public AudimatWindow()
         {
             vashti = new Vashti();
+            settings = new Settings("Audimat.cfg");
 
             InitializeComponent();
+
 
             //control panel goes just below menubar
             controlPanel = new ControlPanel(this);
@@ -71,9 +75,13 @@ namespace Audimat
             controlPanel.Width = rack.Width;
 
             int minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
-            this.ClientSize = new System.Drawing.Size(rack.Size.Width, rack.Size.Height + minHeight);
+            int rackHeight = settings.getIntValue("global-settings.rack-window-height", minHeight);
+            this.ClientSize = new System.Drawing.Size(rack.Size.Width, rack.Size.Height + rackHeight);
             this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - VSTPanel.PANELHEIGHT);
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
+            int rackX = settings.getIntValue("global-settings.rack-window-pos.x", 100);
+            int rackY = settings.getIntValue("global-settings.rack-window-pos.y", 100);
+            this.Location = new Point(rackX, rackY);
 
             patchWin = new PatchWindow(this);
 
@@ -84,6 +92,9 @@ namespace Audimat
             keyboardWnd = new KeyboardWnd(this);
             keyboardWnd.Icon = this.Icon;
             keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
+            int keyX = settings.getIntValue("global-settings.keyboard-window-pos.x", 200);
+            int keyY = settings.getIntValue("global-settings.keyboard-window-pos.y", 200);
+            keyboardWnd.Location = new Point(keyX, keyY);
             keyboardWnd.Hide();
 
             //keyWindowPos = new Point(0, 0);
@@ -112,6 +123,20 @@ namespace Audimat
 
             rack.shutdown();            //unload all plugins in rack
             vashti.shutDown();          //shut down back end
+
+            saveGlobalSettings();
+        }
+
+        public void saveGlobalSettings()
+        {
+            settings.setIntValue("global-settings.rack-window-height", 
+                this.Height - this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
+            settings.setIntValue("global-settings.rack-window-pos.x", this.Location.X);
+            settings.setIntValue("global-settings.rack-window-pos.y", this.Location.Y);
+            settings.getIntValue("global-settings.keyboard-window-pos.x", keyboardWnd.Location.X);
+            settings.getIntValue("global-settings.keyboard-window-pos.y", keyboardWnd.Location.Y);
+
+            settings.saveToFile();
         }
 
         //callback when plugins have been added or removed from the rack
@@ -190,7 +215,17 @@ namespace Audimat
         private void settingsHostMenuItem_Click(object sender, EventArgs e)
         {
             HostSettingsWnd hostsettings = new HostSettingsWnd();
+            hostsettings.Icon = this.Icon;
+            hostsettings.setSampleRate(vashti.host.sampleRate);
+            hostsettings.setBlockSize(vashti.host.blockSize);
+
             hostsettings.ShowDialog(this);
+
+            if (hostsettings.DialogResult == DialogResult.OK)
+            {
+                vashti.host.setSampleRate(hostsettings.sampleRate);
+                vashti.host.setBlockSize(hostsettings.blockSize);
+            }
         }
 
         //- plugin menu -------------------------------------------------------
@@ -232,7 +267,7 @@ namespace Audimat
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.2.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion 1.2.1\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
     }

@@ -28,7 +28,9 @@ namespace Audimat.UI
     class HostSettingsWnd : Form
     {
         public int sampleRate;
-        public int[] blockSizes;
+        public int blockSize;
+
+        public List<int> blockSizes;
         public int[] sampleRates = new int[] { 44100, 48000, 88200, 96000, 176400, 192000};
 
         private Label lblSampleRate;
@@ -132,6 +134,7 @@ namespace Audimat.UI
             this.Controls.Add(this.cbxSampleRate);
             this.Controls.Add(this.lblSampleRate);
             this.Name = "HostSettingsWnd";
+            this.ShowInTaskbar = false;
             this.Text = "Host Settings";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -150,31 +153,33 @@ namespace Audimat.UI
                 }
             }
             cbxSampleRate.SelectedIndex = rateIdx;
-            calculateBlockSizes();
         }
 
         //should this be precomputed?
         private void calculateBlockSizes()
         {
+            blockSizes = new List<int>();
             cbxBlockSize.Items.Clear();
 
             //calculate block sizes from 2 ms to 250 ms
             int maxsize = sampleRate / 4;
             int minsize = sampleRate / 500;
-            for (int i = minsize; i <= maxsize; i++)
+            for (int i = maxsize; i >= minsize; i--)
             {
                 int blocksPerSec = (sampleRate / i);
                 if ((blocksPerSec * i) == sampleRate)
                 {
-                    cbxBlockSize.Items.Add(i + " samples");
+                    blockSizes.Add(i);
+                    cbxBlockSize.Items.Add(i + " samples (" + blocksPerSec + " blocks/sec)");
                 }
             }
+            //cbxBlockSize.SelectedIndex = 0;
         }
 
         public void setBlockSize(int size)
         {
             int sizeIdx = 0;                                //default rate
-            for (int i = 0; i < blockSizes.Length; i++)
+            for (int i = 0; i < blockSizes.Count; i++)
             {
                 if (blockSizes[i] == size)
                 {
@@ -182,7 +187,7 @@ namespace Audimat.UI
                     break;
                 }
             }
-            cbxSampleRate.SelectedIndex = sizeIdx;
+            cbxBlockSize.SelectedIndex = sizeIdx;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -198,11 +203,12 @@ namespace Audimat.UI
         private void cbxSampleRate_SelectedIndexChanged(object sender, EventArgs e)
         {
             sampleRate = sampleRates[cbxSampleRate.SelectedIndex];
+            calculateBlockSizes();
         }
 
         private void cbxBlockSize_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            blockSize = blockSizes[cbxBlockSize.SelectedIndex];
         }
     }
 }

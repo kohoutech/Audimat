@@ -53,6 +53,9 @@ namespace Transonic.VST
         public WaveDevices waveDevices;
         public bool isEngineRunning;
 
+        public int sampleRate;
+        public int blockSize;
+
         public List<VSTPlugin> plugins;
 
         public VSTHost(Vashti _vashti)
@@ -61,6 +64,10 @@ namespace Transonic.VST
             waveDevices = new WaveDevices();
 
             isEngineRunning = false;
+
+            setSampleRate(44100);
+            setBlockSize(2205);
+
             plugins = new List<VSTPlugin>();
         }
 
@@ -106,12 +113,20 @@ namespace Transonic.VST
 
         public void setSampleRate(int rate)
         {
-            VashtiSetSampleRate(rate);
+            if (sampleRate != rate)
+            {
+                sampleRate = rate;
+                VashtiSetSampleRate(rate);
+            }
         }
 
-        public void setBlockSize(int blocksize)
+        public void setBlockSize(int size)
         {
-            VashtiSetBlockSize(blocksize);
+            if (blockSize != size)
+            {
+                blockSize = size;
+                VashtiSetBlockSize(size);
+            }
         }
     }
 }

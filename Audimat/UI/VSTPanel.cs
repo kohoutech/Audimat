@@ -47,8 +47,8 @@ namespace Audimat.UI
         //widgets
         public const int PANELHEIGHT = 75;
         public const int PANELWIDTH = 400;
-        private Label lblPlugName;
-        private ComboBox cbxProgList;
+        public Label lblPlugName;
+        public ComboBox cbxProgList;
         private Button btnNextProg;
         private Button btnPrevProg;
         private Button btnPlugSettings;
