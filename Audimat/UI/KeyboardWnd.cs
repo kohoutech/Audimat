@@ -101,8 +101,10 @@ namespace Audimat.UI
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "KeyboardWnd";
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Audimat Keyboard";
             this.ResumeLayout(false);
+
         }
 
         //- key size ----------------------------------------------------------

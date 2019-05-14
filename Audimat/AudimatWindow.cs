@@ -35,6 +35,8 @@ namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
+        public String VERSION = "1.2.2";
+
         public ControlPanel controlPanel;
         public VSTRack rack;
 
@@ -75,9 +77,9 @@ namespace Audimat
             controlPanel.Width = rack.Width;
 
             int minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
-            int rackHeight = settings.getIntValue("global-settings.rack-window-height", minHeight);
-            this.ClientSize = new System.Drawing.Size(rack.Size.Width, rack.Size.Height + rackHeight);
-            this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - VSTPanel.PANELHEIGHT);
+            int rackHeight = settings.getIntValue("global-settings.rack-window-height", VSTPanel.PANELHEIGHT);
+            this.ClientSize = new System.Drawing.Size(rack.Size.Width, rackHeight + minHeight);
+            this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - rackHeight);
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
             int rackX = settings.getIntValue("global-settings.rack-window-pos.x", 100);
             int rackY = settings.getIntValue("global-settings.rack-window-pos.y", 100);
@@ -96,10 +98,6 @@ namespace Audimat
             int keyY = settings.getIntValue("global-settings.keyboard-window-pos.y", 200);
             keyboardWnd.Location = new Point(keyX, keyY);
             keyboardWnd.Hide();
-
-            //keyWindowPos = new Point(0, 0);
-            //keyWindowSize = -1;
-            //keyWindowPlugin = null;
 
             curpluginPath = "";
             vstnum = 0;
@@ -129,12 +127,13 @@ namespace Audimat
 
         public void saveGlobalSettings()
         {
-            settings.setIntValue("global-settings.rack-window-height", 
-                this.Height - this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
+            int rackheight = this.ClientSize.Height - (this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
+            settings.setStringValue("version", VERSION);
+            settings.setIntValue("global-settings.rack-window-height", rackheight);
             settings.setIntValue("global-settings.rack-window-pos.x", this.Location.X);
             settings.setIntValue("global-settings.rack-window-pos.y", this.Location.Y);
-            settings.getIntValue("global-settings.keyboard-window-pos.x", keyboardWnd.Location.X);
-            settings.getIntValue("global-settings.keyboard-window-pos.y", keyboardWnd.Location.Y);
+            settings.setIntValue("global-settings.keyboard-window-pos.x", keyboardWnd.Location.X);
+            settings.setIntValue("global-settings.keyboard-window-pos.y", keyboardWnd.Location.Y);
 
             settings.saveToFile();
         }
@@ -267,7 +266,7 @@ namespace Audimat
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.2.1\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion 1.2.2\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
     }

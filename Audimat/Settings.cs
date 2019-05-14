@@ -18,7 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ----------------------------------------------------------------------------*/
 
 //simple YAML-like syntax
-//no error checking yet
 
 using System;
 using System.Collections.Generic;
@@ -50,8 +49,11 @@ namespace Audimat
             parseRoot(lines);
         }
 
+        //- reading in --------------------------------------------------------
+
         char[] wspace = new char[] { ' ' };
 
+        //no error checking yet!
         public void parseRoot(string[] lines)
         {
             int lineNum = 0;
@@ -105,15 +107,39 @@ namespace Audimat
         {
             String result = null;
             int dotpos = path.IndexOf('.');
-            if (dotpos != -1)
+            if (dotpos != -1)                                   //path is name.subpath
             {
-                String name = path.Substring(0, dotpos);
-                String subpath = path.Substring(dotpos + 1);
-                result = findLeafValue(subpath, (SettingsStem)subtree.children[name]);
+                String name = path.Substring(0, dotpos);        
+                String subpath = path.Substring(dotpos + 1);    //break path apart
+                if (subtree.children.ContainsKey(name))
+                {
+                    SettingsNode val = subtree.children[name];
+                    if (val != null && val is SettingsStem)
+                    {
+                        result = findLeafValue(subpath, (SettingsStem)val);
+                    }
+                }
             }
             else
             {
-                result = ((SettingsLeaf)subtree.children[path]).value;
+                if (subtree.children.ContainsKey(path))
+                {
+                    SettingsNode leaf = subtree.children[path];
+                    if (leaf != null && leaf is SettingsLeaf)
+                    {
+                        result = ((SettingsLeaf)leaf).value;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public String getStringValue(String path, String defval)
+        {
+            String result = defval;
+            if (root != null)
+            {
+                result = findLeafValue(path, root);
             }
             return result;
         }
@@ -124,12 +150,15 @@ namespace Audimat
             if (root != null)
             {
                 String intstr = findLeafValue(path, root);
-                try
+                if (intstr != null)
                 {
-                    result = Int32.Parse(intstr);
-                }
-                catch (Exception e)
-                {
+                    try
+                    {
+                        result = Int32.Parse(intstr);
+                    }
+                    catch (Exception e)
+                    {
+                    }
                 }
             }
             return result;
@@ -140,17 +169,38 @@ namespace Audimat
         public void setLeafValue(String path, SettingsStem subtree, String val)
         {
             int dotpos = path.IndexOf('.');
-            if (dotpos != -1)
+            if (dotpos != -1)                                                           //path is name.subpath
             {
                 String name = path.Substring(0, dotpos);
                 String subpath = path.Substring(dotpos + 1);
+                if (!subtree.children.ContainsKey(name))
+                {
+                    subtree.children[name] = new SettingsStem();
+                }
                 setLeafValue(subpath, (SettingsStem)subtree.children[name], val);
             }
             else
             {
-                ((SettingsLeaf)subtree.children[path]).value = val;
+                if (!subtree.children.ContainsKey(path))
+                {
+                    subtree.children[path] = new SettingsLeaf(val);
+                }
+                else
+                {
+                    ((SettingsLeaf)subtree.children[path]).value = val;
+                }
             }
         }
+
+        public void setStringValue(String path, String str)
+        {
+            if (root == null)
+            {
+                root = new SettingsStem();
+            }
+            setLeafValue(path, root, str);
+        }
+
 
         public void setIntValue(String path, int val)
         {
@@ -162,19 +212,48 @@ namespace Audimat
             setLeafValue(path, root, intstr);
         }
 
-        public void saveToFile()
+        //- storing out ------------------------------------------------
+
+        public bool saveToFile()
         {
             List<String> lines = new List<string>();
             storeSubTree(lines, root, "");
+            try
+            {
+                File.WriteAllLines(filename, lines);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
         }
 
-        private void storeSubTree(List<string> lines, SettingsNode root, String indent)
+        private void storeSubTree(List<string> lines, SettingsStem stem, String indent)
         {
-            
+            List<string> childNameList = new List<string>(stem.children.Keys);
+            foreach (String childname in childNameList)
+            {
+                storeNode(lines, stem.children[childname], indent + ((stem != root) ? "  " : ""), childname);
+            }
+        }
+
+        private void storeNode(List<string> lines, SettingsNode node, String indent, String name)
+        {
+            String line = indent + name + ":";
+            if (node is SettingsLeaf)
+            {
+                lines.Add(line + " " + ((SettingsLeaf)node).value);
+            }
+            else
+            {
+                lines.Add(line);
+                storeSubTree(lines, (SettingsStem)node, indent);
+            }
         }
     }
 
-    //-------------------------------------------------------------------------
+    //- tree node classes -----------------------------------------------------
 
     //base class
     public class SettingsNode
