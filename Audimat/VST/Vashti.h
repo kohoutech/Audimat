@@ -44,14 +44,8 @@ public:
 	void setPlugAudioOut(int vstnum, int idx);
 
 	//plugin 
-	char* getParamName(int vstnum, int paramnum);
-	float getParamVal(int vstnum, int paramnum);
-	void setParamVal(int vstNum, int paramnum, float paramval);
 	char* getProgramName(int vstNum, int paramnum);
 	void setProgram(int vstNum, int prognum);
-
-	void openEditor(int vstNum, void * hwnd);
-	void closeEditor(int vstNum);
 };
 
 #endif // Vashti_H

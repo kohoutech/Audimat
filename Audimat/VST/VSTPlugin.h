@@ -35,13 +35,13 @@ typedef struct PluginInfo
 	char* vendor;
 	int version;
 	int numPrograms;
-    int numParameters;
-    int numInputs;
-    int numOutputs;
-    int flags;
-    int uniqueID;
-    int editorWidth;
-    int editorHeight;
+	int numParameters;
+	int numInputs;
+	int numOutputs;
+	int flags;
+	int uniqueID;
+	int editorWidth;
+	int editorHeight;
 } PlugInfo;
 
 class VSTHost;
@@ -49,69 +49,77 @@ class VSTHost;
 class VSTPlugin
 {
 public:
-    VSTPlugin(VSTHost *pHost);
-    ~VSTPlugin();
+	VSTPlugin(VSTHost *pHost);
+	~VSTPlugin();
 
-    bool load(const char *name);
-    void unload();
+	bool load(const char *name);
+	void unload();
 	void getPlugInfo(PlugInfo* pinfo);
 
-//processing
+	//processing
 	void storeMidiShortMsg(int b1, int b2, int b3);
 	void buildMIDIEvents();
 
 	float * getOutputBuffer(int bufIdx);
-    void doProcess(long sampleFrames);
-    void doProcessReplacing(long sampleFrames);	
+	void doProcess(long sampleFrames);
+	void doProcessReplacing(long sampleFrames);	
 
 	//plugin function calls
-    long dispatch(long opCode, long index = 0, long value = 0, void *ptr = NULL, float opt = 0.0f);
-    void setParameter(long index, float parameter);
+	long dispatch(long opCode, long index = 0, long value = 0, void *ptr = NULL, float opt = 0.0f);
+	void setParameter(long index, float parameter);
 	float getParameter(long index);
 	void process(float **inputs, float **outputs, long sampleframes);
 	void processReplacing(float **inputs, float **outputs, long sampleframes);
 	void processDoubleReplacing(double** inputs, double** outputs, long sampleFrames);
 
 	//plugin dispatcher calls
-    void open();
-    void close();
-    void setProgram(long lValue);
-    void getParamLabel(long index, char *ptr);
-    void getParamDisplay(long index, char *ptr);
-    void getParamName(long index, char *ptr);
-    void setSampleRate(float fSampleRate);
-    void setBlockSize(long value);
-    void suspend();
-    void resume();
-    long editGetRect(ERect **ptr);
-    long editOpen(void *ptr);
-    void editClose();
+	void open();
+	void close();
+	void setProgram(long lValue);
+	long getProgram();
+	void setProgramName(char *ptr);
+	void getProgramName(char *ptr);
+	void getParamLabel(long index, char *ptr);
+	void getParamDisplay(long index, char *ptr);
+	void getParamName(long index, char *ptr);
+	void setSampleRate(float fSampleRate);
+	void setBlockSize(long value);
+	void suspend();
+	void resume();
+	long getChunk(void **data, bool isPreset);
+	long setChunk(void *data, long byteSize, bool isPreset);
+
+	//editor calls
+	long editGetRect(ERect **ptr);
+	long editOpen(void *ptr);
+	void editClose();
+	void editIdle();
 
 	long processEvents();
 	long getProgramNameIndexed(long category, long index, char* text);
-    long getVendorString(char *ptr);
-    long getProductString(char *ptr);
-    long getVstVersion();
+	long getVendorString(char *ptr);
+	long getProductString(char *ptr);
+	long getVstVersion();
 
 	//plugin callback handlers
-    static long VSTCALLBACK AudioMasterCallback(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
+	static long VSTCALLBACK AudioMasterCallback(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
 	long OnAudioMasterCallback(int nEffect, long opcode, long index, long value, void *ptr, float opt);
 
 	void enterCritical();
 	void leaveCritical();
 
-    VSTHost* pHost;
-	AEffect* pEffect;    
-    HMODULE hModule;
-
 	VstEvents *pEvents;			//midi events
 
 	int inBufCount;
-    int outBufCount;
+	int outBufCount;
 	float** inBufs;
 	float** outBufs;
 
 protected:
+	VSTHost* pHost;
+	AEffect* pEffect;    
+	HMODULE hModule;
+
 	CRITICAL_SECTION cs;
 	int midiBufCount;
 	int midiBuffer[MIDIBUFFERSIZE];

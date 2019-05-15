@@ -74,6 +74,7 @@ extern "C" __declspec(dllexport) void VashtiSetBlockSize(int size) {
 }
 
 //- plugin exports ------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 extern "C" __declspec(dllexport) void VashtiSetPluginAudioIn(int vstnum, int idx) {
 
@@ -94,20 +95,64 @@ extern "C" __declspec(dllexport) void VashtiGetPluginInfo(int vstnum, PlugInfo* 
 	}
 }
 
-extern "C" __declspec(dllexport) char* VashtiGetParamName(int vstnum, int paramnum){
-
-	return Vashti::vashtiB->getParamName(vstnum, paramnum);
-}
+//- plugin params -------------------------------------------------------------
 
 extern "C" __declspec(dllexport) float VashtiGetParamValue(int vstnum, int paramnum){
 
-	return Vashti::vashtiB->getParamVal(vstnum, paramnum);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		return vst->getParameter(paramnum);
+	}
+	return 0.0f;	
 }
 
 extern "C" __declspec(dllexport) void VashtiSetParamValue(int vstnum, int paramnum, float paramval){
 
-	Vashti::vashtiB->setParamVal(vstnum, paramnum, paramval);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{	
+		vst->setParameter(paramnum, paramval);
+	}	
 }
+
+extern "C" __declspec(dllexport) char* VashtiGetParamLabel(int vstnum, int paramnum){
+
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getParamLabel(paramnum, paramname);
+		return paramname;
+	}	
+	return NULL;
+}
+
+extern "C" __declspec(dllexport) char* VashtiGetParamDisplay(int vstnum, int paramnum){
+
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getParamDisplay(paramnum, paramname);
+		return paramname;
+	}	
+	return NULL;
+}
+
+extern "C" __declspec(dllexport) char* VashtiGetParamName(int vstnum, int paramnum){
+
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+		vst->getParamName(paramnum, paramname);
+		return paramname;
+	}	
+	return NULL;
+}
+
+//- plugin programs -----------------------------------------------------------
 
 extern "C" __declspec(dllexport) char* VashtiGetProgramName(int vstnum, int prognum) {
 
@@ -119,14 +164,24 @@ extern "C" __declspec(dllexport) void VashtiSetProgram(int vstnum, int prognum) 
 	Vashti::vashtiB->setProgram(vstnum, prognum);
 }
 
+//- plugin editor -------------------------------------------------------------
+
 extern "C" __declspec(dllexport) void VashtiOpenEditor(int vstnum, void* hwnd) {
 
-	Vashti::vashtiB->openEditor(vstnum, hwnd);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		vst->editOpen(hwnd);
+	}	
 }
 
 extern "C" __declspec(dllexport) void VashtiCloseEditor(int vstnum) {
 
-	Vashti::vashtiB->closeEditor(vstnum);
+	VSTPlugin* vst = Vashti::vashtiB->vstHost->getPlugin(vstnum);
+	if (vst) 
+	{
+		vst->editClose();
+	}	
 }
 
 extern "C" __declspec(dllexport) void VashtiHandleMidiMsg(int vstnum, int b1, int b2, int b3) {
@@ -160,37 +215,6 @@ void Vashti::setPlugAudioOut(int vstnum, int idx)
 {
 }
 
-//- plugin params -------------------------------------------------------------
-
-char* Vashti::getParamName(int vstnum, int paramnum) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst) 
-	{
-		char* paramname = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-		vst->getParamName(paramnum, paramname);
-		return paramname;
-	}
-}
-
-float Vashti::getParamVal(int vstnum, int paramnum) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst) 
-	{
-		return vst->getParameter(paramnum);
-	}
-}
-
-void Vashti::setParamVal(int vstnum, int paramnum, float paramval) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstnum);
-	if (vst) 
-	{	
-		vst->setParameter(paramnum, paramval);
-	}
-}
-
 //- plugin programs -----------------------------------------------------------
 
 char* Vashti::getProgramName(int vstNum, int prognum) 
@@ -213,24 +237,5 @@ void Vashti::setProgram(int vstNum, int prognum)
 	}
 }
 
-//- plugin editor -------------------------------------------------------------
-
-void Vashti::openEditor(int vstNum, void * hwnd) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	if (vst) 
-	{
-		vst->editOpen(hwnd);
-	}
-}
-
-void Vashti::closeEditor(int vstNum) 
-{
-	VSTPlugin* vst = vstHost->getPlugin(vstNum);
-	if (vst) 
-	{
-		vst->editClose();
-	}
-}
 
 //printf("there's no sun in the shadow of the wizard.\n");

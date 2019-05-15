@@ -73,6 +73,7 @@ bool VSTPlugin::load(const char *filename)
 		return false;
 
 	//get effect struct from VST, pass host's callback func to VST
+	//this calls the callback with audioMasterVersion to get the host's version before returning the effect struct
 	pEffect = pMain(AudioMasterCallback);
 
 	//check if valid effect
@@ -281,7 +282,7 @@ void VSTPlugin::processDoubleReplacing(double **inputs, double **outputs, long s
 	pEffect->processDoubleReplacing(pEffect, inputs, outputs, sampleFrames);
 }
 
-//- VST dispatcher functions -----------------------------------------------
+//- AudioEffect dispatcher functions -----------------------------------------------
 
 void VSTPlugin::open() 
 { 
@@ -296,6 +297,21 @@ void VSTPlugin::close()
 void VSTPlugin::setProgram(long lValue) 
 { 
 	dispatch(effSetProgram, 0, lValue); 
+}
+
+long VSTPlugin::getProgram() 
+{ 
+	return dispatch(effGetProgram); 
+}
+
+void VSTPlugin::setProgramName(char *ptr) 
+{ 
+	dispatch(effSetProgramName, 0, 0, ptr); 
+}
+
+void VSTPlugin::getProgramName(char *ptr) 
+{ 
+	dispatch(effGetProgramName, 0, 0, ptr); 
 }
 
 void VSTPlugin::getParamLabel(long index, char *ptr) 
@@ -347,6 +363,23 @@ void VSTPlugin::editClose()
 { 
 	dispatch(effEditClose); 
 }
+
+void VSTPlugin::editIdle() 
+{ 
+	dispatch(effEditIdle); 
+}
+
+long VSTPlugin::getChunk(void **data, bool isPreset) 
+{ 
+	return dispatch(effGetChunk, isPreset, 0, data); 
+}
+
+long VSTPlugin::setChunk(void *data, long byteSize, bool isPreset) 
+{ 
+	return dispatch(effSetChunk, isPreset, byteSize, data); 
+}
+
+//- AudioEffectX dispatcher functions -----------------------------------------------
 
 long VSTPlugin::processEvents() 
 { 

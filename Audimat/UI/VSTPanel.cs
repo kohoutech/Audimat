@@ -227,6 +227,7 @@ namespace Audimat.UI
             this.Size = new System.Drawing.Size(400, 75);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         //- panel management ----------------------------------------------------------
