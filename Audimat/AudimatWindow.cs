@@ -49,7 +49,6 @@ namespace Audimat
 
         public Settings settings;
 
-        public bool isRunning;
         public bool mainShutdown;
 
         String curpluginPath;
@@ -87,7 +86,6 @@ namespace Audimat
 
             patchWin = new PatchWindow(this);
 
-            isRunning = false;
             mainShutdown = false;
 
             //child windows
@@ -156,14 +154,12 @@ namespace Audimat
         public void startHost()
         {
             rack.startEngine();
-            isRunning = true;
             lblAudimatStatus.Text = "Engine is running";
         }
 
         public void stopHost()
         {
             rack.stopEngine();
-            isRunning = false;
             lblAudimatStatus.Text = "Engine is stopped";
         }
 
@@ -180,7 +176,7 @@ namespace Audimat
         public void enableKeyboardBarMenuItem(bool enable)
         {
             keyboardBarHostMenuItem.Enabled = enable;
-            controlPanel.btnKeys.Enabled = enable;
+            controlPanel.btnHide.Enabled = enable;
         }
 
         public void showKeyboardWindow()

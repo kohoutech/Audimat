@@ -31,22 +31,22 @@ namespace Audimat.UI
     {
         public AudimatWindow auditwin;
         public Button btnPanic;
-        public Button btnKeys;
+        public Button btnHide;
         public Button btnStop;
         private ToolTip controlPanelToolTip;
         private System.ComponentModel.IContainer components;
-        private Button btnPlugEditor;
-        private Button btnNextProg;
-        private Button btnPrevProg;
-        public ComboBox cbxProgList;
-        private Button button1;
-        private Button button2;
-        private Button button3;
-        private Button button4;
-        private Button button5;
-        private Button button6;
-        private Button button7;
-        private Button button8;
+        private Button btnSaveRig;
+        private Button btnNextPatch;
+        private Button btnPrevPatch;
+        public ComboBox cbxPatchList;
+        private Button btnLoadRig;
+        private Button btnNewRig;
+        private Button btnSaveRigAs;
+        private Button btnLoadPlugin;
+        private Button btnKeys2;
+        private Button btnMixer;
+        private Button btnSavePatchAs;
+        private Button btnSavePatch;
         public Button btnStart;
 
         public ControlPanel(AudimatWindow _auditwin)
@@ -60,22 +60,22 @@ namespace Audimat.UI
         {
             this.components = new System.ComponentModel.Container();
             this.btnPanic = new System.Windows.Forms.Button();
-            this.btnKeys = new System.Windows.Forms.Button();
+            this.btnHide = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
             this.controlPanelToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnPlugEditor = new System.Windows.Forms.Button();
-            this.btnNextProg = new System.Windows.Forms.Button();
-            this.btnPrevProg = new System.Windows.Forms.Button();
-            this.cbxProgList = new System.Windows.Forms.ComboBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
+            this.btnSaveRig = new System.Windows.Forms.Button();
+            this.btnNextPatch = new System.Windows.Forms.Button();
+            this.btnPrevPatch = new System.Windows.Forms.Button();
+            this.cbxPatchList = new System.Windows.Forms.ComboBox();
+            this.btnLoadRig = new System.Windows.Forms.Button();
+            this.btnNewRig = new System.Windows.Forms.Button();
+            this.btnSaveRigAs = new System.Windows.Forms.Button();
+            this.btnLoadPlugin = new System.Windows.Forms.Button();
+            this.btnKeys2 = new System.Windows.Forms.Button();
+            this.btnMixer = new System.Windows.Forms.Button();
+            this.btnSavePatchAs = new System.Windows.Forms.Button();
+            this.btnSavePatch = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnPanic
@@ -89,16 +89,16 @@ namespace Audimat.UI
             this.btnPanic.UseVisualStyleBackColor = true;
             this.btnPanic.Click += new System.EventHandler(this.btnPanic_Click);
             // 
-            // btnKeys
+            // btnHide
             // 
-            this.btnKeys.Location = new System.Drawing.Point(294, 37);
-            this.btnKeys.Name = "btnKeys";
-            this.btnKeys.Size = new System.Drawing.Size(42, 24);
-            this.btnKeys.TabIndex = 10;
-            this.btnKeys.Text = "Keys";
-            this.controlPanelToolTip.SetToolTip(this.btnKeys, "show keyboard window");
-            this.btnKeys.UseVisualStyleBackColor = true;
-            this.btnKeys.Click += new System.EventHandler(this.btnKeys_Click);
+            this.btnHide.Location = new System.Drawing.Point(294, 37);
+            this.btnHide.Name = "btnHide";
+            this.btnHide.Size = new System.Drawing.Size(42, 24);
+            this.btnHide.TabIndex = 10;
+            this.btnHide.Text = "Hide";
+            this.controlPanelToolTip.SetToolTip(this.btnHide, "show keyboard window");
+            this.btnHide.UseVisualStyleBackColor = true;
+            this.btnHide.Click += new System.EventHandler(this.btnHide_Click);
             // 
             // btnStop
             // 
@@ -122,133 +122,150 @@ namespace Audimat.UI
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // btnPlugEditor
+            // btnSaveRig
             // 
-            this.btnPlugEditor.Location = new System.Drawing.Point(71, 37);
-            this.btnPlugEditor.Name = "btnPlugEditor";
-            this.btnPlugEditor.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugEditor.TabIndex = 13;
-            this.btnPlugEditor.Text = "S";
-            this.btnPlugEditor.UseVisualStyleBackColor = true;
+            this.btnSaveRig.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnSaveRig.Location = new System.Drawing.Point(71, 37);
+            this.btnSaveRig.Name = "btnSaveRig";
+            this.btnSaveRig.Size = new System.Drawing.Size(24, 24);
+            this.btnSaveRig.TabIndex = 13;
+            this.btnSaveRig.Text = "S";
+            this.btnSaveRig.UseVisualStyleBackColor = false;
+            this.btnSaveRig.Click += new System.EventHandler(this.btnSaveRig_Click);
             // 
-            // btnNextProg
+            // btnNextPatch
             // 
-            this.btnNextProg.Location = new System.Drawing.Point(215, 13);
-            this.btnNextProg.Name = "btnNextProg";
-            this.btnNextProg.Size = new System.Drawing.Size(18, 24);
-            this.btnNextProg.TabIndex = 16;
-            this.btnNextProg.Text = "+";
-            this.btnNextProg.UseVisualStyleBackColor = true;
+            this.btnNextPatch.Location = new System.Drawing.Point(215, 13);
+            this.btnNextPatch.Name = "btnNextPatch";
+            this.btnNextPatch.Size = new System.Drawing.Size(18, 24);
+            this.btnNextPatch.TabIndex = 16;
+            this.btnNextPatch.Text = "+";
+            this.btnNextPatch.UseVisualStyleBackColor = true;
             // 
-            // btnPrevProg
+            // btnPrevPatch
             // 
-            this.btnPrevProg.Location = new System.Drawing.Point(25, 13);
-            this.btnPrevProg.Name = "btnPrevProg";
-            this.btnPrevProg.Size = new System.Drawing.Size(18, 25);
-            this.btnPrevProg.TabIndex = 14;
-            this.btnPrevProg.Text = "-";
-            this.btnPrevProg.UseVisualStyleBackColor = true;
+            this.btnPrevPatch.Location = new System.Drawing.Point(25, 13);
+            this.btnPrevPatch.Name = "btnPrevPatch";
+            this.btnPrevPatch.Size = new System.Drawing.Size(18, 25);
+            this.btnPrevPatch.TabIndex = 14;
+            this.btnPrevPatch.Text = "-";
+            this.btnPrevPatch.UseVisualStyleBackColor = true;
             // 
-            // cbxProgList
+            // cbxPatchList
             // 
-            this.cbxProgList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbxProgList.FormattingEnabled = true;
-            this.cbxProgList.Location = new System.Drawing.Point(43, 14);
-            this.cbxProgList.Name = "cbxProgList";
-            this.cbxProgList.Size = new System.Drawing.Size(172, 23);
-            this.cbxProgList.TabIndex = 15;
+            this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbxPatchList.FormattingEnabled = true;
+            this.cbxPatchList.Location = new System.Drawing.Point(43, 14);
+            this.cbxPatchList.Name = "cbxPatchList";
+            this.cbxPatchList.Size = new System.Drawing.Size(172, 23);
+            this.cbxPatchList.TabIndex = 15;
             // 
-            // button1
+            // btnLoadRig
             // 
-            this.button1.Location = new System.Drawing.Point(48, 37);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(24, 24);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "L";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnLoadRig.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnLoadRig.Location = new System.Drawing.Point(48, 37);
+            this.btnLoadRig.Name = "btnLoadRig";
+            this.btnLoadRig.Size = new System.Drawing.Size(24, 24);
+            this.btnLoadRig.TabIndex = 17;
+            this.btnLoadRig.Text = "L";
+            this.btnLoadRig.UseVisualStyleBackColor = false;
+            this.btnLoadRig.Click += new System.EventHandler(this.btnLoadRig_Click);
             // 
-            // button2
+            // btnNewRig
             // 
-            this.button2.Location = new System.Drawing.Point(25, 37);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(24, 24);
-            this.button2.TabIndex = 18;
-            this.button2.Text = "N";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnNewRig.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnNewRig.Location = new System.Drawing.Point(25, 37);
+            this.btnNewRig.Name = "btnNewRig";
+            this.btnNewRig.Size = new System.Drawing.Size(24, 24);
+            this.btnNewRig.TabIndex = 18;
+            this.btnNewRig.Text = "N";
+            this.btnNewRig.UseVisualStyleBackColor = false;
+            this.btnNewRig.Click += new System.EventHandler(this.btnNewRig_Click);
             // 
-            // button3
+            // btnSaveRigAs
             // 
-            this.button3.Location = new System.Drawing.Point(94, 37);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(24, 24);
-            this.button3.TabIndex = 19;
-            this.button3.Text = "A";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnSaveRigAs.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnSaveRigAs.Location = new System.Drawing.Point(94, 37);
+            this.btnSaveRigAs.Name = "btnSaveRigAs";
+            this.btnSaveRigAs.Size = new System.Drawing.Size(24, 24);
+            this.btnSaveRigAs.TabIndex = 19;
+            this.btnSaveRigAs.Text = "A";
+            this.btnSaveRigAs.UseVisualStyleBackColor = false;
+            this.btnSaveRigAs.Click += new System.EventHandler(this.btnSaveRigAs_Click);
             // 
-            // button4
+            // btnLoadPlugin
             // 
-            this.button4.Location = new System.Drawing.Point(163, 37);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(24, 24);
-            this.button4.TabIndex = 20;
-            this.button4.Text = "L";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.btnLoad_Click);
+            this.btnLoadPlugin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.btnLoadPlugin.Location = new System.Drawing.Point(163, 37);
+            this.btnLoadPlugin.Name = "btnLoadPlugin";
+            this.btnLoadPlugin.Size = new System.Drawing.Size(24, 24);
+            this.btnLoadPlugin.TabIndex = 20;
+            this.btnLoadPlugin.Text = "L";
+            this.btnLoadPlugin.UseVisualStyleBackColor = false;
+            this.btnLoadPlugin.Click += new System.EventHandler(this.btnLoad_Click);
             // 
-            // button5
+            // btnKeys2
             // 
-            this.button5.Location = new System.Drawing.Point(186, 37);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(24, 24);
-            this.button5.TabIndex = 21;
-            this.button5.Text = "K";
-            this.button5.UseVisualStyleBackColor = true;
+            this.btnKeys2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.btnKeys2.Location = new System.Drawing.Point(186, 37);
+            this.btnKeys2.Name = "btnKeys2";
+            this.btnKeys2.Size = new System.Drawing.Size(24, 24);
+            this.btnKeys2.TabIndex = 21;
+            this.btnKeys2.Text = "K";
+            this.btnKeys2.UseVisualStyleBackColor = false;
+            this.btnKeys2.Click += new System.EventHandler(this.btnKeys_Click);
             // 
-            // button6
+            // btnMixer
             // 
-            this.button6.Location = new System.Drawing.Point(209, 37);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(24, 24);
-            this.button6.TabIndex = 22;
-            this.button6.Text = "M";
-            this.button6.UseVisualStyleBackColor = true;
+            this.btnMixer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.btnMixer.Location = new System.Drawing.Point(209, 37);
+            this.btnMixer.Name = "btnMixer";
+            this.btnMixer.Size = new System.Drawing.Size(24, 24);
+            this.btnMixer.TabIndex = 22;
+            this.btnMixer.Text = "M";
+            this.btnMixer.UseVisualStyleBackColor = false;
+            this.btnMixer.Click += new System.EventHandler(this.btnMixer_Click);
             // 
-            // button7
+            // btnSavePatchAs
             // 
-            this.button7.Location = new System.Drawing.Point(140, 37);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(24, 24);
-            this.button7.TabIndex = 23;
-            this.button7.Text = "A";
-            this.button7.UseVisualStyleBackColor = true;
+            this.btnSavePatchAs.BackColor = System.Drawing.Color.Yellow;
+            this.btnSavePatchAs.Location = new System.Drawing.Point(140, 37);
+            this.btnSavePatchAs.Name = "btnSavePatchAs";
+            this.btnSavePatchAs.Size = new System.Drawing.Size(24, 24);
+            this.btnSavePatchAs.TabIndex = 23;
+            this.btnSavePatchAs.Text = "A";
+            this.btnSavePatchAs.UseVisualStyleBackColor = false;
+            this.btnSavePatchAs.Click += new System.EventHandler(this.btnSavePatchAs_Click);
             // 
-            // button8
+            // btnSavePatch
             // 
-            this.button8.Location = new System.Drawing.Point(117, 37);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(24, 24);
-            this.button8.TabIndex = 24;
-            this.button8.Text = "S";
-            this.button8.UseVisualStyleBackColor = true;
+            this.btnSavePatch.BackColor = System.Drawing.Color.Yellow;
+            this.btnSavePatch.Location = new System.Drawing.Point(117, 37);
+            this.btnSavePatch.Name = "btnSavePatch";
+            this.btnSavePatch.Size = new System.Drawing.Size(24, 24);
+            this.btnSavePatch.TabIndex = 24;
+            this.btnSavePatch.Text = "S";
+            this.btnSavePatch.UseVisualStyleBackColor = false;
+            this.btnSavePatch.Click += new System.EventHandler(this.btnSavePatch_Click);
             // 
             // ControlPanel
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.Controls.Add(this.button8);
-            this.Controls.Add(this.button7);
-            this.Controls.Add(this.button6);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.btnNextProg);
-            this.Controls.Add(this.btnPrevProg);
-            this.Controls.Add(this.cbxProgList);
-            this.Controls.Add(this.btnPlugEditor);
+            this.Controls.Add(this.btnSavePatch);
+            this.Controls.Add(this.btnSavePatchAs);
+            this.Controls.Add(this.btnMixer);
+            this.Controls.Add(this.btnKeys2);
+            this.Controls.Add(this.btnLoadPlugin);
+            this.Controls.Add(this.btnSaveRigAs);
+            this.Controls.Add(this.btnNewRig);
+            this.Controls.Add(this.btnLoadRig);
+            this.Controls.Add(this.btnNextPatch);
+            this.Controls.Add(this.btnPrevPatch);
+            this.Controls.Add(this.cbxPatchList);
+            this.Controls.Add(this.btnSaveRig);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.btnStop);
-            this.Controls.Add(this.btnKeys);
+            this.Controls.Add(this.btnHide);
             this.Controls.Add(this.btnPanic);
             this.Name = "ControlPanel";
             this.Size = new System.Drawing.Size(400, 75);
@@ -294,6 +311,53 @@ namespace Audimat.UI
             //beveled edge
             g.DrawLine(Pens.SteelBlue, 1, this.Height - 1, this.Width - 1, this.Height - 1);        //bottom
             g.DrawLine(Pens.SteelBlue, this.Width - 1, 1, this.Width - 1, this.Height - 1);         //right
+
+            //running LED
+            Color LEDColor = auditwin.rack.isRunning ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
+            Brush LEDBrush = new SolidBrush(LEDColor);
+            g.FillEllipse(LEDBrush, 34, 12, 16, 16);
+            g.DrawEllipse(Pens.White, 34, 12, 16, 16);
+            LEDBrush.Dispose();            
+        }
+
+        private void btnNewRig_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnLoadRig_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveRig_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveRigAs_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSavePatch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSavePatchAs_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnMixer_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnHide_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

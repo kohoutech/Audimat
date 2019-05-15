@@ -41,6 +41,8 @@ namespace Audimat.UI
 
         public List<VSTPanel> panels;
 
+        public bool isRunning;
+
         //cons
         public VSTRack(AudimatWindow _auditwin, VSTHost _host)
         {
@@ -67,6 +69,8 @@ namespace Audimat.UI
             this.BackColor = Color.Black;
 
             panels = new List<VSTPanel>();
+
+            isRunning = false;
         }
 
         void scrollbar_ValueChanged(object sender, EventArgs e)
@@ -109,11 +113,13 @@ namespace Audimat.UI
         public void startEngine()
         {
             host.startEngine();
+            isRunning = true;
         }
 
         public void stopEngine()
         {
             host.stopEngine();
+            isRunning = false;
         }
 
         //- panel management ----------------------------------------------------------
