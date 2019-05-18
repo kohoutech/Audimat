@@ -58,6 +58,8 @@
     <Compile Include="AudimatWindow.Designer.cs">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Graph\Patch.cs" />
+    <Compile Include="Graph\Rig.cs" />
     <Compile Include="Midi\Engine\MidiTimer.cs" />
     <Compile Include="Midi\Engine\Transport.cs" />
     <Compile Include="Midi\Event.cs" />
@@ -184,9 +186,7 @@
     <Content Include="VST\Vashti.vcxproj.filters" />
     <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graph\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

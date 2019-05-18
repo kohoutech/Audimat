@@ -144,83 +144,66 @@ namespace Audimat
 
         //- file menu -----------------------------------------------------------------
 
+        public void loadRig()
+        {
+        }
+
+        public void newRig()
+        {
+        }
+
+        public void saveRig(bool rename)
+        {
+        }
+        
+        private void loadRigFileMenuItem_Click(object sender, EventArgs e)
+        {
+            loadRig();
+        }
+
+        private void newRigFileMenuItem_Click(object sender, EventArgs e)
+        {
+            newRig();
+        }
+
+        private void saveRigFileMenuItem_Click(object sender, EventArgs e)
+        {
+            saveRig(false);
+        }
+
+        private void saveRigAsFileMenuItem_Click(object sender, EventArgs e)
+        {
+            saveRig(true);
+        }
+
         private void exitFileMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        //- host menu -----------------------------------------------------------------
+        //- patch menu --------------------------------------------------------
 
-        public void startHost()
+        public void newPatch()
         {
-            rack.startEngine();
-            lblAudimatStatus.Text = "Engine is running";
         }
 
-        public void stopHost()
+        public void savePatch(bool rename)
         {
-            rack.stopEngine();
-            lblAudimatStatus.Text = "Engine is stopped";
         }
 
-        private void StartHost_Click(object sender, EventArgs e)
+        private void newPatchFileMenuItem_Click(object sender, EventArgs e)
         {
-            startHost();
+            newPatch();
         }
 
-        private void StopHost_Click(object sender, EventArgs e)
+        private void savePatchPatchMenuItem_Click(object sender, EventArgs e)
         {
-            stopHost();
+            savePatch(false);
         }
 
-        public void enableKeyboardBarMenuItem(bool enable)
+        private void savePatchAsPatchMenuItem_Click(object sender, EventArgs e)
         {
-            keyboardBarHostMenuItem.Enabled = enable;
-            controlPanel.btnHide.Enabled = enable;
-        }
-
-        public void showKeyboardWindow()
-        {
-            keyboardWnd.updatePluginList();
-            keyboardWnd.Show();
-            enableKeyboardBarMenuItem(false);
-        }
-
-        private void keysButton_Click(object sender, EventArgs e)
-        {
-            showKeyboardWindow();
-        }
-
-        private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (!mainShutdown)
-            {
-                e.Cancel = true;
-                keyboardWnd.currentPlugin = null;
-                keyboardWnd.Hide();
-                enableKeyboardBarMenuItem(true);
-            }
-        }
-
-        private void panicButton_Click(object sender, EventArgs e)
-        {
-            //not implemented yet
-        }
-
-        private void settingsHostMenuItem_Click(object sender, EventArgs e)
-        {
-            HostSettingsWnd hostsettings = new HostSettingsWnd();
-            hostsettings.Icon = this.Icon;
-            hostsettings.setSampleRate(vashti.host.sampleRate);
-            hostsettings.setBlockSize(vashti.host.blockSize);
-
-            hostsettings.ShowDialog(this);
-
-            if (hostsettings.DialogResult == DialogResult.OK)
-            {
-                vashti.host.setSampleRate(hostsettings.sampleRate);
-                vashti.host.setBlockSize(hostsettings.blockSize);
-            }
+            savePatch(true);
         }
 
         //- plugin menu -------------------------------------------------------
@@ -258,11 +241,92 @@ namespace Audimat
             loadPlugin();
         }
 
+        //- rack menu ---------------------------------------------------------
+
+        public void startHost()
+        {
+            rack.startEngine();
+            controlPanel.Invalidate();
+            lblAudimatStatus.Text = "Engine is running";
+        }
+
+        public void stopHost()
+        {
+            rack.stopEngine();
+            controlPanel.Invalidate();
+            lblAudimatStatus.Text = "Engine is stopped";
+        }
+
+        private void StartHost_Click(object sender, EventArgs e)
+        {
+            startHost();
+        }
+
+        private void StopHost_Click(object sender, EventArgs e)
+        {
+            stopHost();
+        }
+
+        public void enableKeyboardBarMenuItem(bool enable)
+        {
+            keyboardBarRackMenuItem.Enabled = enable;
+            controlPanel.btnHide.Enabled = enable;
+        }
+
+        public void showKeyboardWindow()
+        {
+            keyboardWnd.updatePluginList();
+            keyboardWnd.Show();
+            enableKeyboardBarMenuItem(false);
+        }
+
+        private void keysButton_Click(object sender, EventArgs e)
+        {
+            showKeyboardWindow();
+        }
+
+        private void keyboardWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!mainShutdown)
+            {
+                e.Cancel = true;
+                keyboardWnd.currentPlugin = null;
+                keyboardWnd.Hide();
+                enableKeyboardBarMenuItem(true);
+            }
+        }
+
+        private void panicButton_Click(object sender, EventArgs e)
+        {
+            //not implemented yet
+        }
+
+        private void hideShowRackMenuItem_Click(object sender, EventArgs e)
+        {
+            //not implemented yet
+        }
+
+        private void settingsHostMenuItem_Click(object sender, EventArgs e)
+        {
+            HostSettingsWnd hostsettings = new HostSettingsWnd();
+            hostsettings.Icon = this.Icon;
+            hostsettings.setSampleRate(vashti.host.sampleRate);
+            hostsettings.setBlockSize(vashti.host.blockSize);
+
+            hostsettings.ShowDialog(this);
+
+            if (hostsettings.DialogResult == DialogResult.OK)
+            {
+                vashti.host.setSampleRate(hostsettings.sampleRate);
+                vashti.host.setBlockSize(hostsettings.blockSize);
+            }
+        }
+
         //- help menu -----------------------------------------------------------------
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.2.2\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion 1.3.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
     }
