@@ -59,8 +59,10 @@ namespace Audimat.UI
 
             cbxAudioIn.DataSource = waveDevices.getInDevNameList();
             cbxAudioOut.DataSource = waveDevices.getOutDevNameList();
+            
             cbxMidiIn.DataSource = midiDevices.getInDevNameList();
-            cbxMidiIn.SelectedIndex = panel.midiInDeviceNum + 1;
+            cbxMidiIn.SelectedIndex = cbxMidiIn.FindString((panel.midiInDevice != null) ? panel.midiInDevice.devName : "no input");
+
             cbxMidiOut.DataSource = midiDevices.getOutDevNameList();
         }
 
@@ -121,7 +123,7 @@ namespace Audimat.UI
             this.cbxAudioIn.Location = new System.Drawing.Point(16, 38);
             this.cbxAudioIn.Name = "cbxAudioIn";
             this.cbxAudioIn.Size = new System.Drawing.Size(297, 21);
-            this.cbxAudioIn.TabIndex = 5;            
+            this.cbxAudioIn.TabIndex = 5;
             // 
             // cbxAudioOut
             // 
@@ -130,7 +132,7 @@ namespace Audimat.UI
             this.cbxAudioOut.Location = new System.Drawing.Point(16, 90);
             this.cbxAudioOut.Name = "cbxAudioOut";
             this.cbxAudioOut.Size = new System.Drawing.Size(297, 21);
-            this.cbxAudioOut.TabIndex = 6;            
+            this.cbxAudioOut.TabIndex = 6;
             // 
             // cbxMidiIn
             // 
@@ -139,7 +141,7 @@ namespace Audimat.UI
             this.cbxMidiIn.Location = new System.Drawing.Point(16, 142);
             this.cbxMidiIn.Name = "cbxMidiIn";
             this.cbxMidiIn.Size = new System.Drawing.Size(297, 21);
-            this.cbxMidiIn.TabIndex = 7;            
+            this.cbxMidiIn.TabIndex = 7;
             // 
             // cbxMidiOut
             // 
@@ -148,7 +150,7 @@ namespace Audimat.UI
             this.cbxMidiOut.Location = new System.Drawing.Point(16, 194);
             this.cbxMidiOut.Name = "cbxMidiOut";
             this.cbxMidiOut.Size = new System.Drawing.Size(297, 21);
-            this.cbxMidiOut.TabIndex = 8;            
+            this.cbxMidiOut.TabIndex = 8;
             // 
             // btnOK
             // 
@@ -175,7 +177,7 @@ namespace Audimat.UI
             // PluginSettingsWnd
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.ClientSize = new System.Drawing.Size(334, 272);
+            this.ClientSize = new System.Drawing.Size(334, 271);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.cbxMidiOut);
@@ -191,6 +193,7 @@ namespace Audimat.UI
             this.ShowInTaskbar = false;
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -202,7 +205,7 @@ namespace Audimat.UI
         {
             plugin.setAudioIn(cbxAudioIn.SelectedIndex - 1);
             plugin.setAudioOut(cbxAudioOut.SelectedIndex - 1);
-            panel.setMidiIn(cbxMidiIn.SelectedIndex - 1);
+            panel.setMidiIn(cbxMidiIn.SelectedText);
             panel.setMidiOut(cbxMidiOut.SelectedIndex - 1);
 
             this.Close();

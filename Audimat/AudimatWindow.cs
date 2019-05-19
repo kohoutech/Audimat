@@ -36,7 +36,7 @@ namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
-        public static String VERSION = "1.2.2";
+        public static String VERSION = "1.3.0";
 
         public ControlPanel controlPanel;
         public VSTRack rack;
@@ -44,6 +44,7 @@ namespace Audimat
         //child windows
         public PatchWindow patchWin;
         public KeyboardWnd keyboardWnd;
+        public PatchNameWnd patchNameWnd;
 
         //backend & i/o
         public Vashti vashti;
@@ -52,6 +53,7 @@ namespace Audimat
 
         public bool mainShutdown;
 
+        String curRigFilename;
         String curRigPath;
         String curPluginPath;
 
@@ -68,7 +70,6 @@ namespace Audimat
             controlPanel = new ControlPanel(this);
             this.Controls.Add(controlPanel);
             controlPanel.Location = new Point(this.ClientRectangle.Left, AudimatMenu.Bottom);
-            //controlPanel.Anchor = AnchorStyles.Top;
             this.Controls.Add(controlPanel);
 
             //rack control fills up entire client area between control panel & status bar
@@ -86,10 +87,6 @@ namespace Audimat
             int rackY = settings.getIntValue("global-settings.rack-window-pos.y", 100);
             this.Location = new Point(rackX, rackY);
 
-            patchWin = new PatchWindow(this);
-
-            mainShutdown = false;
-
             //child windows
             keyboardWnd = new KeyboardWnd(this);
             keyboardWnd.Icon = this.Icon;
@@ -99,9 +96,17 @@ namespace Audimat
             keyboardWnd.Location = new Point(keyX, keyY);
             keyboardWnd.Hide();
 
+            patchWin = new PatchWindow(this);
+
+            patchNameWnd = null;
+
+            this.Text = "Audimat - new rig";
+            curRigFilename = null;
             curRigPath = Application.StartupPath;
             curPluginPath = Application.StartupPath;
             vstnum = 0;
+
+            mainShutdown = false;
         }
 
         protected override void OnResize(EventArgs e)
@@ -139,10 +144,22 @@ namespace Audimat
             settings.saveToFile();
         }
 
+        //- callbacks -----------------------------------------------------------------
+
         //callback when plugins have been added or removed from the rack
-        public void rackChanged()
+        public void rackProgramsChanged(String curPatchName)
+        {
+            controlPanel.updatePatchList(curPatchName);
+            //saveRigFileMenuItem.Enabled = true;
+            //controlPanel.btnSaveRig.Enabled = true;
+        }
+
+        //callback when plugins have been added or removed from the rack
+        public void rackModulesChanged()
         {
             keyboardWnd.updatePluginList();
+            saveRigFileMenuItem.Enabled = true;
+            controlPanel.btnSaveRig.Enabled = true;
         }
 
         //- file menu -----------------------------------------------------------------
@@ -154,25 +171,57 @@ namespace Audimat
 #if (DEBUG)
             rigPath = "test1.rig";
 #else
-            //loadPluginDialog.Title = "load a Audimat rig";
             loadRigDialog.InitialDirectory = curRigPath;
-            //loadPluginDialog.Filter =  "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            loadRigDialog.ShowDialog();
-            rigPath = loadRigDialog.FileName;
-            if (rigPath.Length == 0) return;
+            DialogResult result = loadRigDialog.ShowDialog(this);
+            if (result == DialogResult.Cancel) return;
+            rigPath = loadRigDialog.FileName;            
 #endif
             curRigPath = Path.GetDirectoryName(rigPath);
             bool result = rack.loadRig(rigPath);
+
+            if (result)
+            {
+                curRigFilename = Path.GetFileName(rigPath);
+                this.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
+                saveRigFileMenuItem.Enabled = false;
+                controlPanel.btnSaveRig.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("failed to load the rig file: " + rigPath, "Rig Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void newRig()
         {
+            rack.clearRig();
+
+            curRigFilename = null;
+            this.Text = "Audimat - new rig";
+            saveRigFileMenuItem.Enabled = false;
+            controlPanel.btnSaveRig.Enabled = false;
         }
 
         public void saveRig(bool rename)
         {
+            String rigPath = curRigFilename;
+            if (rename || curRigFilename == null)           //rename automatically is we don't already have a name
+            {
+                saveRigDialog.InitialDirectory = curRigPath;
+                DialogResult result = saveRigDialog.ShowDialog(this);
+                if (result == DialogResult.Cancel) return;
+
+                rigPath = saveRigDialog.FileName;
+                curRigPath = Path.GetDirectoryName(rigPath);
+                curRigFilename = Path.GetFileName(rigPath);
+            }
+            rack.saveRig(rigPath);
+
+            this.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
+            saveRigFileMenuItem.Enabled = false;
+            controlPanel.btnSaveRig.Enabled = false;
         }
-        
+
         private void loadRigFileMenuItem_Click(object sender, EventArgs e)
         {
             loadRig();
@@ -185,7 +234,7 @@ namespace Audimat
 
         private void saveRigFileMenuItem_Click(object sender, EventArgs e)
         {
-            saveRig(false);
+            saveRig((curRigFilename == null));
         }
 
         private void saveRigAsFileMenuItem_Click(object sender, EventArgs e)
@@ -202,25 +251,46 @@ namespace Audimat
 
         public void newPatch()
         {
+            rack.clearPatch();
         }
 
-        public void savePatch(bool rename)
+        public void updatePatch()
         {
+            rack.updatePatch();
         }
 
-        private void newPatchFileMenuItem_Click(object sender, EventArgs e)
+        public void saveNewPatch()
+        {
+            String patchName = "";
+
+            patchNameWnd = new PatchNameWnd(this);
+            patchNameWnd.Icon = this.Icon;
+            if (rack.currentPatch != null)
+            {
+                patchNameWnd.txtPatchname.Text = rack.currentPatch.name;
+            }
+
+            DialogResult result = patchNameWnd.ShowDialog(this);
+            if (result == DialogResult.Cancel) return;
+
+            patchName = patchNameWnd.txtPatchname.Text;
+
+            rack.addNewPatch(patchName);
+        }
+
+        private void newPatchMenuItem_Click(object sender, EventArgs e)
         {
             newPatch();
         }
 
-        private void savePatchPatchMenuItem_Click(object sender, EventArgs e)
+        private void savePatchMenuItem_Click(object sender, EventArgs e)
         {
-            savePatch(false);
+            updatePatch();
         }
 
-        private void savePatchAsPatchMenuItem_Click(object sender, EventArgs e)
+        private void savePatchAsMenuItem_Click(object sender, EventArgs e)
         {
-            savePatch(true);
+            saveNewPatch();
         }
 
         //- plugin menu -------------------------------------------------------
@@ -244,9 +314,9 @@ namespace Audimat
             if (pluginPath.Length == 0) return;
             curpluginPath = Path.GetDirectoryName(pluginPath);
 #endif
-            bool result = rack.addPanel(pluginPath);
+            VSTPanel result = rack.addPanel(pluginPath, true);
 
-            if (!result)
+            if (result == null)
             {
                 MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -313,14 +383,32 @@ namespace Audimat
             }
         }
 
+        public void panicButton()
+        {
+            String msg = "the panic button is coming soon\n" + "have patience!";
+            MessageBox.Show(msg, "Coming soon");
+        }
+
         private void panicButton_Click(object sender, EventArgs e)
         {
-            //not implemented yet
+            panicButton();
+        }
+
+        public void hideRack()
+        {
+            String msg = "the hide/show rack feature is coming soon\n" + "have patience!";
+            MessageBox.Show(msg, "Coming soon");
         }
 
         private void hideShowRackMenuItem_Click(object sender, EventArgs e)
         {
-            //not implemented yet
+            hideRack();
+        }
+
+        public void showMixerWindow()
+        {
+            String msg = "the mixer window is coming soon\n" + "have patience!";
+            MessageBox.Show(msg, "Coming soon");            
         }
 
         private void settingsHostMenuItem_Click(object sender, EventArgs e)

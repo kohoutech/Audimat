@@ -58,6 +58,7 @@
             this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
             this.AudimatMenu.SuspendLayout();
             this.AudimatStatus.SuspendLayout();
             this.SuspendLayout();
@@ -144,21 +145,21 @@
             this.newPatchFileMenuItem.Name = "newPatchFileMenuItem";
             this.newPatchFileMenuItem.Size = new System.Drawing.Size(147, 22);
             this.newPatchFileMenuItem.Text = "&New Patch";
-            this.newPatchFileMenuItem.Click += new System.EventHandler(this.newPatchFileMenuItem_Click);
+            this.newPatchFileMenuItem.Click += new System.EventHandler(this.newPatchMenuItem_Click);
             // 
             // savePatchPatchMenuItem
             // 
             this.savePatchPatchMenuItem.Name = "savePatchPatchMenuItem";
             this.savePatchPatchMenuItem.Size = new System.Drawing.Size(147, 22);
             this.savePatchPatchMenuItem.Text = "&Save Patch";
-            this.savePatchPatchMenuItem.Click += new System.EventHandler(this.savePatchPatchMenuItem_Click);
+            this.savePatchPatchMenuItem.Click += new System.EventHandler(this.savePatchMenuItem_Click);
             // 
             // savePatchAsPatchMenuItem
             // 
             this.savePatchAsPatchMenuItem.Name = "savePatchAsPatchMenuItem";
             this.savePatchAsPatchMenuItem.Size = new System.Drawing.Size(147, 22);
             this.savePatchAsPatchMenuItem.Text = "Save Patch &As";
-            this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsPatchMenuItem_Click);
+            this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsMenuItem_Click);
             // 
             // pluginMenuItem
             // 
@@ -278,8 +279,15 @@
             // 
             // loadRigDialog
             // 
+            this.loadRigDialog.DefaultExt = "rig";
             this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            this.loadRigDialog.Title = "load a Audimat rig";
+            this.loadRigDialog.Title = "load an Audimat rig";
+            // 
+            // saveRigDialog
+            // 
+            this.saveRigDialog.DefaultExt = "rig";
+            this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.saveRigDialog.Title = "save an Audimat rig";
             // 
             // AudimatWindow
             // 
@@ -333,6 +341,7 @@
         private System.Windows.Forms.ToolStripMenuItem savePatchAsPatchMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hideShowRackMenuItem;
         private System.Windows.Forms.OpenFileDialog loadRigDialog;
+        private System.Windows.Forms.SaveFileDialog saveRigDialog;
     }
 }
 

@@ -66,7 +66,7 @@ namespace Audimat.UI
         Form editorWindow;
         Size editorWindowSize;
 
-        public int midiInDeviceNum;
+        public InputDevice midiInDevice;
         public PanelMidiIn midiInUnit;
         public int midiOutDeviceNum;
 
@@ -91,7 +91,7 @@ namespace Audimat.UI
             paramEditorWnd = null;
             editorWindow = null;
 
-            midiInDeviceNum = -1;
+            midiInDevice = null;
             midiInUnit = null;
             midiOutDeviceNum = -1;
         }
@@ -276,42 +276,12 @@ namespace Audimat.UI
             }
 
             //disconnect midi i/o
-            if (midiInDeviceNum != -1)
+            if (midiInDevice != null)
             {
-                rack.disconnectMidiInput(midiInDeviceNum, midiInUnit);
+                rack.disconnectMidiInput(midiInDevice, midiInUnit);
             }
 
             rack.host.unloadPlugin(plugin);     //disconnect and unload back end
-        }
-
-        //- painting ------------------------------------------------------------------
-
-        void drawRackScrew(Graphics g, int xpos, int ypos)
-        {
-            g.DrawEllipse(Pens.Black, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
-            g.FillEllipse(Brushes.Gray, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
-            Pen slotPen = new Pen(Color.Black, 2);
-            g.DrawLine(slotPen, xpos + 5, ypos, xpos + 5, ypos + 10);
-            g.DrawLine(slotPen, xpos, ypos + 5, xpos + 10, ypos + 5);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            Graphics g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-
-            //beveled edge
-            g.DrawLine(Pens.SteelBlue, 1, PANELHEIGHT - 3, PANELWIDTH - 1, PANELHEIGHT - 3);        //bottom
-            g.DrawLine(Pens.SteelBlue, PANELWIDTH - 3, 1, PANELWIDTH - 3, PANELHEIGHT - 1);         //right
-
-            //rack screws
-            int rightOfs = PANELWIDTH - VSTRack.SCREWHOLE - VSTRack.SCREWOFS;
-            int bottomofs = PANELHEIGHT - (VSTRack.SCREWHOLE * 2);
-            drawRackScrew(g, VSTRack.SCREWOFS, VSTRack.SCREWHOLE);
-            drawRackScrew(g, VSTRack.SCREWOFS, bottomofs);
-            drawRackScrew(g, rightOfs, VSTRack.SCREWHOLE);
-            drawRackScrew(g, rightOfs, bottomofs);
         }
 
         //- event handlers ------------------------------------------------------------
@@ -358,19 +328,20 @@ namespace Audimat.UI
             btnPlugSettings.Enabled = true;
         }
 
-        public void setMidiIn(int deviceNum)
+        public void setMidiIn(String deviceName)
         {
-            if (midiInDeviceNum != deviceNum)
+            InputDevice indev = rack.midiDevices.findInputDevice(deviceName);
+            if (midiInDevice != indev)
             {
                 if (midiInUnit != null)
                 {
-                    rack.disconnectMidiInput(midiInDeviceNum, midiInUnit);
+                    rack.disconnectMidiInput(midiInDevice, midiInUnit);
                 }
-                midiInDeviceNum = deviceNum;
-                if (deviceNum != -1)
+                midiInDevice = indev;
+                if (midiInDevice != null)
                 {
                     midiInUnit = new PanelMidiIn(this);
-                    rack.connectMidiInput(deviceNum, midiInUnit);
+                    rack.connectMidiInput(midiInDevice, midiInUnit);
                 }
                 else
                 {
@@ -451,6 +422,36 @@ namespace Audimat.UI
         {
             rack.removePanel(this);
         }
+        
+        //- painting ------------------------------------------------------------------
+
+        void drawRackScrew(Graphics g, int xpos, int ypos)
+        {
+            g.DrawEllipse(Pens.Black, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
+            g.FillEllipse(Brushes.Gray, xpos, ypos, VSTRack.SCREWHOLE, VSTRack.SCREWHOLE);
+            Pen slotPen = new Pen(Color.Black, 2);
+            g.DrawLine(slotPen, xpos + 5, ypos, xpos + 5, ypos + 10);
+            g.DrawLine(slotPen, xpos, ypos + 5, xpos + 10, ypos + 5);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            //beveled edge
+            g.DrawLine(Pens.SteelBlue, 1, PANELHEIGHT - 3, PANELWIDTH - 1, PANELHEIGHT - 3);        //bottom
+            g.DrawLine(Pens.SteelBlue, PANELWIDTH - 3, 1, PANELWIDTH - 3, PANELHEIGHT - 1);         //right
+
+            //rack screws
+            int rightOfs = PANELWIDTH - VSTRack.SCREWHOLE - VSTRack.SCREWOFS;
+            int bottomofs = PANELHEIGHT - (VSTRack.SCREWHOLE * 2);
+            drawRackScrew(g, VSTRack.SCREWOFS, VSTRack.SCREWHOLE);
+            drawRackScrew(g, VSTRack.SCREWOFS, bottomofs);
+            drawRackScrew(g, rightOfs, VSTRack.SCREWHOLE);
+            drawRackScrew(g, rightOfs, bottomofs);
+        }
     }
 
     //- midi listener ---------------------------------------------------------
@@ -471,5 +472,18 @@ namespace Audimat.UI
             //Console.WriteLine(" sending midi message {0} {1} {2}", msg[0], msg[1], msg[2]);
             panel.plugin.sendShortMidiMessage(msg[0], msg[1], msg[2]);
         }
+    }
+
+    //midi output listener unit
+    public class PanelMidiOut : SystemUnit
+    {
+        public VSTPanel panel;
+
+        public PanelMidiOut(VSTPanel _panel)
+            : base(_panel.plugName)
+        {
+            panel = _panel;
+        }
+
     }
 }

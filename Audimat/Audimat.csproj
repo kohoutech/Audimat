@@ -58,7 +58,7 @@
     <Compile Include="AudimatWindow.Designer.cs">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Graph\Rig.cs" />
+    <Compile Include="Graph\VSTRig.cs" />
     <Compile Include="Midi\Engine\MidiTimer.cs" />
     <Compile Include="Midi\Engine\Transport.cs" />
     <Compile Include="Midi\Event.cs" />
@@ -98,6 +98,9 @@
     </Compile>
     <Compile Include="UI\MixerWnd.Designer.cs">
       <DependentUpon>MixerWnd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PatchNameWnd.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\PluginParamWnd.cs">
       <SubType>Form</SubType>
@@ -150,6 +153,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\KeyboardWnd.resx">
       <DependentUpon>KeyboardWnd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PatchNameWnd.resx">
+      <DependentUpon>PatchNameWnd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PluginParamWnd.resx">
       <DependentUpon>PluginParamWnd.cs</DependentUpon>

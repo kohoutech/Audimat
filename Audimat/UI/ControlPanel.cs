@@ -25,36 +25,39 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
+using Audimat.Graph;
+
 namespace Audimat.UI
 {
     public class ControlPanel : UserControl
     {
         public AudimatWindow auditwin;
-        public Button btnPanic;
-        public Button btnHide;
-        public Button btnStop;
-        private ToolTip controlPanelToolTip;
+
         private System.ComponentModel.IContainer components;
-        private Button btnSaveRig;
+        public ComboBox cbxPatchList;
         private Button btnNextPatch;
         private Button btnPrevPatch;
-        public ComboBox cbxPatchList;
         private Button btnLoadRig;
         private Button btnNewRig;
+        public Button btnSaveRig;
         private Button btnSaveRigAs;
-        private Button btnLoadPlugin;
-        private Button btnKeys2;
-        private Button btnMixer;
+        private Button btnNewPatch;
         private Button btnSavePatchAs;
         private Button btnSavePatch;
-        private Button btnNewPatch;
+        private Button btnLoadPlugin;
+        private Button btnKeys;
+        private Button btnMixer;
+        public Button btnPanic;
+        public Button btnHide;
         public Button btnStart;
+        public Button btnStop;
+        private ToolTip controlPanelToolTip;
 
         public ControlPanel(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
 
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void InitializeComponent()
@@ -72,7 +75,7 @@ namespace Audimat.UI
             this.btnNewRig = new System.Windows.Forms.Button();
             this.btnSaveRigAs = new System.Windows.Forms.Button();
             this.btnLoadPlugin = new System.Windows.Forms.Button();
-            this.btnKeys2 = new System.Windows.Forms.Button();
+            this.btnKeys = new System.Windows.Forms.Button();
             this.btnMixer = new System.Windows.Forms.Button();
             this.btnSavePatchAs = new System.Windows.Forms.Button();
             this.btnSavePatch = new System.Windows.Forms.Button();
@@ -140,6 +143,7 @@ namespace Audimat.UI
             // 
             // btnNextPatch
             // 
+            this.btnNextPatch.Enabled = false;
             this.btnNextPatch.Location = new System.Drawing.Point(218, 13);
             this.btnNextPatch.Name = "btnNextPatch";
             this.btnNextPatch.Size = new System.Drawing.Size(18, 24);
@@ -151,6 +155,7 @@ namespace Audimat.UI
             // 
             // btnPrevPatch
             // 
+            this.btnPrevPatch.Enabled = false;
             this.btnPrevPatch.Location = new System.Drawing.Point(25, 12);
             this.btnPrevPatch.Name = "btnPrevPatch";
             this.btnPrevPatch.Size = new System.Drawing.Size(18, 25);
@@ -208,17 +213,17 @@ namespace Audimat.UI
             this.btnLoadPlugin.UseVisualStyleBackColor = false;
             this.btnLoadPlugin.Click += new System.EventHandler(this.btnLoad_Click);
             // 
-            // btnKeys2
+            // btnKeys
             // 
-            this.btnKeys2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnKeys2.Location = new System.Drawing.Point(255, 13);
-            this.btnKeys2.Name = "btnKeys2";
-            this.btnKeys2.Size = new System.Drawing.Size(24, 24);
-            this.btnKeys2.TabIndex = 16;
-            this.btnKeys2.Text = "K";
-            this.controlPanelToolTip.SetToolTip(this.btnKeys2, "show keyboard window");
-            this.btnKeys2.UseVisualStyleBackColor = false;
-            this.btnKeys2.Click += new System.EventHandler(this.btnKeys_Click);
+            this.btnKeys.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnKeys.Location = new System.Drawing.Point(255, 13);
+            this.btnKeys.Name = "btnKeys";
+            this.btnKeys.Size = new System.Drawing.Size(24, 24);
+            this.btnKeys.TabIndex = 16;
+            this.btnKeys.Text = "K";
+            this.controlPanelToolTip.SetToolTip(this.btnKeys, "show keyboard window");
+            this.btnKeys.UseVisualStyleBackColor = false;
+            this.btnKeys.Click += new System.EventHandler(this.btnKeys_Click);
             // 
             // btnMixer
             // 
@@ -271,6 +276,7 @@ namespace Audimat.UI
             // cbxPatchList
             // 
             this.cbxPatchList.BackColor = System.Drawing.Color.GreenYellow;
+            this.cbxPatchList.Enabled = false;
             this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxPatchList.ForeColor = System.Drawing.Color.Black;
             this.cbxPatchList.FormattingEnabled = true;
@@ -287,7 +293,7 @@ namespace Audimat.UI
             this.Controls.Add(this.btnSavePatch);
             this.Controls.Add(this.btnSavePatchAs);
             this.Controls.Add(this.btnMixer);
-            this.Controls.Add(this.btnKeys2);
+            this.Controls.Add(this.btnKeys);
             this.Controls.Add(this.btnLoadPlugin);
             this.Controls.Add(this.btnSaveRigAs);
             this.Controls.Add(this.btnNewRig);
@@ -306,21 +312,46 @@ namespace Audimat.UI
 
         }
 
+        public void updatePatchList(String patchName)
+        {
+            cbxPatchList.Items.Clear();
+            cbxPatchList.Text = "";
+            foreach (Patch patch in auditwin.rack.currentRig.patches)
+            {
+                cbxPatchList.Items.Add(patch.name);
+            }
+            bool enabled = (cbxPatchList.Items.Count > 0);
+            cbxPatchList.Enabled = enabled;
+            btnPrevPatch.Enabled = enabled;
+            btnNextPatch.Enabled = enabled;
+            cbxPatchList.SelectedIndex = (enabled && patchName != null) ? cbxPatchList.FindString(patchName) : -1;
+        }
+
         //- patch selector ----------------------------------------------------
+
+        private void cbxPatchList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            auditwin.rack.setCurrentPatch(cbxPatchList.SelectedIndex);
+        }
 
         private void btnPrevPatch_Click(object sender, EventArgs e)
         {
-
+            int curpatch = cbxPatchList.SelectedIndex;
+            curpatch--;
+            if (curpatch >= 0)
+            {
+                cbxPatchList.SelectedIndex = curpatch;
+            }
         }
 
         private void btnNextPatch_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void cbxPatchList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
+            int curpatch = cbxPatchList.SelectedIndex;
+            curpatch++;
+            if (curpatch < cbxPatchList.Items.Count)
+            {
+                cbxPatchList.SelectedIndex = curpatch;
+            }
         }
 
         //- rig buttons -------------------------------------------------------
@@ -351,15 +382,15 @@ namespace Audimat.UI
         {
             auditwin.newPatch();
         }
-        
+
         private void btnSavePatch_Click(object sender, EventArgs e)
         {
-            auditwin.savePatch(false);
+            auditwin.updatePatch();
         }
 
         private void btnSavePatchAs_Click(object sender, EventArgs e)
         {
-            auditwin.savePatch(true);
+            auditwin.saveNewPatch();
         }
 
         //- plugin buttons ----------------------------------------------------
@@ -373,12 +404,12 @@ namespace Audimat.UI
 
         private void btnHide_Click(object sender, EventArgs e)
         {
-            //not implemented yet
+            auditwin.hideRack();
         }
 
         private void btnPanic_Click(object sender, EventArgs e)
         {
-            //not implemented yet
+            auditwin.panicButton();
         }
 
         private void btnKeys_Click(object sender, EventArgs e)
@@ -388,7 +419,7 @@ namespace Audimat.UI
 
         private void btnMixer_Click(object sender, EventArgs e)
         {
-            //not implemented yet
+            auditwin.showMixerWindow();
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -418,8 +449,8 @@ namespace Audimat.UI
             Brush LEDBrush = new SolidBrush(LEDColor);
             g.DrawEllipse(Pens.Black, 380, 28, 20, 20);
             g.FillEllipse(Brushes.White, 381, 29, 19, 19);
-            g.FillEllipse(LEDBrush,      382, 30, 16, 16);
-            LEDBrush.Dispose();            
+            g.FillEllipse(LEDBrush, 382, 30, 16, 16);
+            LEDBrush.Dispose();
         }
     }
 }
