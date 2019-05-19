@@ -124,27 +124,27 @@ void VSTPlugin::unload()
 
 void VSTPlugin::getPlugInfo(PlugInfo* pinfo) 
 {
-		pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-		getProductString(pinfo->name);
-		pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
-		getVendorString(pinfo->vendor);
-		pinfo->version = getVstVersion();
-		pinfo->numPrograms = pEffect->numPrograms;
-		pinfo->numParameters = pEffect->numParams;
-		pinfo->numInputs = pEffect->numInputs;
-		pinfo->numOutputs = pEffect->numOutputs;
-		pinfo->flags = pEffect->flags;
-		pinfo->uniqueID = pEffect->uniqueID;
+	pinfo->name = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+	getProductString(pinfo->name);
+	pinfo->vendor = (char*) CoTaskMemAlloc(kVstMaxNameLen);
+	getVendorString(pinfo->vendor);
+	pinfo->version = getVstVersion();
+	pinfo->numPrograms = pEffect->numPrograms;
+	pinfo->numParameters = pEffect->numParams;
+	pinfo->numInputs = pEffect->numInputs;
+	pinfo->numOutputs = pEffect->numOutputs;
+	pinfo->flags = pEffect->flags;
+	pinfo->uniqueID = pEffect->uniqueID;
 
-		if (pEffect->flags && effFlagsHasEditor != 0) {
-			ERect* pRect;
-			editGetRect(&pRect);
-			pinfo->editorWidth = pRect->right - pRect->left;
-			pinfo->editorHeight = pRect->bottom - pRect->top;
-		} else {
-			pinfo->editorWidth = 0;
-			pinfo->editorHeight = 0;
-		}
+	if (pEffect->flags && effFlagsHasEditor != 0) {
+		ERect* pRect;
+		editGetRect(&pRect);
+		pinfo->editorWidth = pRect->right - pRect->left;
+		pinfo->editorHeight = pRect->bottom - pRect->top;
+	} else {
+		pinfo->editorWidth = 0;
+		pinfo->editorHeight = 0;
+	}
 }
 
 //- processing methods --------------------------------------------------------
@@ -189,7 +189,7 @@ void VSTPlugin::buildMIDIEvents()
 		pEvents = (VstEvents *) eventData;
 		memset(pEvents, 0, eventSize);
 		pEvents->numEvents = eventCount;
-			
+
 		//store event data
 		VstMidiEvent* pEvent = ((VstMidiEvent *)(eventData + hdrSize));
 		int midiBufPos = 0;
@@ -349,6 +349,220 @@ void VSTPlugin::resume()
 	dispatch(effMainsChanged, 0, true); 
 }
 
+long VSTPlugin::getChunk(void **data, bool isPreset) 
+{ 
+	return dispatch(effGetChunk, isPreset, 0, data); 
+}
+
+long VSTPlugin::setChunk(void *data, long byteSize, bool isPreset) 
+{ 
+	return dispatch(effSetChunk, isPreset, byteSize, data); 
+}
+
+//- AudioEffectX dispatcher functions -----------------------------------------------
+
+long VSTPlugin::processEvents() 
+{ 
+	return dispatch(effProcessEvents, 0, 0, pEvents); 
+}
+
+long VSTPlugin::canParameterBeAutomated(long index) 
+{ 
+	return dispatch(effCanBeAutomated, index); 
+}
+
+long VSTPlugin::string2Parameter(long index, char *ptr) 
+{ 
+	return dispatch(effString2Parameter, index, 0, ptr); 
+}
+
+long VSTPlugin::getProgramNameIndexed(long category, long index, char* text) 
+{ 
+	return dispatch(effGetProgramNameIndexed, index, category, text); 
+}
+
+long VSTPlugin::getInputProperties(long index, VstPinProperties *ptr) 
+{ 
+	return dispatch(effGetInputProperties, index, 0, ptr); 
+}
+
+long VSTPlugin::getOutputProperties(long index, VstPinProperties *ptr) 
+{ 
+	return dispatch(effGetOutputProperties, index, 0, ptr); 
+}
+
+long VSTPlugin::getPlugCategory() 
+{ 
+	return dispatch(effGetPlugCategory); 
+}
+
+long VSTPlugin::offlineNotify(VstAudioFile* ptr, long numAudioFiles, bool start) 
+{ 
+	return dispatch(effOfflineNotify, start, numAudioFiles, ptr); 
+}
+
+long VSTPlugin::offlinePrepare(VstOfflineTask *ptr, long count) 
+{ 
+	return dispatch(effOfflinePrepare, 0, count, ptr); 
+}
+
+long VSTPlugin::offlineRun(VstOfflineTask *ptr, long count) 
+{ 
+	return dispatch(effOfflineRun, 0, count, ptr); 
+}
+
+long VSTPlugin::setSpeakerArrangement(VstSpeakerArrangement* pluginInput, VstSpeakerArrangement* pluginOutput) 
+{ 
+	return dispatch(effSetSpeakerArrangement, 0, (long)pluginInput, pluginOutput); 
+}
+
+long VSTPlugin::processVarIo(VstVariableIo* varIo) 
+{ 
+	return dispatch(effProcessVarIo, 0, 0, varIo); 
+}
+
+long VSTPlugin::setBypass(bool onOff) 
+{ 
+	return dispatch(effSetBypass, 0, onOff); 
+}
+
+long VSTPlugin::getEffectName(char *ptr) 
+{ 
+	return dispatch(effGetEffectName, 0, 0, ptr); 
+}
+
+long VSTPlugin::getVendorString(char *ptr) 
+{ 
+	return dispatch(effGetVendorString, 0, 0, ptr); 
+}
+
+long VSTPlugin::getProductString(char *ptr) 
+{ 
+	return dispatch(effGetProductString, 0, 0, ptr); 
+}
+
+long VSTPlugin::getVendorVersion() 
+{ 
+	return dispatch(effGetVendorVersion); 
+}
+
+long VSTPlugin::vendorSpecific(long index, long value, void *ptr, float opt) 
+{ 
+	return dispatch(effVendorSpecific, index, value, ptr, opt); 
+}
+
+long VSTPlugin::canDo(const char *ptr) 
+{ 
+	return dispatch(effCanDo, 0, 0, (void *)ptr);
+}
+
+long VSTPlugin::getTailSize() 
+{ 
+	return dispatch(effGetTailSize); 
+}
+
+long VSTPlugin::getParameterProperties(long index, VstParameterProperties* ptr) 
+{ 
+	return dispatch(effGetParameterProperties, index, 0, ptr); 
+}
+
+long VSTPlugin::getVstVersion() 
+{ 
+	return dispatch(effGetVstVersion); 
+}
+
+long VSTPlugin::getMidiProgramName(long channel, MidiProgramName* midiProgramName) 
+{ 
+	return dispatch(effGetMidiProgramName, channel, 0, midiProgramName); 
+}
+
+long VSTPlugin::getCurrentMidiProgram (long channel, MidiProgramName* currentProgram) 
+{ 
+	return dispatch(effGetCurrentMidiProgram, channel, 0, currentProgram); 
+}
+
+long VSTPlugin::getMidiProgramCategory (long channel, MidiProgramCategory* category) 
+{ 
+	return dispatch(effGetMidiProgramCategory, channel, 0, category); 
+}
+
+long VSTPlugin::hasMidiProgramsChanged (long channel) 
+{ 
+	return dispatch(effHasMidiProgramsChanged, channel); 
+}
+
+long VSTPlugin::getMidiKeyName(long channel, MidiKeyName* keyName) 
+{ 
+	return dispatch(effGetMidiKeyName, channel, 0, keyName); 
+}
+
+long VSTPlugin::beginSetProgram() 
+{ 
+	return dispatch(effBeginSetProgram); 
+}
+
+long VSTPlugin::endSetProgram() 
+{ 
+	return dispatch(effEndSetProgram); 
+}
+
+long VSTPlugin::getSpeakerArrangement(VstSpeakerArrangement** pluginInput, VstSpeakerArrangement** pluginOutput)
+{ 
+	return dispatch(effGetSpeakerArrangement, 0, (long)pluginInput, pluginOutput); 
+}
+
+long VSTPlugin::setTotalSampleToProcess (long value) 
+{ 
+	return dispatch(effSetTotalSampleToProcess, 0, value); 
+}
+
+long VSTPlugin::getNextShellPlugin(char *name)
+{ 
+	return dispatch(effShellGetNextPlugin, 0, 0, name); 
+}
+
+long VSTPlugin::startProcess() 
+{ 
+	return dispatch(effStartProcess); 
+}
+
+long VSTPlugin::stopProcess() 
+{ 
+	return dispatch(effStopProcess); 
+}
+
+long VSTPlugin::setPanLaw(long type, float val) 
+{ 
+	return dispatch(effSetPanLaw, 0, type, 0, val); 
+}
+
+long VSTPlugin::beginLoadBank(VstPatchChunkInfo* ptr) 
+{ 
+	return dispatch(effBeginLoadBank, 0, 0, ptr); 
+}
+
+long VSTPlugin::beginLoadProgram(VstPatchChunkInfo* ptr) 
+{ 
+	return dispatch(effBeginLoadProgram, 0, 0, ptr); 
+}
+
+long VSTPlugin::setProcessPrecision(long precision) 
+{ 
+	return dispatch(effSetProcessPrecision, 0, precision, 0); 
+}
+
+long VSTPlugin::getNumMidiInputChannels() 
+{ 
+	return dispatch(effGetNumMidiInputChannels, 0, 0, 0); 
+}
+
+long VSTPlugin::getNumMidiOutputChannels() 
+{ 
+	return dispatch(effGetNumMidiOutputChannels, 0, 0, 0); 
+}
+
+//- editor functions -----------------------------------------------
+
 long VSTPlugin::editGetRect(ERect **ptr) 
 { 
 	return dispatch(effEditGetRect, 0, 0, ptr); 
@@ -369,40 +583,19 @@ void VSTPlugin::editIdle()
 	dispatch(effEditIdle); 
 }
 
-long VSTPlugin::getChunk(void **data, bool isPreset) 
+long VSTPlugin::editkeyDown(VstKeyCode &keyCode) 
 { 
-	return dispatch(effGetChunk, isPreset, 0, data); 
+	return dispatch(effEditKeyDown, keyCode.character, keyCode.virt, 0, keyCode.modifier); 
 }
 
-long VSTPlugin::setChunk(void *data, long byteSize, bool isPreset) 
+long VSTPlugin::editkeyUp(VstKeyCode &keyCode) 
 { 
-	return dispatch(effSetChunk, isPreset, byteSize, data); 
+	return dispatch(effEditKeyUp, keyCode.character, keyCode.virt, 0, keyCode.modifier); 
 }
 
-//- AudioEffectX dispatcher functions -----------------------------------------------
-
-long VSTPlugin::processEvents() 
+void VSTPlugin::setEditKnobMode(long value) 
 { 
-	return dispatch(effProcessEvents, 0, 0, pEvents); 
-}
-
-long VSTPlugin::getProgramNameIndexed(long category, long index, char* text) { 
-	return dispatch(effGetProgramNameIndexed, index, category, text); 
-}
-
-long VSTPlugin::getVendorString(char *ptr) 
-{ 
-	return dispatch(effGetVendorString, 0, 0, ptr); 
-}
-
-long VSTPlugin::getProductString(char *ptr) 
-{ 
-	return dispatch(effGetProductString, 0, 0, ptr); 
-}
-
-long VSTPlugin::getVstVersion() 
-{ 
-	return dispatch(effGetVstVersion); 
+	dispatch(effSetEditKnobMode, 0, value); 
 }
 
 //- host callback functions ---------------------------------------------------
@@ -420,7 +613,7 @@ long VSTCALLBACK VSTPlugin::AudioMasterCallback
 	float opt
 	)
 {
-	if (opcode == audioMasterVersion)		//this is called before the user field is set
+	if (opcode == audioMasterVersion)		//this is called from <VSTPluginMain> before the user field is set
 		return 2400;
 
 	VSTPlugin* plugin = (VSTPlugin*)effect->user;

@@ -72,7 +72,7 @@ public:
 	void processReplacing(float **inputs, float **outputs, long sampleframes);
 	void processDoubleReplacing(double** inputs, double** outputs, long sampleFrames);
 
-	//plugin dispatcher calls
+	//plugin AudioEffect dispatcher calls
 	void open();
 	void close();
 	void setProgram(long lValue);
@@ -89,17 +89,56 @@ public:
 	long getChunk(void **data, bool isPreset);
 	long setChunk(void *data, long byteSize, bool isPreset);
 
+	//plugin AudioEffectX dispatcher calls
+	long processEvents();
+	long canParameterBeAutomated(long index);
+	long string2Parameter(long index, char *ptr);
+	long getProgramNameIndexed(long category, long index, char* text);
+    long getInputProperties(long index, VstPinProperties *ptr);
+    long getOutputProperties(long index, VstPinProperties *ptr);
+    long getPlugCategory();
+    long offlineNotify(VstAudioFile* ptr, long numAudioFiles, bool start);
+    long offlinePrepare(VstOfflineTask *ptr, long count);
+    long offlineRun(VstOfflineTask *ptr, long count);
+    long setSpeakerArrangement(VstSpeakerArrangement* pluginInput, VstSpeakerArrangement* pluginOutput);
+    long processVarIo(VstVariableIo* varIo);
+    long setBypass(bool onOff);
+    long getEffectName(char *ptr);
+    long getVendorString(char *ptr);
+    long getProductString(char *ptr);
+    long getVendorVersion();
+    long vendorSpecific(long index, long value, void *ptr, float opt);
+    long canDo(const char *ptr);
+    long getTailSize();
+    long getParameterProperties(long index, VstParameterProperties* ptr);
+    long getVstVersion();
+    long getMidiProgramName(long channel, MidiProgramName* midiProgramName);
+    long getCurrentMidiProgram (long channel, MidiProgramName* currentProgram);
+    long getMidiProgramCategory (long channel, MidiProgramCategory* category);
+    long hasMidiProgramsChanged (long channel);
+    long getMidiKeyName(long channel, MidiKeyName* keyName);
+    long beginSetProgram();
+    long endSetProgram();
+    long getSpeakerArrangement(VstSpeakerArrangement** pluginInput, VstSpeakerArrangement** pluginOutput);
+    long setTotalSampleToProcess (long value);
+    long getNextShellPlugin(char *name);
+    long startProcess();
+    long stopProcess();
+    long setPanLaw(long type, float val);
+    long beginLoadBank(VstPatchChunkInfo* ptr);
+    long beginLoadProgram(VstPatchChunkInfo* ptr);
+    long setProcessPrecision(long precision);
+    long getNumMidiInputChannels();
+    long getNumMidiOutputChannels();
+
 	//editor calls
 	long editGetRect(ERect **ptr);
 	long editOpen(void *ptr);
 	void editClose();
 	void editIdle();
-
-	long processEvents();
-	long getProgramNameIndexed(long category, long index, char* text);
-	long getVendorString(char *ptr);
-	long getProductString(char *ptr);
-	long getVstVersion();
+    long editkeyDown(VstKeyCode &keyCode);
+    long editkeyUp(VstKeyCode &keyCode);
+    void setEditKnobMode(long value);
 
 	//plugin callback handlers
 	static long VSTCALLBACK AudioMasterCallback(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);

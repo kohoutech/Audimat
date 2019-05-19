@@ -25,6 +25,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
+using Audimat.Graph;
 using Transonic.VST;
 using Transonic.MIDI.System;
 
@@ -223,5 +224,14 @@ namespace Audimat.UI
                 g.FillEllipse(Brushes.Black, rightOfs, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);
             }
         }
+
+        internal bool loadRig(string rigPath)
+        {
+            Rig rig = Rig.loadRig(rigPath);
+            
+            return true;
+        }
     }
 }
+
+//Console.WriteLine(" there's no sun in the shadow of the wizard");

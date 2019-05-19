@@ -31,7 +31,18 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AudimatWindow));
             this.AudimatMenu = new System.Windows.Forms.MenuStrip();
             this.fileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveRigAsFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.patchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newPatchFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.savePatchPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.savePatchAsPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,24 +50,14 @@
             this.keyboardBarRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panicRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.hideShowRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
             this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
-            this.loadRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveRigFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveRigAsFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.patchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.newPatchFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.savePatchPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.savePatchAsPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hideShowRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
             this.AudimatMenu.SuspendLayout();
             this.AudimatStatus.SuspendLayout();
             this.SuspendLayout();
@@ -88,12 +89,93 @@
             this.fileMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileMenuItem.Text = "&File";
             // 
+            // loadRigFileMenuItem
+            // 
+            this.loadRigFileMenuItem.Name = "loadRigFileMenuItem";
+            this.loadRigFileMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.loadRigFileMenuItem.Text = "&Load Rig";
+            this.loadRigFileMenuItem.Click += new System.EventHandler(this.loadRigFileMenuItem_Click);
+            // 
+            // newRigFileMenuItem
+            // 
+            this.newRigFileMenuItem.Name = "newRigFileMenuItem";
+            this.newRigFileMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.newRigFileMenuItem.Text = "&New Rig";
+            this.newRigFileMenuItem.Click += new System.EventHandler(this.newRigFileMenuItem_Click);
+            // 
+            // saveRigFileMenuItem
+            // 
+            this.saveRigFileMenuItem.Name = "saveRigFileMenuItem";
+            this.saveRigFileMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.saveRigFileMenuItem.Text = "&Save Rig";
+            this.saveRigFileMenuItem.Click += new System.EventHandler(this.saveRigFileMenuItem_Click);
+            // 
+            // saveRigAsFileMenuItem
+            // 
+            this.saveRigAsFileMenuItem.Name = "saveRigAsFileMenuItem";
+            this.saveRigAsFileMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.saveRigAsFileMenuItem.Text = "Save Rig &As";
+            this.saveRigAsFileMenuItem.Click += new System.EventHandler(this.saveRigAsFileMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(131, 6);
+            // 
             // exitFileMenuItem
             // 
             this.exitFileMenuItem.Name = "exitFileMenuItem";
-            this.exitFileMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitFileMenuItem.Size = new System.Drawing.Size(134, 22);
             this.exitFileMenuItem.Text = "E&xit";
             this.exitFileMenuItem.Click += new System.EventHandler(this.exitFileMenuItem_Click);
+            // 
+            // patchToolStripMenuItem
+            // 
+            this.patchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newPatchFileMenuItem,
+            this.savePatchPatchMenuItem,
+            this.savePatchAsPatchMenuItem});
+            this.patchToolStripMenuItem.Name = "patchToolStripMenuItem";
+            this.patchToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.patchToolStripMenuItem.Text = "P&atch";
+            // 
+            // newPatchFileMenuItem
+            // 
+            this.newPatchFileMenuItem.Name = "newPatchFileMenuItem";
+            this.newPatchFileMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.newPatchFileMenuItem.Text = "&New Patch";
+            this.newPatchFileMenuItem.Click += new System.EventHandler(this.newPatchFileMenuItem_Click);
+            // 
+            // savePatchPatchMenuItem
+            // 
+            this.savePatchPatchMenuItem.Name = "savePatchPatchMenuItem";
+            this.savePatchPatchMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.savePatchPatchMenuItem.Text = "&Save Patch";
+            this.savePatchPatchMenuItem.Click += new System.EventHandler(this.savePatchPatchMenuItem_Click);
+            // 
+            // savePatchAsPatchMenuItem
+            // 
+            this.savePatchAsPatchMenuItem.Name = "savePatchAsPatchMenuItem";
+            this.savePatchAsPatchMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.savePatchAsPatchMenuItem.Text = "Save Patch &As";
+            this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsPatchMenuItem_Click);
+            // 
+            // pluginMenuItem
+            // 
+            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadPluginMenuItem});
+            this.pluginMenuItem.Name = "pluginMenuItem";
+            this.pluginMenuItem.ShowShortcutKeys = false;
+            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.pluginMenuItem.Text = "&Plugin";
+            // 
+            // loadPluginMenuItem
+            // 
+            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.loadPluginMenuItem.Text = "&Load Plugin";
+            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
             // hostMenuItem
             // 
@@ -148,29 +230,19 @@
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(179, 6);
             // 
+            // hideShowRackMenuItem
+            // 
+            this.hideShowRackMenuItem.Name = "hideShowRackMenuItem";
+            this.hideShowRackMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.hideShowRackMenuItem.Text = "&Hide/Show Rack";
+            this.hideShowRackMenuItem.Click += new System.EventHandler(this.hideShowRackMenuItem_Click);
+            // 
             // settingsRackMenuItem
             // 
             this.settingsRackMenuItem.Name = "settingsRackMenuItem";
             this.settingsRackMenuItem.Size = new System.Drawing.Size(182, 22);
             this.settingsRackMenuItem.Text = "&Rack Settings";
             this.settingsRackMenuItem.Click += new System.EventHandler(this.settingsHostMenuItem_Click);
-            // 
-            // pluginMenuItem
-            // 
-            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadPluginMenuItem});
-            this.pluginMenuItem.Name = "pluginMenuItem";
-            this.pluginMenuItem.ShowShortcutKeys = false;
-            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.pluginMenuItem.Text = "&Plugin";
-            // 
-            // loadPluginMenuItem
-            // 
-            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.loadPluginMenuItem.Text = "&Load Plugin";
-            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
             // helpMenuItem
             // 
@@ -183,7 +255,7 @@
             // aboutHelpMenuItem
             // 
             this.aboutHelpMenuItem.Name = "aboutHelpMenuItem";
-            this.aboutHelpMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutHelpMenuItem.Size = new System.Drawing.Size(116, 22);
             this.aboutHelpMenuItem.Text = "&About...";
             this.aboutHelpMenuItem.Click += new System.EventHandler(this.aboutHelpMenuItem_Click);
             // 
@@ -204,76 +276,10 @@
             this.lblAudimatStatus.Size = new System.Drawing.Size(100, 17);
             this.lblAudimatStatus.Text = "Engine is stopped";
             // 
-            // loadRigFileMenuItem
+            // loadRigDialog
             // 
-            this.loadRigFileMenuItem.Name = "loadRigFileMenuItem";
-            this.loadRigFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.loadRigFileMenuItem.Text = "&Load Rig";
-            this.loadRigFileMenuItem.Click += new System.EventHandler(this.loadRigFileMenuItem_Click);
-            // 
-            // newRigFileMenuItem
-            // 
-            this.newRigFileMenuItem.Name = "newRigFileMenuItem";
-            this.newRigFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.newRigFileMenuItem.Text = "&New Rig";
-            this.newRigFileMenuItem.Click += new System.EventHandler(this.newRigFileMenuItem_Click);
-            // 
-            // saveRigFileMenuItem
-            // 
-            this.saveRigFileMenuItem.Name = "saveRigFileMenuItem";
-            this.saveRigFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveRigFileMenuItem.Text = "&Save Rig";
-            this.saveRigFileMenuItem.Click += new System.EventHandler(this.saveRigFileMenuItem_Click);
-            // 
-            // saveRigAsFileMenuItem
-            // 
-            this.saveRigAsFileMenuItem.Name = "saveRigAsFileMenuItem";
-            this.saveRigAsFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveRigAsFileMenuItem.Text = "Save Rig &As";
-            this.saveRigAsFileMenuItem.Click += new System.EventHandler(this.saveRigAsFileMenuItem_Click);
-            // 
-            // patchToolStripMenuItem
-            // 
-            this.patchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newPatchFileMenuItem,
-            this.savePatchPatchMenuItem,
-            this.savePatchAsPatchMenuItem});
-            this.patchToolStripMenuItem.Name = "patchToolStripMenuItem";
-            this.patchToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
-            this.patchToolStripMenuItem.Text = "P&atch";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // newPatchFileMenuItem
-            // 
-            this.newPatchFileMenuItem.Name = "newPatchFileMenuItem";
-            this.newPatchFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.newPatchFileMenuItem.Text = "&New Patch";
-            this.newPatchFileMenuItem.Click += new System.EventHandler(this.newPatchFileMenuItem_Click);
-            // 
-            // savePatchPatchMenuItem
-            // 
-            this.savePatchPatchMenuItem.Name = "savePatchPatchMenuItem";
-            this.savePatchPatchMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.savePatchPatchMenuItem.Text = "&Save Patch";
-            this.savePatchPatchMenuItem.Click += new System.EventHandler(this.savePatchPatchMenuItem_Click);
-            // 
-            // savePatchAsPatchMenuItem
-            // 
-            this.savePatchAsPatchMenuItem.Name = "savePatchAsPatchMenuItem";
-            this.savePatchAsPatchMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.savePatchAsPatchMenuItem.Text = "Save Patch &As";
-            this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsPatchMenuItem_Click);
-            // 
-            // hideShowRackMenuItem
-            // 
-            this.hideShowRackMenuItem.Name = "hideShowRackMenuItem";
-            this.hideShowRackMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.hideShowRackMenuItem.Text = "&Hide/Show Rack";
-            this.hideShowRackMenuItem.Click += new System.EventHandler(this.hideShowRackMenuItem_Click);
+            this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.loadRigDialog.Title = "load a Audimat rig";
             // 
             // AudimatWindow
             // 
@@ -326,6 +332,7 @@
         private System.Windows.Forms.ToolStripMenuItem savePatchPatchMenuItem;
         private System.Windows.Forms.ToolStripMenuItem savePatchAsPatchMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hideShowRackMenuItem;
+        private System.Windows.Forms.OpenFileDialog loadRigDialog;
     }
 }
 

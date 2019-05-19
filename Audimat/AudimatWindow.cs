@@ -30,12 +30,13 @@ using System.IO;
 using Audimat.UI;
 using Transonic.VST;
 using Transonic.Widget;
+using Origami.Serial;
 
 namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
-        public String VERSION = "1.2.2";
+        public static String VERSION = "1.2.2";
 
         public ControlPanel controlPanel;
         public VSTRack rack;
@@ -47,20 +48,21 @@ namespace Audimat
         //backend & i/o
         public Vashti vashti;
 
-        public Settings settings;
+        public SerialData settings;
 
         public bool mainShutdown;
 
-        String curpluginPath;
+        String curRigPath;
+        String curPluginPath;
+
         int vstnum;         //for debugging
 
         public AudimatWindow()
         {
             vashti = new Vashti();
-            settings = new Settings("Audimat.cfg");
+            settings = new SerialData("Audimat.cfg");
 
             InitializeComponent();
-
 
             //control panel goes just below menubar
             controlPanel = new ControlPanel(this);
@@ -97,7 +99,8 @@ namespace Audimat
             keyboardWnd.Location = new Point(keyX, keyY);
             keyboardWnd.Hide();
 
-            curpluginPath = "";
+            curRigPath = Application.StartupPath;
+            curPluginPath = Application.StartupPath;
             vstnum = 0;
         }
 
@@ -146,6 +149,20 @@ namespace Audimat
 
         public void loadRig()
         {
+            String rigPath = "";
+
+#if (DEBUG)
+            rigPath = "test1.rig";
+#else
+            //loadPluginDialog.Title = "load a Audimat rig";
+            loadRigDialog.InitialDirectory = curRigPath;
+            //loadPluginDialog.Filter =  "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            loadRigDialog.ShowDialog();
+            rigPath = loadRigDialog.FileName;
+            if (rigPath.Length == 0) return;
+#endif
+            curRigPath = Path.GetDirectoryName(rigPath);
+            bool result = rack.loadRig(rigPath);
         }
 
         public void newRig()

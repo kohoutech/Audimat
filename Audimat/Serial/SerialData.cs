@@ -1,5 +1,5 @@
 ﻿/* ----------------------------------------------------------------------------
-Audimat : an audio plugin host
+Origami Serial Library
 Copyright (C) 2005-2019  George E Greaney
 
 This program is free software; you can redistribute it and/or
@@ -25,16 +25,21 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Audimat
+namespace Origami.Serial
 {
-    public class Settings
+    public class SerialData
     {
         String filename;
         SettingsStem root;
 
-        public Settings(String _filename)
+        public SerialData()
         {
             root = null;
+            filename = null;
+        }
+
+        public SerialData(String _filename) : this()
+        {
             filename = _filename;
             string[] lines = null;
             try
@@ -54,13 +59,13 @@ namespace Audimat
         char[] wspace = new char[] { ' ' };
 
         //no error checking yet!
-        public void parseRoot(string[] lines)
+        private void parseRoot(string[] lines)
         {
             int lineNum = 0;
             root = parseSubtree(lines, ref lineNum);
         }
 
-        public SettingsStem parseSubtree(string[] lines, ref int lineNum)
+        private SettingsStem parseSubtree(string[] lines, ref int lineNum)
         {
             SettingsStem curStem = new SettingsStem();
             int indentLevel = -1;
@@ -164,6 +169,48 @@ namespace Audimat
             return result;
         }
 
+        public List<String> getSubpathKeys(String path)
+        {
+            List<String> result = null;
+            SettingsStem subtree = root;
+            bool done = false;
+            while (!done)
+            {
+                int dotpos = path.IndexOf('.');
+                if (dotpos != -1)                                   //path is name.subpath
+                {
+                    String name = path.Substring(0, dotpos);
+                    String subpath = path.Substring(dotpos + 1);    //break path apart
+                    if (subtree.children.ContainsKey(name))
+                    {
+                        SettingsNode val = subtree.children[name];
+                        if (val != null && val is SettingsStem)
+                        {
+                            subtree = (SettingsStem)val;
+                        }
+                    }
+                }
+                else
+                {
+                    if (subtree.children.ContainsKey(path))
+                    {
+                        SettingsNode val = subtree.children[path];
+                        if (val != null && val is SettingsStem)
+                        {
+                            result = new List<string>();
+
+                            foreach (string key in ((SettingsStem)val).children.Keys)
+                            {
+                                result.Add(key);
+                            }
+                            done = true;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         //- setting values ----------------------------------------------------
 
         public void setLeafValue(String path, SettingsStem subtree, String val)
@@ -213,6 +260,12 @@ namespace Audimat
         }
 
         //- storing out ------------------------------------------------
+
+        public bool saveToFile(String _filename)
+        {
+            filename = _filename;
+            return saveToFile();
+        }
 
         public bool saveToFile()
         {

@@ -83,7 +83,7 @@ namespace Audimat.UI
             // btnPanic
             // 
             this.btnPanic.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnPanic.Location = new System.Drawing.Point(279, 13);
+            this.btnPanic.Location = new System.Drawing.Point(279, 37);
             this.btnPanic.Name = "btnPanic";
             this.btnPanic.Size = new System.Drawing.Size(24, 24);
             this.btnPanic.TabIndex = 15;
@@ -95,7 +95,7 @@ namespace Audimat.UI
             // btnHide
             // 
             this.btnHide.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnHide.Location = new System.Drawing.Point(255, 13);
+            this.btnHide.Location = new System.Drawing.Point(255, 37);
             this.btnHide.Name = "btnHide";
             this.btnHide.Size = new System.Drawing.Size(24, 24);
             this.btnHide.TabIndex = 14;
@@ -147,6 +147,7 @@ namespace Audimat.UI
             this.btnNextPatch.Text = "+";
             this.controlPanelToolTip.SetToolTip(this.btnNextPatch, "next patch");
             this.btnNextPatch.UseVisualStyleBackColor = true;
+            this.btnNextPatch.Click += new System.EventHandler(this.btnNextPatch_Click);
             // 
             // btnPrevPatch
             // 
@@ -157,6 +158,7 @@ namespace Audimat.UI
             this.btnPrevPatch.Text = "-";
             this.controlPanelToolTip.SetToolTip(this.btnPrevPatch, "previous patch");
             this.btnPrevPatch.UseVisualStyleBackColor = true;
+            this.btnPrevPatch.Click += new System.EventHandler(this.btnPrevPatch_Click);
             // 
             // btnLoadRig
             // 
@@ -209,7 +211,7 @@ namespace Audimat.UI
             // btnKeys2
             // 
             this.btnKeys2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnKeys2.Location = new System.Drawing.Point(255, 37);
+            this.btnKeys2.Location = new System.Drawing.Point(255, 13);
             this.btnKeys2.Name = "btnKeys2";
             this.btnKeys2.Size = new System.Drawing.Size(24, 24);
             this.btnKeys2.TabIndex = 16;
@@ -221,7 +223,7 @@ namespace Audimat.UI
             // btnMixer
             // 
             this.btnMixer.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnMixer.Location = new System.Drawing.Point(279, 37);
+            this.btnMixer.Location = new System.Drawing.Point(279, 13);
             this.btnMixer.Name = "btnMixer";
             this.btnMixer.Size = new System.Drawing.Size(24, 24);
             this.btnMixer.TabIndex = 17;
@@ -268,12 +270,15 @@ namespace Audimat.UI
             // 
             // cbxPatchList
             // 
+            this.cbxPatchList.BackColor = System.Drawing.Color.GreenYellow;
             this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbxPatchList.ForeColor = System.Drawing.Color.Black;
             this.cbxPatchList.FormattingEnabled = true;
             this.cbxPatchList.Location = new System.Drawing.Point(43, 14);
             this.cbxPatchList.Name = "cbxPatchList";
             this.cbxPatchList.Size = new System.Drawing.Size(175, 23);
             this.cbxPatchList.TabIndex = 4;
+            this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
             // 
             // ControlPanel
             // 
@@ -298,6 +303,23 @@ namespace Audimat.UI
             this.Name = "ControlPanel";
             this.Size = new System.Drawing.Size(400, 75);
             this.ResumeLayout(false);
+
+        }
+
+        //- patch selector ----------------------------------------------------
+
+        private void btnPrevPatch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnNextPatch_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cbxPatchList_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
         }
 

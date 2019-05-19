@@ -124,7 +124,9 @@ namespace Audimat.UI
             // 
             // cbxProgList
             // 
+            this.cbxProgList.BackColor = System.Drawing.Color.GreenYellow;
             this.cbxProgList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbxProgList.ForeColor = System.Drawing.Color.Black;
             this.cbxProgList.FormattingEnabled = true;
             this.cbxProgList.Location = new System.Drawing.Point(43, 37);
             this.cbxProgList.Name = "cbxProgList";
