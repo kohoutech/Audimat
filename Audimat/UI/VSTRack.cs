@@ -25,37 +25,23 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-using Audimat.Graph;
-using Transonic.VST;
-using Transonic.MIDI.System;
-
 namespace Audimat.UI
 {
     public class VSTRack : UserControl
     {
         public AudimatWindow auditwin;
-        public VSTHost host;
-        public MidiSystem midiDevices;
 
         private VScrollBar scrollbar;
         private Panel panelSpace;
 
         public List<VSTPanel> panels;
 
-        public VSTRig currentRig;
-        public Patch currentPatch;
-
-        public bool isRunning;
-        public bool hasChanged;
-
         //cons
-        public VSTRack(AudimatWindow _auditwin, VSTHost _host)
+        public VSTRack(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
-            host = _host;
 
-            midiDevices = new MidiSystem();
-
+            //ui
             scrollbar = new VScrollBar();
             scrollbar.Minimum = 0;
             scrollbar.Dock = DockStyle.Right;
@@ -75,11 +61,6 @@ namespace Audimat.UI
 
             panels = new List<VSTPanel>();
 
-            currentRig = new VSTRig();
-            currentPatch = null;
-
-            isRunning = false;
-            hasChanged = false;
         }
 
         void scrollbar_ValueChanged(object sender, EventArgs e)
@@ -106,148 +87,19 @@ namespace Audimat.UI
             updateScrollBar();
         }
 
-        public void shutdown()
-        {
-            host.stopEngine();
-            currentRig.shutDown();
-            removeAllPanels();
-            midiDevices.shutdown();     //close midi devices
-        }
-
-        //- host management ----------------------------------------------------------
-
-        public void startEngine()
-        {
-            host.startEngine();
-            isRunning = true;
-        }
-
-        public void stopEngine()
-        {
-            host.stopEngine();
-            isRunning = false;
-        }
-
-        //- rigging -------------------------------------------------------------------
-
-        public bool loadRig(string rigPath)
-        {
-            VSTRig newRig = VSTRig.loadFromFile(rigPath);
-            if (newRig != null)
-            {
-                //remove prev rig
-                currentRig.shutDown();
-                removeAllPanels();
-
-                //install new rig
-                currentRig = newRig;
-                foreach (Module mod in currentRig.modules)      //add panels to rack
-                {
-                    VSTPanel panel = addPanel(mod.path, false);
-                    if (panel != null)
-                    {
-                        mod.panel = panel;
-                        panel.setMidiIn(mod.midiIn);
-                    }
-                }
-                auditwin.rackProgramsChanged(null);
-
-                hasChanged = false;
-                return true;
-            }
-            return false;
-        }
-
-        public void clearRig()
-        {
-            currentRig.shutDown();
-            removeAllPanels();
-
-            currentRig = new VSTRig();
-            hasChanged = false;
-        }
-
-        public void saveRig(string rigPath)
-        {
-            currentRig.saveToFile(rigPath);
-            hasChanged = false;
-        }
-
-        //- patching ----------------------------------------------------------
-
-        public void setCurrentPatch(int p)
-        {
-            currentPatch = currentRig.patches[p];
-            foreach (Module mod in currentRig.modules)
-            {
-                int patchNum = (currentPatch.modules.ContainsKey(mod) ? currentPatch.modules[mod] : 0);
-                mod.panel.cbxProgList.SelectedIndex = patchNum;
-            }
-        }
-
-        public void clearPatch()
-        {
-            currentPatch = null;
-            auditwin.rackProgramsChanged(null);
-            foreach (Module mod in currentRig.modules)
-            {
-                mod.panel.cbxProgList.SelectedIndex = 0;
-            }
-        }
-
-        public void updatePatch()
-        {
-            foreach (Module mod in currentRig.modules)
-            {
-                int patchNum = mod.panel.cbxProgList.SelectedIndex;
-                if (currentPatch.modules.ContainsKey(mod))
-                {
-                    currentPatch.modules[mod] = patchNum;
-                }
-            }
-        }
-
-        public void addNewPatch(String patchName)
-        {
-            Patch newPatch = new Patch(patchName);
-            foreach (Module mod in currentRig.modules)
-            {
-                int patchNum = mod.panel.cbxProgList.SelectedIndex;
-                newPatch.AddModule(mod, patchNum);
-            }
-            currentRig.AddPatch(newPatch);
-            currentPatch = newPatch;
-            auditwin.rackProgramsChanged(currentPatch.name);
-        }
-
         //- panel management ----------------------------------------------------------
 
-        public VSTPanel addPanel(String plugPath, bool updateRig)
+        public void addPanel(VSTPanel panel)
         {
-            VSTPanel panel = new VSTPanel(this, panels.Count);
-            bool result = panel.loadPlugin(plugPath);
-            if (!result) return null;
-
             panels.Add(panel);
             panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panels.Count);
             panel.Location = new Point(0, VSTPanel.PANELHEIGHT * (panels.Count - 1));
             panelSpace.Controls.Add(panel);
             updateScrollBar();
-
-            auditwin.rackModulesChanged();         //broadcast rack change
-            if (updateRig)
-            {
-                Module mod = new Module(plugPath, "no output", "no input");
-                mod.panel = panel;
-                currentRig.AddModule(mod);
-            }
-
-            return panel;
         }
 
         public void removePanel(VSTPanel panel)
         {
-            //remove panel from rack, shutting down plugin is handled by panel
             panelSpace.Controls.Remove(panel);
             panels.Remove(panel);
             panelSpace.Size = new Size(VSTPanel.PANELWIDTH, VSTPanel.PANELHEIGHT * panels.Count);
@@ -258,62 +110,6 @@ namespace Audimat.UI
             }
             updateScrollBar();
             Invalidate();
-
-            panel.unloadPlugin();           //disconnect panel & shut down plugin
-            auditwin.rackModulesChanged();         //broadcast rack change
-        }
-
-        public void removeAllPanels()
-        {
-            foreach (VSTPanel panel in panels)            //remove panels from rack
-            {
-                panelSpace.Controls.Remove(panel);
-                panel.unloadPlugin();
-            }
-            panels.Clear();
-            panelSpace.Size = new Size(0, 0);
-            updateScrollBar();
-            Invalidate();
-
-            //broadcast rack change
-            auditwin.rackProgramsChanged(null);
-            auditwin.rackModulesChanged();
-        }
-
-        public List<VSTPlugin> getPluginList()
-        {
-            return host.plugins;
-        }
-
-        //- midi i/o connections ----------------------------------------------
-
-        public void connectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
-        {
-            //InputDevice indev = midiDevices.inputDevices[idx];
-            try
-            {
-                indev.open();
-                indev.connectUnit(pluginMidiIn);
-                indev.start();
-            }
-            catch
-            {
-                //Console.WriteLine("error connecting midi input");
-            }
-        }
-
-        public void disconnectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
-        {
-            //InputDevice indev = midiDevices.inputDevices[idx];
-            indev.disconnectUnit(pluginMidiIn);
-        }
-
-        public void connectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
-        {
-        }
-
-        public void disconnectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
-        {
         }
 
         //- painting ------------------------------------------------------------------

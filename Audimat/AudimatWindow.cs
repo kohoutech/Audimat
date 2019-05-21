@@ -25,44 +25,29 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
 
 using Audimat.UI;
-using Transonic.VST;
 using Transonic.Widget;
-using Origami.Serial;
 
 namespace Audimat
 {
     public partial class AudimatWindow : Form
     {
-        public static String VERSION = "1.3.0";
-
         public ControlPanel controlPanel;
         public VSTRack rack;
 
         //child windows
         public PatchWindow patchWin;
+        public MixerWnd mixerWnd;
         public KeyboardWnd keyboardWnd;
-        public PatchNameWnd patchNameWnd;
 
-        //backend & i/o
-        public Vashti vashti;
+        public Settings settings;
 
-        public SerialData settings;
-
-        public bool mainShutdown;
-
-        String curRigFilename;
-        String curRigPath;
-        String curPluginPath;
-
-        int vstnum;         //for debugging
+        public bool mainShutdown;           //hide child windows instead of closing them until main prog shuts down
 
         public AudimatWindow()
         {
-            vashti = new Vashti();
-            settings = new SerialData("Audimat.cfg");
+            settings = new Settings();          //read prog settings in from config file
 
             InitializeComponent();
 
@@ -73,38 +58,28 @@ namespace Audimat
             this.Controls.Add(controlPanel);
 
             //rack control fills up entire client area between control panel & status bar
-            rack = new VSTRack(this, vashti.host);
+            rack = new VSTRack(this);
             rack.Location = new Point(this.ClientRectangle.Left, controlPanel.Bottom);
             this.Controls.Add(rack);
             controlPanel.Width = rack.Width;
 
+            //set initial sizes
             int minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
-            int rackHeight = settings.getIntValue("global-settings.rack-window-height", VSTPanel.PANELHEIGHT);
+            int rackHeight = settings.rackHeight;
             this.ClientSize = new System.Drawing.Size(rack.Size.Width, rackHeight + minHeight);
             this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - rackHeight);
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
-            int rackX = settings.getIntValue("global-settings.rack-window-pos.x", 100);
-            int rackY = settings.getIntValue("global-settings.rack-window-pos.y", 100);
-            this.Location = new Point(rackX, rackY);
+            this.Location = new Point(settings.rackPosX, settings.rackPosY);
 
             //child windows
             keyboardWnd = new KeyboardWnd(this);
             keyboardWnd.Icon = this.Icon;
             keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
-            int keyX = settings.getIntValue("global-settings.keyboard-window-pos.x", 200);
-            int keyY = settings.getIntValue("global-settings.keyboard-window-pos.y", 200);
-            keyboardWnd.Location = new Point(keyX, keyY);
+            keyboardWnd.Location = new Point(settings.keyWndPosX, settings.keyWndPosY);
             keyboardWnd.Hide();
 
+            mixerWnd = new MixerWnd(this);
             patchWin = new PatchWindow(this);
-
-            patchNameWnd = null;
-
-            this.Text = "Audimat - new rig";
-            curRigFilename = null;
-            curRigPath = Application.StartupPath;
-            curPluginPath = Application.StartupPath;
-            vstnum = 0;
 
             mainShutdown = false;
         }
@@ -115,6 +90,7 @@ namespace Audimat
             if (rack != null)
             {
                 rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - controlPanel.Bottom);
+                settings.rackHeight = this.ClientSize.Height - (this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
             }
         }
 
@@ -125,121 +101,30 @@ namespace Audimat
             mainShutdown = true;
             keyboardWnd.Close();
 
-            rack.shutdown();            //unload all plugins in rack
-            vashti.shutDown();          //shut down back end
-
-            saveGlobalSettings();
-        }
-
-        public void saveGlobalSettings()
-        {
-            int rackheight = this.ClientSize.Height - (this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
-            settings.setStringValue("version", VERSION);
-            settings.setIntValue("global-settings.rack-window-height", rackheight);
-            settings.setIntValue("global-settings.rack-window-pos.x", this.Location.X);
-            settings.setIntValue("global-settings.rack-window-pos.y", this.Location.Y);
-            settings.setIntValue("global-settings.keyboard-window-pos.x", keyboardWnd.Location.X);
-            settings.setIntValue("global-settings.keyboard-window-pos.y", keyboardWnd.Location.Y);
-
-            settings.saveToFile();
-        }
-
-        //- callbacks -----------------------------------------------------------------
-
-        //callback when plugins have been added or removed from the rack
-        public void rackProgramsChanged(String curPatchName)
-        {
-            controlPanel.updatePatchList(curPatchName);
-            //saveRigFileMenuItem.Enabled = true;
-            //controlPanel.btnSaveRig.Enabled = true;
-        }
-
-        //callback when plugins have been added or removed from the rack
-        public void rackModulesChanged()
-        {
-            keyboardWnd.updatePluginList();
-            saveRigFileMenuItem.Enabled = true;
-            controlPanel.btnSaveRig.Enabled = true;
+            controlPanel.shutdown();
+            settings.save();
         }
 
         //- file menu -----------------------------------------------------------------
 
-        public void loadRig()
-        {
-            String rigPath = "";
-
-#if (DEBUG)
-            rigPath = "test1.rig";
-#else
-            loadRigDialog.InitialDirectory = curRigPath;
-            DialogResult result = loadRigDialog.ShowDialog(this);
-            if (result == DialogResult.Cancel) return;
-            rigPath = loadRigDialog.FileName;            
-#endif
-            curRigPath = Path.GetDirectoryName(rigPath);
-            bool result = rack.loadRig(rigPath);
-
-            if (result)
-            {
-                curRigFilename = Path.GetFileName(rigPath);
-                this.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
-                saveRigFileMenuItem.Enabled = false;
-                controlPanel.btnSaveRig.Enabled = false;
-            }
-            else
-            {
-                MessageBox.Show("failed to load the rig file: " + rigPath, "Rig Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        public void newRig()
-        {
-            rack.clearRig();
-
-            curRigFilename = null;
-            this.Text = "Audimat - new rig";
-            saveRigFileMenuItem.Enabled = false;
-            controlPanel.btnSaveRig.Enabled = false;
-        }
-
-        public void saveRig(bool rename)
-        {
-            String rigPath = curRigFilename;
-            if (rename || curRigFilename == null)           //rename automatically is we don't already have a name
-            {
-                saveRigDialog.InitialDirectory = curRigPath;
-                DialogResult result = saveRigDialog.ShowDialog(this);
-                if (result == DialogResult.Cancel) return;
-
-                rigPath = saveRigDialog.FileName;
-                curRigPath = Path.GetDirectoryName(rigPath);
-                curRigFilename = Path.GetFileName(rigPath);
-            }
-            rack.saveRig(rigPath);
-
-            this.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
-            saveRigFileMenuItem.Enabled = false;
-            controlPanel.btnSaveRig.Enabled = false;
-        }
-
         private void loadRigFileMenuItem_Click(object sender, EventArgs e)
         {
-            loadRig();
+            controlPanel.loadRig();
         }
 
         private void newRigFileMenuItem_Click(object sender, EventArgs e)
         {
-            newRig();
+            controlPanel.newRig();
         }
 
         private void saveRigFileMenuItem_Click(object sender, EventArgs e)
         {
-            saveRig((curRigFilename == null));
+            controlPanel.saveRig(false);
         }
 
         private void saveRigAsFileMenuItem_Click(object sender, EventArgs e)
         {
-            saveRig(true);
+            controlPanel.saveRig(true);
         }
 
         private void exitFileMenuItem_Click(object sender, EventArgs e)
@@ -249,109 +134,38 @@ namespace Audimat
 
         //- patch menu --------------------------------------------------------
 
-        public void newPatch()
-        {
-            rack.clearPatch();
-        }
-
-        public void updatePatch()
-        {
-            rack.updatePatch();
-        }
-
-        public void saveNewPatch()
-        {
-            String patchName = "";
-
-            patchNameWnd = new PatchNameWnd(this);
-            patchNameWnd.Icon = this.Icon;
-            if (rack.currentPatch != null)
-            {
-                patchNameWnd.txtPatchname.Text = rack.currentPatch.name;
-            }
-
-            DialogResult result = patchNameWnd.ShowDialog(this);
-            if (result == DialogResult.Cancel) return;
-
-            patchName = patchNameWnd.txtPatchname.Text;
-
-            rack.addNewPatch(patchName);
-        }
-
         private void newPatchMenuItem_Click(object sender, EventArgs e)
         {
-            newPatch();
+            controlPanel.newPatch();
         }
 
         private void savePatchMenuItem_Click(object sender, EventArgs e)
         {
-            updatePatch();
+            controlPanel.savePatch();
         }
 
         private void savePatchAsMenuItem_Click(object sender, EventArgs e)
         {
-            saveNewPatch();
+            controlPanel.saveNewPatch();
         }
 
         //- plugin menu -------------------------------------------------------
 
-        public void loadPlugin()
-        {
-            String pluginPath = "";
-
-#if (DEBUG)
-            //useful for testing, don't have to go through the FileOPen dialog over & over
-            string[] vstlist = File.ReadAllLines("vst.lst");
-            pluginPath = vstlist[vstnum++];
-            if (vstnum >= vstlist.Length) vstnum = 0;       //wrap it around
-
-#else
-            loadPluginDialog.Title = "load a VST";
-            loadPluginDialog.InitialDirectory = curpluginPath;
-            loadPluginDialog.Filter =  "VST plugins (*.dll)|*.dll|All files (*.*)|*.*";
-            loadPluginDialog.ShowDialog();            
-            pluginPath = loadPluginDialog.FileName;
-            if (pluginPath.Length == 0) return;
-            curpluginPath = Path.GetDirectoryName(pluginPath);
-#endif
-            VSTPanel result = rack.addPanel(pluginPath, true);
-
-            if (result == null)
-            {
-                MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void loadPlugin_Click(object sender, EventArgs e)
         {
-            loadPlugin();
+            controlPanel.loadPlugin();
         }
 
         //- rack menu ---------------------------------------------------------
 
-        public void startHost()
-        {
-            rack.startEngine();
-            controlPanel.Invalidate();
-            lblAudimatStatus.Text = "Engine is running";
-        }
-
-        public void stopHost()
-        {
-            rack.stopEngine();
-            controlPanel.Invalidate();
-            lblAudimatStatus.Text = "Engine is stopped";
-        }
-
         private void StartHost_Click(object sender, EventArgs e)
         {
-            startHost();
+            controlPanel.startHost();
         }
 
         private void StopHost_Click(object sender, EventArgs e)
         {
-            stopHost();
+            controlPanel.stopHost();
         }
 
         public void enableKeyboardBarMenuItem(bool enable)
@@ -413,25 +227,14 @@ namespace Audimat
 
         private void settingsHostMenuItem_Click(object sender, EventArgs e)
         {
-            HostSettingsWnd hostsettings = new HostSettingsWnd();
-            hostsettings.Icon = this.Icon;
-            hostsettings.setSampleRate(vashti.host.sampleRate);
-            hostsettings.setBlockSize(vashti.host.blockSize);
-
-            hostsettings.ShowDialog(this);
-
-            if (hostsettings.DialogResult == DialogResult.OK)
-            {
-                vashti.host.setSampleRate(hostsettings.sampleRate);
-                vashti.host.setBlockSize(hostsettings.blockSize);
-            }
+            controlPanel.updateHostSettings();
         }
 
         //- help menu -----------------------------------------------------------------
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion 1.3.0\n" + "\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion " + Settings.VERSION + "\n\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
     }

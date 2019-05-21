@@ -41,8 +41,6 @@
             this.newPatchFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePatchPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePatchAsPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,13 +50,12 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.hideShowRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
             this.lblAudimatStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
-            this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
             this.AudimatMenu.SuspendLayout();
             this.AudimatStatus.SuspendLayout();
             this.SuspendLayout();
@@ -68,8 +65,8 @@
             this.AudimatMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuItem,
             this.patchToolStripMenuItem,
-            this.pluginMenuItem,
             this.hostMenuItem,
+            this.pluginMenuItem,
             this.helpMenuItem});
             this.AudimatMenu.Location = new System.Drawing.Point(0, 0);
             this.AudimatMenu.Name = "AudimatMenu";
@@ -161,23 +158,6 @@
             this.savePatchAsPatchMenuItem.Text = "Save Patch &As";
             this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsMenuItem_Click);
             // 
-            // pluginMenuItem
-            // 
-            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadPluginMenuItem});
-            this.pluginMenuItem.Name = "pluginMenuItem";
-            this.pluginMenuItem.ShowShortcutKeys = false;
-            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.pluginMenuItem.Text = "&Plugin";
-            // 
-            // loadPluginMenuItem
-            // 
-            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.loadPluginMenuItem.Text = "&Load Plugin";
-            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
-            // 
             // hostMenuItem
             // 
             this.hostMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -191,7 +171,7 @@
             this.settingsRackMenuItem});
             this.hostMenuItem.Name = "hostMenuItem";
             this.hostMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.hostMenuItem.Text = "&Rack";
+            this.hostMenuItem.Text = "&Host";
             // 
             // startRackMenuItem
             // 
@@ -245,6 +225,23 @@
             this.settingsRackMenuItem.Text = "&Rack Settings";
             this.settingsRackMenuItem.Click += new System.EventHandler(this.settingsHostMenuItem_Click);
             // 
+            // pluginMenuItem
+            // 
+            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadPluginMenuItem});
+            this.pluginMenuItem.Name = "pluginMenuItem";
+            this.pluginMenuItem.ShowShortcutKeys = false;
+            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.pluginMenuItem.Text = "&Plugin";
+            // 
+            // loadPluginMenuItem
+            // 
+            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.loadPluginMenuItem.Text = "&Load Plugin";
+            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
+            // 
             // helpMenuItem
             // 
             this.helpMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -277,18 +274,6 @@
             this.lblAudimatStatus.Size = new System.Drawing.Size(100, 17);
             this.lblAudimatStatus.Text = "Engine is stopped";
             // 
-            // loadRigDialog
-            // 
-            this.loadRigDialog.DefaultExt = "rig";
-            this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            this.loadRigDialog.Title = "load an Audimat rig";
-            // 
-            // saveRigDialog
-            // 
-            this.saveRigDialog.DefaultExt = "rig";
-            this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            this.saveRigDialog.Title = "save an Audimat rig";
-            // 
             // AudimatWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -313,7 +298,6 @@
         #endregion
 
         private System.Windows.Forms.MenuStrip AudimatMenu;
-        private System.Windows.Forms.StatusStrip AudimatStatus;
         private System.Windows.Forms.ToolStripMenuItem fileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitFileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pluginMenuItem;
@@ -323,7 +307,6 @@
         private System.Windows.Forms.ToolStripMenuItem stopRackMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutHelpMenuItem;
-        private System.Windows.Forms.OpenFileDialog loadPluginDialog;
         private System.Windows.Forms.ToolStripStatusLabel lblAudimatStatus;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem keyboardBarRackMenuItem;
@@ -340,8 +323,7 @@
         private System.Windows.Forms.ToolStripMenuItem savePatchPatchMenuItem;
         private System.Windows.Forms.ToolStripMenuItem savePatchAsPatchMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hideShowRackMenuItem;
-        private System.Windows.Forms.OpenFileDialog loadRigDialog;
-        private System.Windows.Forms.SaveFileDialog saveRigDialog;
+        public System.Windows.Forms.StatusStrip AudimatStatus;
     }
 }
 
