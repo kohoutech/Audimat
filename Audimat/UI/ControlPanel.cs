@@ -24,8 +24,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 
 using Audimat.Graph;
+using Transonic.VST;
+using Transonic.MIDI.System;
 
 namespace Audimat.UI
 {
@@ -33,6 +36,7 @@ namespace Audimat.UI
     {
         public AudimatWindow auditwin;
 
+        //controls
         private System.ComponentModel.IContainer components;
         public ComboBox cbxPatchList;
         private Button btnNextPatch;
@@ -53,11 +57,55 @@ namespace Audimat.UI
         public Button btnStop;
         private ToolTip controlPanelToolTip;
 
+        //child windows
+        public PatchNameWnd patchNameWnd;
+
+        //dialogs
+        private OpenFileDialog loadRigDialog;
+        private SaveFileDialog saveRigDialog;
+        private OpenFileDialog loadPluginDialog;
+
+        //backend & i/o
+        public Vashti vashti;
+        public VSTHost host;
+        public MidiSystem midiDevices;
+
+        //model
+        public VSTRig currentRig;
+
+        String curRigFilename;
+        String curRigPath;
+        String curPluginPath;
+
+        //status
+        public bool isRunning;
+
+        int vstnum;         //for debugging
+
         public ControlPanel(AudimatWindow _auditwin)
         {
             auditwin = _auditwin;
 
+            //init backend
+            vashti = new Vashti();
+            host = new VSTHost(vashti);
+            midiDevices = new MidiSystem();
+
             InitializeComponent();
+
+            //child windows
+            patchNameWnd = null;
+
+            //model
+            currentRig = new VSTRig(this);              //empty rig w/ no modules or patches
+            auditwin.Text = "Audimat - new rig";
+            curRigFilename = null;
+            curRigPath = Application.StartupPath;
+            curPluginPath = Application.StartupPath;
+
+            vstnum = 0;
+
+            isRunning = false;
         }
 
         private void InitializeComponent()
@@ -81,6 +129,9 @@ namespace Audimat.UI
             this.btnSavePatch = new System.Windows.Forms.Button();
             this.btnNewPatch = new System.Windows.Forms.Button();
             this.cbxPatchList = new System.Windows.Forms.ComboBox();
+            this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
+            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // btnPanic
@@ -271,7 +322,7 @@ namespace Audimat.UI
             this.btnNewPatch.Text = "N";
             this.controlPanelToolTip.SetToolTip(this.btnNewPatch, "new patch");
             this.btnNewPatch.UseVisualStyleBackColor = false;
-            this.btnNewPatch.Click += new System.EventHandler(this.btmNewPatch_Click);
+            this.btnNewPatch.Click += new System.EventHandler(this.btnNewPatch_Click);
             // 
             // cbxPatchList
             // 
@@ -285,6 +336,18 @@ namespace Audimat.UI
             this.cbxPatchList.Size = new System.Drawing.Size(175, 23);
             this.cbxPatchList.TabIndex = 4;
             this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
+            // 
+            // loadRigDialog
+            // 
+            this.loadRigDialog.DefaultExt = "rig";
+            this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.loadRigDialog.Title = "load an Audimat rig";
+            // 
+            // saveRigDialog
+            // 
+            this.saveRigDialog.DefaultExt = "rig";
+            this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.saveRigDialog.Title = "save an Audimat rig";
             // 
             // ControlPanel
             // 
@@ -312,11 +375,37 @@ namespace Audimat.UI
 
         }
 
+        public void shutdown()
+        {
+            host.stopEngine();
+            currentRig.shutDown();      //unload all plugins in rack
+            midiDevices.shutdown();     //close midi devices
+            vashti.shutDown();          //shut down back end
+        }
+
+        //- callbacks -----------------------------------------------------------------
+
+        //callback when rack's patch list has changed (added/deleted/renamed)
+        public void rigPatchesChanged(String curPatchName)
+        {
+            updatePatchList(curPatchName);
+            //saveRigFileMenuItem.Enabled = true;
+            btnSaveRig.Enabled = true;
+        }
+
+        //callback when plugins have been added or removed from the rack
+        public void rigModulesChanged()
+        {
+            auditwin.keyboardWnd.updatePluginList();
+            //auditwin.saveRigFileMenuItem.Enabled = true;
+            btnSaveRig.Enabled = true;
+        }
+
         public void updatePatchList(String patchName)
         {
             cbxPatchList.Items.Clear();
             cbxPatchList.Text = "";
-            foreach (Patch patch in auditwin.rack.currentRig.patches)
+            foreach (Patch patch in currentRig.patches)
             {
                 cbxPatchList.Items.Add(patch.name);
             }
@@ -327,11 +416,150 @@ namespace Audimat.UI
             cbxPatchList.SelectedIndex = (enabled && patchName != null) ? cbxPatchList.FindString(patchName) : -1;
         }
 
+        //- host management ----------------------------------------------------------
+
+        public void startHost()
+        {
+            host.startEngine();
+            isRunning = true;
+            Invalidate();
+            //auditwin.lblAudimatStatus.Text = "Engine is running";
+        }
+
+        public void stopHost()
+        {
+            host.stopEngine();
+            isRunning = false;
+            Invalidate();
+            //auditwin.lblAudimatStatus.Text = "Engine is stopped";
+        }
+
+        //- rigging -------------------------------------------------------------------
+
+        public void loadRig()
+        {
+            String rigPath = "";
+
+#if (DEBUG)
+            rigPath = "test1.rig";
+#else
+            loadRigDialog.InitialDirectory = curRigPath;
+            DialogResult dlgresult = loadRigDialog.ShowDialog(this);
+            if (dlgresult == DialogResult.Cancel) return;
+            rigPath = loadRigDialog.FileName;            
+#endif
+            curRigPath = Path.GetDirectoryName(rigPath);
+            VSTRig newRig = VSTRig.loadFromFile(rigPath, this);
+
+            if (newRig != null)
+            {
+                currentRig.shutDown();
+                currentRig = newRig;
+
+                curRigFilename = Path.GetFileName(rigPath);
+                auditwin.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
+                //saveRigFileMenuItem.Enabled = false;
+                btnSaveRig.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("failed to load the rig file: " + rigPath, "Rig Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void newRig()
+        {
+            currentRig.shutDown();
+            currentRig = new VSTRig(this);
+
+            curRigFilename = null;
+            auditwin.Text = "Audimat - new rig";
+            //saveRigFileMenuItem.Enabled = false;
+            btnSaveRig.Enabled = false;
+        }
+
+        public void saveRig(bool rename)
+        {
+            String rigPath = curRigFilename;
+            if (rename || curRigFilename == null)           //rename automatically is we don't already have a name
+            {
+                saveRigDialog.InitialDirectory = curRigPath;
+                DialogResult result = saveRigDialog.ShowDialog(this);
+                if (result == DialogResult.Cancel) return;
+
+                rigPath = saveRigDialog.FileName;
+                curRigPath = Path.GetDirectoryName(rigPath);
+                curRigFilename = Path.GetFileName(rigPath);
+            }
+            currentRig.saveToFile(rigPath);
+
+            auditwin.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
+            //saveRigFileMenuItem.Enabled = false;
+            btnSaveRig.Enabled = false;
+        }
+
+        //- patching -------------------------------------------------------------------
+
+        public void newPatch()
+        {
+            currentRig.clearPatch();
+        }
+
+        public void savePatch()
+        {
+            currentRig.updatePatch();
+        }
+
+        public void saveNewPatch()
+        {
+            patchNameWnd = new PatchNameWnd(this);
+            patchNameWnd.Icon = auditwin.Icon;
+            if (currentRig.currentPatch != null)
+            {
+                patchNameWnd.txtPatchname.Text = currentRig.currentPatch.name;
+            }
+
+            DialogResult result = patchNameWnd.ShowDialog(this);
+            if (result == DialogResult.Cancel) return;
+
+            currentRig.addNewPatch(patchNameWnd.txtPatchname.Text);
+        }
+
+        //- plugin management -------------------------------------------------
+
+        public void loadPlugin()
+        {
+            String pluginPath = "";
+
+#if (DEBUG)
+            //useful for testing, don't have to go through the FileOPen dialog over & over
+            string[] vstlist = File.ReadAllLines("vst.lst");
+            pluginPath = vstlist[vstnum++];
+            if (vstnum >= vstlist.Length) vstnum = 0;       //wrap it around
+
+#else
+            loadPluginDialog.Title = "load a VST";
+            loadPluginDialog.InitialDirectory = curPluginPath;
+            loadPluginDialog.Filter =  "VST plugins (*.dll)|*.dll|All files (*.*)|*.*";
+            loadPluginDialog.ShowDialog();            
+            pluginPath = loadPluginDialog.FileName;
+            if (pluginPath.Length == 0) return;
+            curPluginPath = Path.GetDirectoryName(pluginPath);
+#endif
+            bool result = currentRig.addPanel(pluginPath);
+
+            if (!result)
+            {
+                MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         //- patch selector ----------------------------------------------------
 
         private void cbxPatchList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            auditwin.rack.setCurrentPatch(cbxPatchList.SelectedIndex);
+            currentRig.setCurrentPatch(cbxPatchList.SelectedIndex);
         }
 
         private void btnPrevPatch_Click(object sender, EventArgs e)
@@ -358,59 +586,49 @@ namespace Audimat.UI
 
         private void btnLoadRig_Click(object sender, EventArgs e)
         {
-            auditwin.loadRig();
+            loadRig();
         }
 
         private void btnNewRig_Click(object sender, EventArgs e)
         {
-            auditwin.newRig();
+            newRig();
         }
 
         private void btnSaveRig_Click(object sender, EventArgs e)
         {
-            auditwin.saveRig(false);
+            saveRig(false);
         }
 
         private void btnSaveRigAs_Click(object sender, EventArgs e)
         {
-            auditwin.saveRig(true);
+            saveRig(true);
         }
 
         //- patch buttons -------------------------------------------------------
 
-        private void btmNewPatch_Click(object sender, EventArgs e)
+        private void btnNewPatch_Click(object sender, EventArgs e)
         {
-            auditwin.newPatch();
+            newPatch();
         }
 
         private void btnSavePatch_Click(object sender, EventArgs e)
         {
-            auditwin.updatePatch();
+            savePatch();
         }
 
         private void btnSavePatchAs_Click(object sender, EventArgs e)
         {
-            auditwin.saveNewPatch();
+            saveNewPatch();
         }
 
         //- plugin buttons ----------------------------------------------------
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            auditwin.loadPlugin();
+            loadPlugin();
         }
 
-        //- rack buttons ------------------------------------------------------
-
-        private void btnHide_Click(object sender, EventArgs e)
-        {
-            auditwin.hideRack();
-        }
-
-        private void btnPanic_Click(object sender, EventArgs e)
-        {
-            auditwin.panicButton();
-        }
+        //- window buttons ----------------------------------------------------
 
         private void btnKeys_Click(object sender, EventArgs e)
         {
@@ -422,14 +640,44 @@ namespace Audimat.UI
             auditwin.showMixerWindow();
         }
 
+        //- performance buttons -----------------------------------------------
+
+        private void btnHide_Click(object sender, EventArgs e)
+        {
+            auditwin.hideRack();
+        }
+
+        private void btnPanic_Click(object sender, EventArgs e)
+        {
+            auditwin.panicButton();
+        }
+
+        //- host buttons ------------------------------------------------------
+
         private void btnStart_Click(object sender, EventArgs e)
         {
-            auditwin.startHost();
+            startHost();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            auditwin.stopHost();
+            stopHost();
+        }
+
+        public void updateHostSettings()
+        {
+            HostSettingsWnd hostsettings = new HostSettingsWnd();
+            hostsettings.Icon = auditwin.Icon;
+            hostsettings.setSampleRate(vashti.host.sampleRate);
+            hostsettings.setBlockSize(vashti.host.blockSize);
+
+            hostsettings.ShowDialog(this);
+
+            if (hostsettings.DialogResult == DialogResult.OK)
+            {
+                vashti.host.setSampleRate(hostsettings.sampleRate);
+                vashti.host.setBlockSize(hostsettings.blockSize);
+            }
         }
 
         //- painting ------------------------------------------------------------------
@@ -445,7 +693,7 @@ namespace Audimat.UI
             g.DrawLine(Pens.SteelBlue, this.Width - 1, 1, this.Width - 1, this.Height - 1);         //right
 
             //running LED
-            Color LEDColor = auditwin.rack.isRunning ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
+            Color LEDColor = isRunning ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
             Brush LEDBrush = new SolidBrush(LEDColor);
             g.DrawEllipse(Pens.Black, 380, 28, 20, 20);
             g.FillEllipse(Brushes.White, 381, 29, 19, 19);

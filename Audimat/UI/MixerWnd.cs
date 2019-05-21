@@ -30,9 +30,15 @@ namespace Audimat.UI
 {
     public partial class MixerWnd : Form
     {
-        public MixerWnd()
+        public AudimatWindow audimatWindow;
+
+        public MixerWnd(AudimatWindow _audimatWindow)
         {
+            audimatWindow = _audimatWindow;
+
             InitializeComponent();
+
+            this.ShowInTaskbar = false;
         }
     }
 }

@@ -27,16 +27,16 @@ namespace Audimat.UI
 {
     public class PatchNameWnd : Form
     {
-        public AudimatWindow audiWin;
+        public ControlPanel controlPanel;
 
         private Button btnOK;
         private Button btnCancel;
         public TextBox txtPatchname;
         private Label lblPrompt;
 
-        public PatchNameWnd(AudimatWindow _audiWin)
+        public PatchNameWnd(ControlPanel _controlPanel)
         {
-            audiWin = _audiWin;
+            controlPanel = _controlPanel;
 
             InitializeComponent();
         }
