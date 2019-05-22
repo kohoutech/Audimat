@@ -110,6 +110,8 @@ namespace Transonic.MIDI.System
         public InputDevice findInputDevice(String inName)
         {
             InputDevice result = null;
+            if (inName.Equals("no input")) return result;
+
             foreach (InputDevice indev in inputDevices)
             {
                 if (indev.devName.Equals(inName)) {
@@ -134,6 +136,8 @@ namespace Transonic.MIDI.System
         public OutputDevice findOutputDevice(String outName)
         {
             OutputDevice result = null;
+            if (outName.Equals("no input")) return result;
+
             foreach (OutputDevice outdev in outputDevices)
             {
                 if (outdev.devName.Equals(outName)) {

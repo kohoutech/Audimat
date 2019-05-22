@@ -171,13 +171,13 @@ namespace Origami.Serial
 
         public List<String> getSubpathKeys(String path)
         {
-            List<String> result = null;
+            List<String> result = new List<string>();
             SettingsStem subtree = root;
             bool done = false;
             while (!done)
             {
                 int dotpos = path.IndexOf('.');
-                if (dotpos != -1)                                   //path is name.subpath
+                if (dotpos != -1)                                   //not at end of path - path is name.subpath
                 {
                     String name = path.Substring(0, dotpos);
                     String subpath = path.Substring(dotpos + 1);    //break path apart
@@ -197,15 +197,13 @@ namespace Origami.Serial
                         SettingsNode val = subtree.children[path];
                         if (val != null && val is SettingsStem)
                         {
-                            result = new List<string>();
-
                             foreach (string key in ((SettingsStem)val).children.Keys)
                             {
                                 result.Add(key);
                             }
-                            done = true;
                         }
                     }
+                    done = true;
                 }
             }
             return result;

@@ -33,242 +33,205 @@ namespace Audimat.Graph
 {
     public class VSTRig
     {
-        ControlPanel controlPanel;
-        public MidiSystem midiDevices;
+        public ControlPanel controlPanel;
+        public VSTRack rack;
 
-        public List<Module> modules;
+        public List<VSTPanel> panels;
         public List<Patch> patches;
 
         public Patch currentPatch;
+        public Patch newPatch;
 
         public bool hasChanged;
+
+        //---------------------------------------------------------------------
 
         public static VSTRig loadFromFile(String path, ControlPanel controlPanel)
         {
             VSTRig rig = null;
 
-            SerialData rigData = new SerialData(path);
+            SerialData rigData = new SerialData(path);      //load data from file
 
             if (rigData != null)
             {
-
                 rig = new VSTRig(controlPanel);
 
-                //load modules
-                List<String> mods = rigData.getSubpathKeys("module-list");
-                Dictionary<String, Module> modList = new Dictionary<string, Module>();
-                foreach (String mod in mods)
+                //load plugins
+                List<String> plugs = rigData.getSubpathKeys("plugin-list");
+                Dictionary<String, VSTPanel> plugList = new Dictionary<string, VSTPanel>();      //temp dict for matching plugins to patches
+                foreach (String plug in plugs)
                 {
-                    String modPath = rigData.getStringValue("module-list." + mod + ".path", "");
-                    String modAudioOut = rigData.getStringValue("module-list." + mod + ".audio-out", "");
-                    String modMidiIn = rigData.getStringValue("module-list." + mod + ".midi-in", "");
-                    Module module = new Module(modPath, modAudioOut, modMidiIn);
-                    rig.AddModule(module);
-                    modList[mod] = module;
+                    String plugPath = rigData.getStringValue("plugin-list." + plug + ".path", "");
+                    String plugAudioOut = rigData.getStringValue("plugin-list." + plug + ".audio-out", "");
+                    String plugMidiIn = rigData.getStringValue("plugin-list." + plug + ".midi-in", "");
+
+                    VSTPanel panel = rig.addPanel(plugPath);
+                    //panel.plugin.setAudioOut(plugAudioOut);
+                    panel.setMidiIn(plugMidiIn);
+
+                    plugList[plug] = panel;
                 }
 
                 //load patches
                 List<String> pats = rigData.getSubpathKeys("patch-list");
                 foreach (String pat in pats)
                 {
-                    String patname = rigData.getStringValue("patch-list." + pat + ".name", "");
-                    Patch patch = new Patch(patname);
-                    foreach (String mod in mods)
+                    String patchName = rigData.getStringValue("patch-list." + pat + ".name", "");
+                    Patch patch = new Patch(patchName);
+                    foreach (String plug in plugs)
                     {
-                        int patnum = rigData.getIntValue("patch-list." + pat + "." + mod, 0);
-                        patch.AddModule(modList[mod], patnum);
+                        int patnum = rigData.getIntValue("patch-list." + pat + "." + plug, 0);
+                        patch.addPanel(plugList[plug], patnum);
                     }
-                    rig.AddPatch(patch);
+                    rig.patches.Add(patch);
                 }
+                rig.setCurrentPatch(0);
             }
 
             return rig;
         }
 
-        //---------------------------------------------------------------------
-
         public VSTRig(ControlPanel _controlPanel)
         {
             controlPanel = _controlPanel;
-            midiDevices = controlPanel.midiDevices;
+            rack = controlPanel.auditwin.rack;
 
-            modules = new List<Module>();
+            panels = new List<VSTPanel>();
             patches = new List<Patch>();
 
             currentPatch = null;
+            newPatch = null;
             hasChanged = false;
         }
 
-        ////load new rig from file and update rack to match rig
-        //public bool loadRig(string rigPath)
-        //{
-
-        //    //VSTRig newRig = VSTRig.loadFromFile(rigPath);
-        //    //if (newRig != null)
-        //    //{
-        //    //    //remove prev rig
-        //    //    currentRig.shutDown();
-        //    //    removeAllPanels();
-
-        //    //    //install new rig
-        //    //    currentRig = newRig;
-        //    //    foreach (Module mod in currentRig.modules)      //add panels to rack
-        //    //    {
-        //    //        VSTPanel panel = addPanel(mod.path, false);
-        //    //        if (panel != null)
-        //    //        {
-        //    //            mod.panel = panel;
-        //    //            panel.setMidiIn(mod.midiIn);
-        //    //        }
-        //    //    }
-        //    //    auditwin.rackPatchesChanged(null);             //broadcast patch change
-
-        //    //    hasChanged = false;
-        //    //    return true;
-        //    //}
-        //    return false;
-        //}
-
-        //public void clearRig()
-        //{
-        //    //currentRig.shutDown();
-        //    //removeAllPanels();
-
-        //    //currentRig = new VSTRig();
-        //    //hasChanged = false;
-        //}
-
-        //public void saveRig(string rigPath)
-        //{
-        //    //currentRig.saveToFile(rigPath);
-        //    //hasChanged = false;
-        //}
-
-        public void AddModule(Module module)
+        //return rig to empty state
+        public void shutDown()
         {
-            modules.Add(module);
+            currentPatch = null;
+            patches.Clear();
+            removeAllPanels();
+            hasChanged = false;
         }
 
-        public void AddPatch(Patch patch)
-        {
-            patches.Add(patch);
-        }
+        //- plugin management ------------------------------------------------------------
 
-        private void removeAllPanels()
+        public VSTPanel addPanel(string pluginPath)
         {
-            foreach (VSTPanel panel in panels)            //remove panels from rack
+            VSTPanel panel = new VSTPanel(this, panels.Count);
+            bool result = panel.loadPlugin(pluginPath);
+            if (!result) return null;
+
+            panels.Add(panel);
+            rack.addPanel(panel);
+
+            foreach (Patch patch in patches)            //add panel to each patch
             {
-                panelSpace.Controls.Remove(panel);
-                panel.unloadPlugin();
+                patch.addPanel(panel, 0);
             }
-            panels.Clear();
-            panelSpace.Size = new Size(0, 0);
-            updateScrollBar();
-            Invalidate();
 
-            //broadcast rack change
-            auditwin.rackPatchesChanged(null);
-            auditwin.rackModulesChanged();
+            hasChanged = true;
+            controlPanel.rigPluginsChanged();         //broadcast rack change
+
+            return panel;
         }
 
-        public List<VSTPlugin> getPluginList()
+        public void removePanel(VSTPanel panel)
         {
-            return host.plugins;
+            panel.unloadPlugin();           //disconnect panel & shut down plugin
+            rack.removePanel(panel);
+            panels.Remove(panel);
+
+            foreach (Patch patch in patches)            //add panel to each patch
+            {
+                patch.removePanel(panel);
+            }
+
+
+            hasChanged = true;
+            controlPanel.rigPluginsChanged();         //broadcast rack change            
         }
 
-        //- patching ----------------------------------------------------------
+        public void removeAllPanels()
+        {
+            List<VSTPanel> tmpList = new List<VSTPanel>(panels);
+            foreach (VSTPanel panel in tmpList)                         
+            {
+                removePanel(panel);                 //remove panels from rack
+            }
+        }
+
+        //- patch management --------------------------------------------------
 
         public void setCurrentPatch(int p)
         {
-            //currentPatch = currentRig.patches[p];
-            //foreach (Module mod in currentRig.modules)
-            //{
-            //    int patchNum = (currentPatch.modules.ContainsKey(mod) ? currentPatch.modules[mod] : 0);
-            //    mod.panel.cbxProgList.SelectedIndex = patchNum;
-            //}
-        }
-
-        public void clearPatch()
-        {
-            currentPatch = null;
-            auditwin.rackPatchesChanged(null);
-            foreach (Module mod in currentRig.modules)
+            if (p < patches.Count)
             {
-                mod.panel.cbxProgList.SelectedIndex = 0;
-            }
-        }
-
-        public void updatePatch()
-        {
-            foreach (Module mod in currentRig.modules)
-            {
-                int patchNum = mod.panel.cbxProgList.SelectedIndex;
-                if (currentPatch.modules.ContainsKey(mod))
+                currentPatch = patches[p];
+                foreach (VSTPanel panel in panels)
                 {
-                    currentPatch.modules[mod] = patchNum;
+                    int patchNum = (currentPatch.panels.ContainsKey(panel) ? currentPatch.panels[panel] : 0);
+                    panel.cbxProgList.SelectedIndex = patchNum;
                 }
             }
         }
 
-        public void addNewPatch(String patchName)
+        //add a new patch to the patch list
+        public void addNamedPatch(String patchName)
         {
             Patch newPatch = new Patch(patchName);
-            foreach (Module mod in currentRig.modules)
+            foreach (VSTPanel panel in panels)
             {
-                int patchNum = mod.panel.cbxProgList.SelectedIndex;
-                newPatch.AddModule(mod, patchNum);
+                int patchNum = panel.cbxProgList.SelectedIndex;
+                newPatch.addPanel(panel, patchNum);
             }
-            currentRig.AddPatch(newPatch);
+            patches.Add(newPatch);
             currentPatch = newPatch;
-            auditwin.rackPatchesChanged(currentPatch.name);
+            hasChanged = true;
+            controlPanel.rigPatchesChanged();
         }
 
-        //- midi i/o connections ----------------------------------------------
-
-        public void connectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
+        //add a new patch, but don't add it to the list until the user gives it a name
+        public void addNewPatch()
         {
-            //InputDevice indev = midiDevices.inputDevices[idx];
-            try
+            newPatch = new Patch("new patch");
+            foreach (VSTPanel panel in panels)
             {
-                indev.open();
-                indev.connectUnit(pluginMidiIn);
-                indev.start();
+                newPatch.addPanel(panel, 0);
+                panel.cbxProgList.SelectedIndex = 0;
             }
-            catch
+            currentPatch = newPatch;
+            controlPanel.rigPatchesChanged();
+        }
+
+        public void updatePatch()
+        {
+            foreach (VSTPanel panel in panels)
             {
-                //Console.WriteLine("error connecting midi input");
+                int patchNum = panel.cbxProgList.SelectedIndex;
+                if (currentPatch.panels.ContainsKey(panel))
+                {
+                    currentPatch.panels[panel] = patchNum;
+                }
             }
         }
 
-        public void disconnectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
-        {
-            //InputDevice indev = midiDevices.inputDevices[idx];
-            indev.disconnectUnit(pluginMidiIn);
-        }
-
-        public void connectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
-        {
-        }
-
-        public void disconnectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
-        {
-        }
-
+        //- saving ------------------------------------------------------------
 
         public void saveToFile(String filename)
         {
             SerialData rigData = new SerialData();
             rigData.setStringValue("version", Settings.VERSION);
 
-            Dictionary<Module, String> modList = new Dictionary<Module, string>();
+            Dictionary<VSTPanel, String> plugList = new Dictionary<VSTPanel, string>();
             int count = 1;
-            foreach (Module module in modules)
+            foreach (VSTPanel panel in panels)
             {
-                String modname = "module-" + count.ToString().PadLeft(3, '0');
-                rigData.setStringValue("module-list." + modname + ".path", module.path);
-                rigData.setStringValue("module-list." + modname + ".audio-out", module.audioOut);
-                rigData.setStringValue("module-list." + modname + ".midi-in", module.midiIn);
-                modList[module] = modname;
+                String plugName = "plugin-" + count.ToString().PadLeft(3, '0');
+                rigData.setStringValue("plugin-list." + plugName + ".path", panel.plugPath);
+                rigData.setStringValue("plugin-list." + plugName + ".audio-out", panel.audioOut);
+                rigData.setStringValue("plugin-list." + plugName + ".midi-in", 
+                    ((panel.midiInDevice != null) ? panel.midiInDevice.devName : "no input"));
+                plugList[panel] = plugName;
                 count++;
             }
             count = 1;
@@ -276,59 +239,14 @@ namespace Audimat.Graph
             {
                 String patname = "patch-" + count.ToString().PadLeft(3, '0');
                 rigData.setStringValue("patch-list." + patname + ".name", patch.name);
-                foreach (Module module in patch.modules.Keys)
+                foreach (VSTPanel panel in patch.panels.Keys)
                 {
-                    rigData.setIntValue("patch-list." + patname + "." + modList[module], patch.modules[module]);
+                    rigData.setIntValue("patch-list." + patname + "." + plugList[panel], patch.panels[panel]);
                 }
                 count++;
             }
             rigData.saveToFile(filename);
-        }
-
-        //return rig to empty state
-        public void shutDown()
-        {
-            modules.Clear();
-            patches.Clear();
             hasChanged = false;
-            //    removeAllPanels();
-        }
-
-        public bool addPanel(string pluginPath)
-        {
-            //        panel.unloadPlugin();           //disconnect panel & shut down plugin
-            //auditwin.rackModulesChanged();         //broadcast rack change
-
-            //        auditwin.rackModulesChanged();         //broadcast rack change
-            //if (updateRig)
-            //{
-            //    Module mod = new Module(plugPath, "no output", "no input");
-            //    mod.panel = panel;
-            //    currentRig.AddModule(mod);
-            //}
-
-            //        VSTPanel panel = new VSTPanel(this, panels.Count);
-            //bool result = panel.loadPlugin(plugPath);
-            //if (!result) return null;
-            return true;
-        }
-    }
-
-    //-------------------------------------------------------------------------
-
-    public class Module
-    {
-        public string path;
-        public string audioOut;
-        public string midiIn;
-        public VSTPanel panel;
-
-        public Module(string _path, string _audioOut, string _midiIn)
-        {
-            path = _path;
-            audioOut = _audioOut;
-            midiIn = _midiIn;
-            panel = null;
         }
     }
 
@@ -337,18 +255,24 @@ namespace Audimat.Graph
     public class Patch
     {
         public string name;
-        public Dictionary<Module, int> modules;
+        public Dictionary<VSTPanel, int> panels;
 
         public Patch(string _name)
         {            
             name = _name;
-
-            modules = new Dictionary<Module, int>();
+            panels = new Dictionary<VSTPanel, int>();
         }
 
-        public void AddModule(Module mod, int patchNum)
+        public void addPanel(VSTPanel panel, int patchNum)
         {
-            modules.Add(mod, patchNum);
+            panels.Add(panel, patchNum);
+        }
+
+        public void removePanel(VSTPanel panel)
+        {
+            panels.Remove(panel);
         }
     }
 }
+
+//  Console.WriteLine(" there's no sun in the shadow of the wizard");

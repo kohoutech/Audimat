@@ -262,4 +262,4 @@ namespace Transonic.VST
     }
 }
 
-//Console.WriteLine(" plugin " + name + " parameter " + i + " name is " + paramName);
+//  Console.WriteLine(" there's no sun in the shadow of the wizard");
