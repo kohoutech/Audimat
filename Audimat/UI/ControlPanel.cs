@@ -49,7 +49,7 @@ namespace Audimat.UI
         private Button btnSavePatchAs;
         private Button btnSavePatch;
         private Button btnLoadPlugin;
-        private Button btnKeys;
+        public Button btnKeys;
         private Button btnMixer;
         public Button btnPanic;
         public Button btnHide;
@@ -97,8 +97,7 @@ namespace Audimat.UI
             patchNameWnd = null;
 
             //model
-            currentRig = new VSTRig(this);              //empty rig w/ no modules or patches
-            auditwin.Text = "Audimat - new rig";
+            currentRig = null;
             curRigFilename = null;
             curRigPath = Application.StartupPath;
             curPluginPath = Application.StartupPath;
@@ -385,27 +384,11 @@ namespace Audimat.UI
 
         //- callbacks -----------------------------------------------------------------
 
-        //callback when rack's patch list has changed (added/deleted/renamed)
-        public void rigPatchesChanged(String curPatchName)
-        {
-            updatePatchList(curPatchName);
-            //saveRigFileMenuItem.Enabled = true;
-            btnSaveRig.Enabled = true;
-        }
-
-        //callback when plugins have been added or removed from the rack
-        public void rigModulesChanged()
-        {
-            auditwin.keyboardWnd.updatePluginList();
-            //auditwin.saveRigFileMenuItem.Enabled = true;
-            btnSaveRig.Enabled = true;
-        }
-
-        public void updatePatchList(String patchName)
+        public void updatePatchList(VSTRig rig)
         {
             cbxPatchList.Items.Clear();
             cbxPatchList.Text = "";
-            foreach (Patch patch in currentRig.patches)
+            foreach (Patch patch in rig.patches)
             {
                 cbxPatchList.Items.Add(patch.name);
             }
@@ -413,7 +396,25 @@ namespace Audimat.UI
             cbxPatchList.Enabled = enabled;
             btnPrevPatch.Enabled = enabled;
             btnNextPatch.Enabled = enabled;
-            cbxPatchList.SelectedIndex = (enabled && patchName != null) ? cbxPatchList.FindString(patchName) : -1;
+            cbxPatchList.SelectedIndex = (enabled && rig.currentPatch != null) ? cbxPatchList.FindString(rig.currentPatch.name) : -1;
+            if (rig.currentPatch == rig.newPatch)
+            {
+                cbxPatchList.Text = rig.newPatch.name;
+            }
+        }
+
+        //callback when rack's patch list has changed (added/deleted/renamed)
+        public void rigPatchesChanged()
+        {
+            updatePatchList(currentRig);
+            auditwin.enableSaveRigMenuItem(true);
+        }
+
+        //callback when plugins have been added or removed from the rack
+        public void rigPluginsChanged()
+        {
+            auditwin.keyboardWnd.updatePluginList();
+            auditwin.enableSaveRigMenuItem(true);
         }
 
         //- host management ----------------------------------------------------------
@@ -423,7 +424,7 @@ namespace Audimat.UI
             host.startEngine();
             isRunning = true;
             Invalidate();
-            //auditwin.lblAudimatStatus.Text = "Engine is running";
+            auditwin.setStatusText("Engine is running");
         }
 
         public void stopHost()
@@ -431,13 +432,26 @@ namespace Audimat.UI
             host.stopEngine();
             isRunning = false;
             Invalidate();
-            //auditwin.lblAudimatStatus.Text = "Engine is stopped";
+            auditwin.setStatusText("Engine is stopped");
         }
 
         //- rigging -------------------------------------------------------------------
 
+        private bool promptToSave()
+        {
+            DialogResult result = MessageBox.Show("your current rig has changed. Save it now?", "Save Rig Changes",
+                                                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+            if (result == DialogResult.Cancel) return false;
+            if (result == DialogResult.Yes)
+            {
+                saveRig(true);
+            }
+            return true;
+        }
+
         public void loadRig()
         {
+            //get rig filename
             String rigPath = "";
 
 #if (DEBUG)
@@ -448,40 +462,60 @@ namespace Audimat.UI
             if (dlgresult == DialogResult.Cancel) return;
             rigPath = loadRigDialog.FileName;            
 #endif
+            //shut down prev rig
+            if (currentRig != null)
+            {
+                if (currentRig.hasChanged)
+                {
+                    bool doAction = promptToSave();
+                    if (!doAction) return;
+                }
+                currentRig.shutDown();
+            }
+
+            //load new rig
             curRigPath = Path.GetDirectoryName(rigPath);
             VSTRig newRig = VSTRig.loadFromFile(rigPath, this);
 
             if (newRig != null)
             {
-                currentRig.shutDown();
                 currentRig = newRig;
-
                 curRigFilename = Path.GetFileName(rigPath);
                 auditwin.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
-                //saveRigFileMenuItem.Enabled = false;
-                btnSaveRig.Enabled = false;
             }
             else
             {
                 MessageBox.Show("failed to load the rig file: " + rigPath, "Rig Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                currentRig = new VSTRig(this);
+                curRigFilename = null;
+                auditwin.Text = "Audimat - new rig";
             }
+            updatePatchList(currentRig);
+            auditwin.enableSaveRigMenuItem(false);
         }
 
         public void newRig()
         {
-            currentRig.shutDown();
+            if (currentRig != null)
+            {
+                if (currentRig.hasChanged)
+                {
+                    bool doAction = promptToSave();
+                    if (!doAction) return;
+                }
+                currentRig.shutDown();
+            }
             currentRig = new VSTRig(this);
-
             curRigFilename = null;
             auditwin.Text = "Audimat - new rig";
-            //saveRigFileMenuItem.Enabled = false;
-            btnSaveRig.Enabled = false;
+            auditwin.enableSaveRigMenuItem(false);
         }
 
         public void saveRig(bool rename)
         {
             String rigPath = curRigFilename;
-            if (rename || curRigFilename == null)           //rename automatically is we don't already have a name
+            if (rename || curRigFilename == null)           //rename automatically if we don't already have a name
             {
                 saveRigDialog.InitialDirectory = curRigPath;
                 DialogResult result = saveRigDialog.ShowDialog(this);
@@ -494,20 +528,26 @@ namespace Audimat.UI
             currentRig.saveToFile(rigPath);
 
             auditwin.Text = "Audimat - " + Path.GetFileNameWithoutExtension(curRigFilename);
-            //saveRigFileMenuItem.Enabled = false;
-            btnSaveRig.Enabled = false;
+            auditwin.enableSaveRigMenuItem(false);
         }
 
         //- patching -------------------------------------------------------------------
 
         public void newPatch()
         {
-            currentRig.clearPatch();
+            currentRig.addNewPatch();
         }
 
         public void savePatch()
         {
-            currentRig.updatePatch();
+            if (currentRig.currentPatch != currentRig.newPatch)
+            {
+                currentRig.updatePatch();
+            }
+            else
+            {
+                saveNewPatch();         //if the patch is untitled, prompt for name
+            }
         }
 
         public void saveNewPatch()
@@ -522,7 +562,7 @@ namespace Audimat.UI
             DialogResult result = patchNameWnd.ShowDialog(this);
             if (result == DialogResult.Cancel) return;
 
-            currentRig.addNewPatch(patchNameWnd.txtPatchname.Text);
+            currentRig.addNamedPatch(patchNameWnd.txtPatchname.Text);
         }
 
         //- plugin management -------------------------------------------------
@@ -546,13 +586,18 @@ namespace Audimat.UI
             if (pluginPath.Length == 0) return;
             curPluginPath = Path.GetDirectoryName(pluginPath);
 #endif
-            bool result = currentRig.addPanel(pluginPath);
+            VSTPanel panel = currentRig.addPanel(pluginPath);
 
-            if (!result)
+            if (panel == null)
             {
                 MessageBox.Show("failed to load the plugin file: " + pluginPath, "Plugin Load Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public List<VSTPlugin> getPluginList()
+        {
+            return host.plugins;
         }
 
         //- patch selector ----------------------------------------------------

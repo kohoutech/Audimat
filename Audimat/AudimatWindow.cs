@@ -44,6 +44,9 @@ namespace Audimat
         public Settings settings;
 
         public bool mainShutdown;           //hide child windows instead of closing them until main prog shuts down
+        public bool rackhidden;
+        public int curRackHeight;
+        public int minHeight;
 
         public AudimatWindow()
         {
@@ -64,15 +67,18 @@ namespace Audimat
             controlPanel.Width = rack.Width;
 
             //set initial sizes
-            int minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
+            minHeight = this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height;
             int rackHeight = settings.rackHeight;
             this.ClientSize = new System.Drawing.Size(rack.Size.Width, rackHeight + minHeight);
             this.MinimumSize = new System.Drawing.Size(this.Size.Width, this.Size.Height - rackHeight);
             this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
             this.Location = new Point(settings.rackPosX, settings.rackPosY);
+            curRackHeight = rack.Height;
+
+            controlPanel.newRig();              //initial empty rig
 
             //child windows
-            keyboardWnd = new KeyboardWnd(this);
+            keyboardWnd = new KeyboardWnd(controlPanel);
             keyboardWnd.Icon = this.Icon;
             keyboardWnd.FormClosing += new FormClosingEventHandler(keyboardWindow_FormClosing);
             keyboardWnd.Location = new Point(settings.keyWndPosX, settings.keyWndPosY);
@@ -82,6 +88,7 @@ namespace Audimat
             patchWin = new PatchWindow(this);
 
             mainShutdown = false;
+            rackhidden = false;
         }
 
         protected override void OnResize(EventArgs e)
@@ -90,18 +97,26 @@ namespace Audimat
             if (rack != null)
             {
                 rack.Size = new Size(this.ClientSize.Width, AudimatStatus.Top - controlPanel.Bottom);
-                settings.rackHeight = this.ClientSize.Height - (this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
+                if (!rackhidden)
+                {
+                    settings.rackHeight = this.ClientSize.Height - (this.AudimatMenu.Height + controlPanel.Height + this.AudimatStatus.Height);
+                }
             }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-
             mainShutdown = true;
+
+            settings.keyWndPosX = keyboardWnd.Location.X;
+            settings.keyWndPosY = keyboardWnd.Location.Y;
             keyboardWnd.Close();
 
             controlPanel.shutdown();
+
+            settings.rackPosX = this.Location.X;
+            settings.rackPosY = this.Location.Y;
             settings.save();
         }
 
@@ -115,6 +130,12 @@ namespace Audimat
         private void newRigFileMenuItem_Click(object sender, EventArgs e)
         {
             controlPanel.newRig();
+        }
+
+        public void enableSaveRigMenuItem(bool enable)
+        {
+            saveRigFileMenuItem.Enabled = enable;
+            controlPanel.btnSaveRig.Enabled = enable;
         }
 
         private void saveRigFileMenuItem_Click(object sender, EventArgs e)
@@ -149,14 +170,7 @@ namespace Audimat
             controlPanel.saveNewPatch();
         }
 
-        //- plugin menu -------------------------------------------------------
-
-        private void loadPlugin_Click(object sender, EventArgs e)
-        {
-            controlPanel.loadPlugin();
-        }
-
-        //- rack menu ---------------------------------------------------------
+        //- host menu ---------------------------------------------------------
 
         private void StartHost_Click(object sender, EventArgs e)
         {
@@ -171,7 +185,7 @@ namespace Audimat
         public void enableKeyboardBarMenuItem(bool enable)
         {
             keyboardBarRackMenuItem.Enabled = enable;
-            controlPanel.btnHide.Enabled = enable;
+            controlPanel.btnKeys.Enabled = enable;
         }
 
         public void showKeyboardWindow()
@@ -210,8 +224,19 @@ namespace Audimat
 
         public void hideRack()
         {
-            String msg = "the hide/show rack feature is coming soon\n" + "have patience!";
-            MessageBox.Show(msg, "Coming soon");
+            if (!rackhidden)
+            {
+                rackhidden = true;
+                curRackHeight = rack.Height;
+                this.ClientSize = new System.Drawing.Size(rack.Size.Width, minHeight);
+                this.MaximumSize = this.MinimumSize;
+            }
+            else
+            {
+                rackhidden = false;
+                this.MaximumSize = new System.Drawing.Size(this.Size.Width, Int32.MaxValue);
+                this.ClientSize = new System.Drawing.Size(rack.Size.Width, curRackHeight + minHeight);
+            }            
         }
 
         private void hideShowRackMenuItem_Click(object sender, EventArgs e)
@@ -230,12 +255,26 @@ namespace Audimat
             controlPanel.updateHostSettings();
         }
 
+        //- plugin menu -------------------------------------------------------
+
+        private void loadPlugin_Click(object sender, EventArgs e)
+        {
+            controlPanel.loadPlugin();
+        }
+
         //- help menu -----------------------------------------------------------------
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
             String msg = "Audimat\nversion " + Settings.VERSION + "\n\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
+        }
+
+        //- status bar -----------------------------------------------------------------
+
+        public void setStatusText(String text)
+        {
+            lblAudimatStatus.Text = text;
         }
     }
 }
