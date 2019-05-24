@@ -168,7 +168,7 @@ namespace Audimat.Graph
             {
                 currentPatch = patches[p];
                 foreach (VSTPanel panel in panels)
-                {
+                {                    
                     int patchNum = (currentPatch.panels.ContainsKey(panel) ? currentPatch.panels[panel] : 0);
                     panel.cbxProgList.SelectedIndex = patchNum;
                 }

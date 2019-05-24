@@ -211,15 +211,9 @@ namespace Audimat
             }
         }
 
-        public void panicButton()
-        {
-            String msg = "the panic button is coming soon\n" + "have patience!";
-            MessageBox.Show(msg, "Coming soon");
-        }
-
         private void panicButton_Click(object sender, EventArgs e)
         {
-            panicButton();
+            controlPanel.panicButton();
         }
 
         public void hideRack()

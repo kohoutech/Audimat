@@ -54,7 +54,6 @@ namespace Audimat.UI
         public Button btnPanic;
         public Button btnHide;
         public Button btnStart;
-        public Button btnStop;
         private ToolTip controlPanelToolTip;
 
         //child windows
@@ -79,6 +78,7 @@ namespace Audimat.UI
 
         //status
         public bool isRunning;
+        private Button btnPatchList;
 
         int vstnum;         //for debugging
 
@@ -112,7 +112,6 @@ namespace Audimat.UI
             this.components = new System.ComponentModel.Container();
             this.btnPanic = new System.Windows.Forms.Button();
             this.btnHide = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
             this.controlPanelToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.btnSaveRig = new System.Windows.Forms.Button();
@@ -127,6 +126,7 @@ namespace Audimat.UI
             this.btnSavePatchAs = new System.Windows.Forms.Button();
             this.btnSavePatch = new System.Windows.Forms.Button();
             this.btnNewPatch = new System.Windows.Forms.Button();
+            this.btnPatchList = new System.Windows.Forms.Button();
             this.cbxPatchList = new System.Windows.Forms.ComboBox();
             this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
@@ -136,7 +136,7 @@ namespace Audimat.UI
             // btnPanic
             // 
             this.btnPanic.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnPanic.Location = new System.Drawing.Point(279, 37);
+            this.btnPanic.Location = new System.Drawing.Point(295, 37);
             this.btnPanic.Name = "btnPanic";
             this.btnPanic.Size = new System.Drawing.Size(24, 24);
             this.btnPanic.TabIndex = 15;
@@ -148,7 +148,7 @@ namespace Audimat.UI
             // btnHide
             // 
             this.btnHide.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnHide.Location = new System.Drawing.Point(255, 37);
+            this.btnHide.Location = new System.Drawing.Point(271, 37);
             this.btnHide.Name = "btnHide";
             this.btnHide.Size = new System.Drawing.Size(24, 24);
             this.btnHide.TabIndex = 14;
@@ -157,25 +157,15 @@ namespace Audimat.UI
             this.btnHide.UseVisualStyleBackColor = false;
             this.btnHide.Click += new System.EventHandler(this.btnHide_Click);
             // 
-            // btnStop
-            // 
-            this.btnStop.Location = new System.Drawing.Point(320, 37);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(38, 24);
-            this.btnStop.TabIndex = 2;
-            this.btnStop.Text = "Stop";
-            this.controlPanelToolTip.SetToolTip(this.btnStop, "stop engine");
-            this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(320, 13);
+            this.btnStart.BackgroundImage = global::Audimat.Properties.Resources.switchoff;
+            this.btnStart.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnStart.Location = new System.Drawing.Point(350, 13);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(38, 24);
+            this.btnStart.Size = new System.Drawing.Size(24, 48);
             this.btnStart.TabIndex = 1;
-            this.btnStart.Text = "Start";
-            this.controlPanelToolTip.SetToolTip(this.btnStart, "start engine");
+            this.controlPanelToolTip.SetToolTip(this.btnStart, "start / stop engine");
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
@@ -194,7 +184,7 @@ namespace Audimat.UI
             // btnNextPatch
             // 
             this.btnNextPatch.Enabled = false;
-            this.btnNextPatch.Location = new System.Drawing.Point(218, 13);
+            this.btnNextPatch.Location = new System.Drawing.Point(223, 13);
             this.btnNextPatch.Name = "btnNextPatch";
             this.btnNextPatch.Size = new System.Drawing.Size(18, 24);
             this.btnNextPatch.TabIndex = 5;
@@ -254,7 +244,7 @@ namespace Audimat.UI
             // btnLoadPlugin
             // 
             this.btnLoadPlugin.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnLoadPlugin.Location = new System.Drawing.Point(212, 37);
+            this.btnLoadPlugin.Location = new System.Drawing.Point(217, 37);
             this.btnLoadPlugin.Name = "btnLoadPlugin";
             this.btnLoadPlugin.Size = new System.Drawing.Size(24, 24);
             this.btnLoadPlugin.TabIndex = 13;
@@ -266,7 +256,7 @@ namespace Audimat.UI
             // btnKeys
             // 
             this.btnKeys.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnKeys.Location = new System.Drawing.Point(255, 13);
+            this.btnKeys.Location = new System.Drawing.Point(271, 13);
             this.btnKeys.Name = "btnKeys";
             this.btnKeys.Size = new System.Drawing.Size(24, 24);
             this.btnKeys.TabIndex = 16;
@@ -278,7 +268,7 @@ namespace Audimat.UI
             // btnMixer
             // 
             this.btnMixer.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnMixer.Location = new System.Drawing.Point(279, 13);
+            this.btnMixer.Location = new System.Drawing.Point(295, 13);
             this.btnMixer.Name = "btnMixer";
             this.btnMixer.Size = new System.Drawing.Size(24, 24);
             this.btnMixer.TabIndex = 17;
@@ -290,7 +280,7 @@ namespace Audimat.UI
             // btnSavePatchAs
             // 
             this.btnSavePatchAs.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSavePatchAs.Location = new System.Drawing.Point(179, 37);
+            this.btnSavePatchAs.Location = new System.Drawing.Point(193, 37);
             this.btnSavePatchAs.Name = "btnSavePatchAs";
             this.btnSavePatchAs.Size = new System.Drawing.Size(24, 24);
             this.btnSavePatchAs.TabIndex = 12;
@@ -302,7 +292,7 @@ namespace Audimat.UI
             // btnSavePatch
             // 
             this.btnSavePatch.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSavePatch.Location = new System.Drawing.Point(155, 37);
+            this.btnSavePatch.Location = new System.Drawing.Point(169, 37);
             this.btnSavePatch.Name = "btnSavePatch";
             this.btnSavePatch.Size = new System.Drawing.Size(24, 24);
             this.btnSavePatch.TabIndex = 11;
@@ -314,7 +304,7 @@ namespace Audimat.UI
             // btnNewPatch
             // 
             this.btnNewPatch.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnNewPatch.Location = new System.Drawing.Point(131, 37);
+            this.btnNewPatch.Location = new System.Drawing.Point(145, 37);
             this.btnNewPatch.Name = "btnNewPatch";
             this.btnNewPatch.Size = new System.Drawing.Size(24, 24);
             this.btnNewPatch.TabIndex = 10;
@@ -322,6 +312,18 @@ namespace Audimat.UI
             this.controlPanelToolTip.SetToolTip(this.btnNewPatch, "new patch");
             this.btnNewPatch.UseVisualStyleBackColor = false;
             this.btnNewPatch.Click += new System.EventHandler(this.btnNewPatch_Click);
+            // 
+            // btnPatchList
+            // 
+            this.btnPatchList.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnPatchList.Location = new System.Drawing.Point(121, 37);
+            this.btnPatchList.Name = "btnPatchList";
+            this.btnPatchList.Size = new System.Drawing.Size(24, 24);
+            this.btnPatchList.TabIndex = 18;
+            this.btnPatchList.Text = "P";
+            this.controlPanelToolTip.SetToolTip(this.btnPatchList, "show patch list");
+            this.btnPatchList.UseVisualStyleBackColor = false;
+            this.btnPatchList.Click += new System.EventHandler(this.btnPatchList_Click);
             // 
             // cbxPatchList
             // 
@@ -332,7 +334,7 @@ namespace Audimat.UI
             this.cbxPatchList.FormattingEnabled = true;
             this.cbxPatchList.Location = new System.Drawing.Point(43, 14);
             this.cbxPatchList.Name = "cbxPatchList";
-            this.cbxPatchList.Size = new System.Drawing.Size(175, 23);
+            this.cbxPatchList.Size = new System.Drawing.Size(180, 23);
             this.cbxPatchList.TabIndex = 4;
             this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
             // 
@@ -351,6 +353,7 @@ namespace Audimat.UI
             // ControlPanel
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.Controls.Add(this.btnPatchList);
             this.Controls.Add(this.btnNewPatch);
             this.Controls.Add(this.btnSavePatch);
             this.Controls.Add(this.btnSavePatchAs);
@@ -365,7 +368,6 @@ namespace Audimat.UI
             this.Controls.Add(this.cbxPatchList);
             this.Controls.Add(this.btnSaveRig);
             this.Controls.Add(this.btnStart);
-            this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnHide);
             this.Controls.Add(this.btnPanic);
             this.Name = "ControlPanel";
@@ -651,6 +653,12 @@ namespace Audimat.UI
 
         //- patch buttons -------------------------------------------------------
 
+        private void btnPatchList_Click(object sender, EventArgs e)
+        {
+            String msg = "the patch list window is coming soon\n" + "have patience!";
+            MessageBox.Show(msg, "Coming soon");
+        }
+
         private void btnNewPatch_Click(object sender, EventArgs e)
         {
             newPatch();
@@ -692,21 +700,33 @@ namespace Audimat.UI
             auditwin.hideRack();
         }
 
+        public void panicButton()
+        {
+            foreach (VSTPanel panel in currentRig.panels)
+            {
+                panel.sendMidiPanicMessage();
+            }
+        }
+
         private void btnPanic_Click(object sender, EventArgs e)
         {
-            auditwin.panicButton();
+            panicButton();
         }
 
         //- host buttons ------------------------------------------------------
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            startHost();
-        }
-
-        private void btnStop_Click(object sender, EventArgs e)
-        {
-            stopHost();
+            if (!isRunning)
+            {
+                startHost();
+                btnStart.BackgroundImage = Properties.Resources.switchon;
+            }
+            else
+            {
+                stopHost();
+                btnStart.BackgroundImage = Properties.Resources.switchoff;
+            }
         }
 
         public void updateHostSettings()
@@ -740,9 +760,9 @@ namespace Audimat.UI
             //running LED
             Color LEDColor = isRunning ? Color.FromArgb(0xff, 0, 0) : Color.FromArgb(0x40, 0, 0);
             Brush LEDBrush = new SolidBrush(LEDColor);
-            g.DrawEllipse(Pens.Black, 380, 28, 20, 20);
-            g.FillEllipse(Brushes.White, 381, 29, 19, 19);
-            g.FillEllipse(LEDBrush, 382, 30, 16, 16);
+            g.DrawEllipse(Pens.Black, 382, 28, 20, 20);
+            g.FillEllipse(Brushes.White, 383, 29, 19, 19);
+            g.FillEllipse(LEDBrush, 384, 30, 16, 16);
             LEDBrush.Dispose();
         }
     }

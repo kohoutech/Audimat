@@ -145,6 +145,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="UI\ControlPanel.resx">
       <DependentUpon>ControlPanel.cs</DependentUpon>
@@ -189,6 +190,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon1.ico" />
+    <None Include="resources\switchoff.png" />
+    <None Include="resources\switchon.png" />
     <Content Include="VST\Vashti.vcxproj.filters" />
     <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>
