@@ -65,8 +65,8 @@
             this.AudimatMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuItem,
             this.patchToolStripMenuItem,
-            this.hostMenuItem,
             this.pluginMenuItem,
+            this.hostMenuItem,
             this.helpMenuItem});
             this.AudimatMenu.Location = new System.Drawing.Point(0, 0);
             this.AudimatMenu.Name = "AudimatMenu";
@@ -238,7 +238,7 @@
             // 
             this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
             this.loadPluginMenuItem.Text = "&Load Plugin";
             this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 

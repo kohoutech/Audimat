@@ -192,6 +192,27 @@
     <Content Include="Icon1.ico" />
     <None Include="resources\switchoff.png" />
     <None Include="resources\switchon.png" />
+    <Content Include="resources\hide.png" />
+    <Content Include="resources\host-settings.png" />
+    <Content Include="resources\keys-window.png" />
+    <Content Include="resources\midi-config.png" />
+    <Content Include="resources\mixer-window.png" />
+    <None Include="resources\panel-editor.png" />
+    <None Include="resources\panel-info.png" />
+    <None Include="resources\panel-params.png" />
+    <None Include="resources\panel-settings.png" />
+    <Content Include="resources\panic.png" />
+    <Content Include="resources\patch-editor.png" />
+    <None Include="resources\patch-list.png" />
+    <Content Include="resources\patch-new.png" />
+    <Content Include="resources\patch-save-as.png" />
+    <Content Include="resources\patch-save.png" />
+    <Content Include="resources\plugin-load.png" />
+    <Content Include="resources\rig-load.png" />
+    <Content Include="resources\rig-new.png" />
+    <Content Include="resources\rig-save-as.png" />
+    <Content Include="resources\rig-save.png" />
+    <Content Include="resources\virtual-audio-window.png" />
     <Content Include="VST\Vashti.vcxproj.filters" />
     <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>

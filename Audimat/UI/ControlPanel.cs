@@ -110,84 +110,37 @@ namespace Audimat.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.btnPanic = new System.Windows.Forms.Button();
-            this.btnHide = new System.Windows.Forms.Button();
-            this.btnStart = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ControlPanel));
             this.controlPanelToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnSaveRig = new System.Windows.Forms.Button();
             this.btnNextPatch = new System.Windows.Forms.Button();
             this.btnPrevPatch = new System.Windows.Forms.Button();
-            this.btnLoadRig = new System.Windows.Forms.Button();
-            this.btnNewRig = new System.Windows.Forms.Button();
-            this.btnSaveRigAs = new System.Windows.Forms.Button();
-            this.btnLoadPlugin = new System.Windows.Forms.Button();
-            this.btnKeys = new System.Windows.Forms.Button();
-            this.btnMixer = new System.Windows.Forms.Button();
-            this.btnSavePatchAs = new System.Windows.Forms.Button();
-            this.btnSavePatch = new System.Windows.Forms.Button();
-            this.btnNewPatch = new System.Windows.Forms.Button();
-            this.btnPatchList = new System.Windows.Forms.Button();
             this.cbxPatchList = new System.Windows.Forms.ComboBox();
             this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
             this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
+            this.btnPatchList = new System.Windows.Forms.Button();
+            this.btnNewPatch = new System.Windows.Forms.Button();
+            this.btnSavePatch = new System.Windows.Forms.Button();
+            this.btnSavePatchAs = new System.Windows.Forms.Button();
+            this.btnMixer = new System.Windows.Forms.Button();
+            this.btnKeys = new System.Windows.Forms.Button();
+            this.btnLoadPlugin = new System.Windows.Forms.Button();
+            this.btnSaveRigAs = new System.Windows.Forms.Button();
+            this.btnNewRig = new System.Windows.Forms.Button();
+            this.btnLoadRig = new System.Windows.Forms.Button();
+            this.btnSaveRig = new System.Windows.Forms.Button();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.btnHide = new System.Windows.Forms.Button();
+            this.btnPanic = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // btnPanic
-            // 
-            this.btnPanic.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnPanic.Location = new System.Drawing.Point(295, 37);
-            this.btnPanic.Name = "btnPanic";
-            this.btnPanic.Size = new System.Drawing.Size(24, 24);
-            this.btnPanic.TabIndex = 15;
-            this.btnPanic.Text = "P";
-            this.controlPanelToolTip.SetToolTip(this.btnPanic, "panic button!");
-            this.btnPanic.UseVisualStyleBackColor = false;
-            this.btnPanic.Click += new System.EventHandler(this.btnPanic_Click);
-            // 
-            // btnHide
-            // 
-            this.btnHide.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnHide.Location = new System.Drawing.Point(271, 37);
-            this.btnHide.Name = "btnHide";
-            this.btnHide.Size = new System.Drawing.Size(24, 24);
-            this.btnHide.TabIndex = 14;
-            this.btnHide.Text = "H";
-            this.controlPanelToolTip.SetToolTip(this.btnHide, "show / hide rack");
-            this.btnHide.UseVisualStyleBackColor = false;
-            this.btnHide.Click += new System.EventHandler(this.btnHide_Click);
-            // 
-            // btnStart
-            // 
-            this.btnStart.BackgroundImage = global::Audimat.Properties.Resources.switchoff;
-            this.btnStart.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnStart.Location = new System.Drawing.Point(350, 13);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(24, 48);
-            this.btnStart.TabIndex = 1;
-            this.controlPanelToolTip.SetToolTip(this.btnStart, "start / stop engine");
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
-            // 
-            // btnSaveRig
-            // 
-            this.btnSaveRig.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSaveRig.Location = new System.Drawing.Point(73, 37);
-            this.btnSaveRig.Name = "btnSaveRig";
-            this.btnSaveRig.Size = new System.Drawing.Size(24, 24);
-            this.btnSaveRig.TabIndex = 8;
-            this.btnSaveRig.Text = "S";
-            this.controlPanelToolTip.SetToolTip(this.btnSaveRig, "save rig");
-            this.btnSaveRig.UseVisualStyleBackColor = false;
-            this.btnSaveRig.Click += new System.EventHandler(this.btnSaveRig_Click);
             // 
             // btnNextPatch
             // 
             this.btnNextPatch.Enabled = false;
-            this.btnNextPatch.Location = new System.Drawing.Point(223, 13);
+            this.btnNextPatch.Location = new System.Drawing.Point(224, 13);
             this.btnNextPatch.Name = "btnNextPatch";
             this.btnNextPatch.Size = new System.Drawing.Size(18, 24);
-            this.btnNextPatch.TabIndex = 5;
+            this.btnNextPatch.TabIndex = 3;
             this.btnNextPatch.Text = "+";
             this.controlPanelToolTip.SetToolTip(this.btnNextPatch, "next patch");
             this.btnNextPatch.UseVisualStyleBackColor = true;
@@ -196,134 +149,14 @@ namespace Audimat.UI
             // btnPrevPatch
             // 
             this.btnPrevPatch.Enabled = false;
-            this.btnPrevPatch.Location = new System.Drawing.Point(25, 12);
+            this.btnPrevPatch.Location = new System.Drawing.Point(24, 13);
             this.btnPrevPatch.Name = "btnPrevPatch";
             this.btnPrevPatch.Size = new System.Drawing.Size(18, 25);
-            this.btnPrevPatch.TabIndex = 3;
+            this.btnPrevPatch.TabIndex = 1;
             this.btnPrevPatch.Text = "-";
             this.controlPanelToolTip.SetToolTip(this.btnPrevPatch, "previous patch");
             this.btnPrevPatch.UseVisualStyleBackColor = true;
             this.btnPrevPatch.Click += new System.EventHandler(this.btnPrevPatch_Click);
-            // 
-            // btnLoadRig
-            // 
-            this.btnLoadRig.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnLoadRig.Location = new System.Drawing.Point(25, 37);
-            this.btnLoadRig.Name = "btnLoadRig";
-            this.btnLoadRig.Size = new System.Drawing.Size(24, 24);
-            this.btnLoadRig.TabIndex = 6;
-            this.btnLoadRig.Text = "L";
-            this.controlPanelToolTip.SetToolTip(this.btnLoadRig, "load rig");
-            this.btnLoadRig.UseVisualStyleBackColor = false;
-            this.btnLoadRig.Click += new System.EventHandler(this.btnLoadRig_Click);
-            // 
-            // btnNewRig
-            // 
-            this.btnNewRig.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnNewRig.Location = new System.Drawing.Point(49, 37);
-            this.btnNewRig.Name = "btnNewRig";
-            this.btnNewRig.Size = new System.Drawing.Size(24, 24);
-            this.btnNewRig.TabIndex = 7;
-            this.btnNewRig.Text = "N";
-            this.controlPanelToolTip.SetToolTip(this.btnNewRig, "new rig");
-            this.btnNewRig.UseVisualStyleBackColor = false;
-            this.btnNewRig.Click += new System.EventHandler(this.btnNewRig_Click);
-            // 
-            // btnSaveRigAs
-            // 
-            this.btnSaveRigAs.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSaveRigAs.Location = new System.Drawing.Point(97, 37);
-            this.btnSaveRigAs.Name = "btnSaveRigAs";
-            this.btnSaveRigAs.Size = new System.Drawing.Size(24, 24);
-            this.btnSaveRigAs.TabIndex = 9;
-            this.btnSaveRigAs.Text = "A";
-            this.controlPanelToolTip.SetToolTip(this.btnSaveRigAs, "save rig as");
-            this.btnSaveRigAs.UseVisualStyleBackColor = false;
-            this.btnSaveRigAs.Click += new System.EventHandler(this.btnSaveRigAs_Click);
-            // 
-            // btnLoadPlugin
-            // 
-            this.btnLoadPlugin.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnLoadPlugin.Location = new System.Drawing.Point(217, 37);
-            this.btnLoadPlugin.Name = "btnLoadPlugin";
-            this.btnLoadPlugin.Size = new System.Drawing.Size(24, 24);
-            this.btnLoadPlugin.TabIndex = 13;
-            this.btnLoadPlugin.Text = "L";
-            this.controlPanelToolTip.SetToolTip(this.btnLoadPlugin, "load plugin");
-            this.btnLoadPlugin.UseVisualStyleBackColor = false;
-            this.btnLoadPlugin.Click += new System.EventHandler(this.btnLoad_Click);
-            // 
-            // btnKeys
-            // 
-            this.btnKeys.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnKeys.Location = new System.Drawing.Point(271, 13);
-            this.btnKeys.Name = "btnKeys";
-            this.btnKeys.Size = new System.Drawing.Size(24, 24);
-            this.btnKeys.TabIndex = 16;
-            this.btnKeys.Text = "K";
-            this.controlPanelToolTip.SetToolTip(this.btnKeys, "show keyboard window");
-            this.btnKeys.UseVisualStyleBackColor = false;
-            this.btnKeys.Click += new System.EventHandler(this.btnKeys_Click);
-            // 
-            // btnMixer
-            // 
-            this.btnMixer.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnMixer.Location = new System.Drawing.Point(295, 13);
-            this.btnMixer.Name = "btnMixer";
-            this.btnMixer.Size = new System.Drawing.Size(24, 24);
-            this.btnMixer.TabIndex = 17;
-            this.btnMixer.Text = "M";
-            this.controlPanelToolTip.SetToolTip(this.btnMixer, "show mixer window");
-            this.btnMixer.UseVisualStyleBackColor = false;
-            this.btnMixer.Click += new System.EventHandler(this.btnMixer_Click);
-            // 
-            // btnSavePatchAs
-            // 
-            this.btnSavePatchAs.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSavePatchAs.Location = new System.Drawing.Point(193, 37);
-            this.btnSavePatchAs.Name = "btnSavePatchAs";
-            this.btnSavePatchAs.Size = new System.Drawing.Size(24, 24);
-            this.btnSavePatchAs.TabIndex = 12;
-            this.btnSavePatchAs.Text = "A";
-            this.controlPanelToolTip.SetToolTip(this.btnSavePatchAs, "save patch as");
-            this.btnSavePatchAs.UseVisualStyleBackColor = false;
-            this.btnSavePatchAs.Click += new System.EventHandler(this.btnSavePatchAs_Click);
-            // 
-            // btnSavePatch
-            // 
-            this.btnSavePatch.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnSavePatch.Location = new System.Drawing.Point(169, 37);
-            this.btnSavePatch.Name = "btnSavePatch";
-            this.btnSavePatch.Size = new System.Drawing.Size(24, 24);
-            this.btnSavePatch.TabIndex = 11;
-            this.btnSavePatch.Text = "S";
-            this.controlPanelToolTip.SetToolTip(this.btnSavePatch, "save patch");
-            this.btnSavePatch.UseVisualStyleBackColor = false;
-            this.btnSavePatch.Click += new System.EventHandler(this.btnSavePatch_Click);
-            // 
-            // btnNewPatch
-            // 
-            this.btnNewPatch.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnNewPatch.Location = new System.Drawing.Point(145, 37);
-            this.btnNewPatch.Name = "btnNewPatch";
-            this.btnNewPatch.Size = new System.Drawing.Size(24, 24);
-            this.btnNewPatch.TabIndex = 10;
-            this.btnNewPatch.Text = "N";
-            this.controlPanelToolTip.SetToolTip(this.btnNewPatch, "new patch");
-            this.btnNewPatch.UseVisualStyleBackColor = false;
-            this.btnNewPatch.Click += new System.EventHandler(this.btnNewPatch_Click);
-            // 
-            // btnPatchList
-            // 
-            this.btnPatchList.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btnPatchList.Location = new System.Drawing.Point(121, 37);
-            this.btnPatchList.Name = "btnPatchList";
-            this.btnPatchList.Size = new System.Drawing.Size(24, 24);
-            this.btnPatchList.TabIndex = 18;
-            this.btnPatchList.Text = "P";
-            this.controlPanelToolTip.SetToolTip(this.btnPatchList, "show patch list");
-            this.btnPatchList.UseVisualStyleBackColor = false;
-            this.btnPatchList.Click += new System.EventHandler(this.btnPatchList_Click);
             // 
             // cbxPatchList
             // 
@@ -332,10 +165,10 @@ namespace Audimat.UI
             this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxPatchList.ForeColor = System.Drawing.Color.Black;
             this.cbxPatchList.FormattingEnabled = true;
-            this.cbxPatchList.Location = new System.Drawing.Point(43, 14);
+            this.cbxPatchList.Location = new System.Drawing.Point(42, 14);
             this.cbxPatchList.Name = "cbxPatchList";
-            this.cbxPatchList.Size = new System.Drawing.Size(180, 23);
-            this.cbxPatchList.TabIndex = 4;
+            this.cbxPatchList.Size = new System.Drawing.Size(182, 23);
+            this.cbxPatchList.TabIndex = 2;
             this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
             // 
             // loadRigDialog
@@ -349,6 +182,227 @@ namespace Audimat.UI
             this.saveRigDialog.DefaultExt = "rig";
             this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
             this.saveRigDialog.Title = "save an Audimat rig";
+            // 
+            // btnPatchList
+            // 
+            this.btnPatchList.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnPatchList.BackgroundImage = global::Audimat.Properties.Resources.patch_new;
+            this.btnPatchList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPatchList.FlatAppearance.BorderSize = 0;
+            this.btnPatchList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPatchList.Location = new System.Drawing.Point(121, 37);
+            this.btnPatchList.Name = "btnPatchList";
+            this.btnPatchList.Size = new System.Drawing.Size(24, 24);
+            this.btnPatchList.TabIndex = 8;
+            this.btnPatchList.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnPatchList, "show patch list");
+            this.btnPatchList.UseVisualStyleBackColor = false;
+            this.btnPatchList.Click += new System.EventHandler(this.btnPatchList_Click);
+            // 
+            // btnNewPatch
+            // 
+            this.btnNewPatch.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnNewPatch.BackgroundImage = global::Audimat.Properties.Resources.patch_save;
+            this.btnNewPatch.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnNewPatch.FlatAppearance.BorderSize = 0;
+            this.btnNewPatch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNewPatch.Location = new System.Drawing.Point(49, 37);
+            this.btnNewPatch.Name = "btnNewPatch";
+            this.btnNewPatch.Size = new System.Drawing.Size(24, 24);
+            this.btnNewPatch.TabIndex = 9;
+            this.btnNewPatch.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnNewPatch, "new patch");
+            this.btnNewPatch.UseVisualStyleBackColor = false;
+            this.btnNewPatch.Click += new System.EventHandler(this.btnNewPatch_Click);
+            // 
+            // btnSavePatch
+            // 
+            this.btnSavePatch.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSavePatch.BackgroundImage = global::Audimat.Properties.Resources.patch_save_as;
+            this.btnSavePatch.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnSavePatch.FlatAppearance.BorderSize = 0;
+            this.btnSavePatch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSavePatch.Location = new System.Drawing.Point(73, 37);
+            this.btnSavePatch.Name = "btnSavePatch";
+            this.btnSavePatch.Size = new System.Drawing.Size(24, 24);
+            this.btnSavePatch.TabIndex = 10;
+            this.btnSavePatch.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnSavePatch, "save patch");
+            this.btnSavePatch.UseVisualStyleBackColor = false;
+            this.btnSavePatch.Click += new System.EventHandler(this.btnSavePatch_Click);
+            // 
+            // btnSavePatchAs
+            // 
+            this.btnSavePatchAs.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSavePatchAs.BackgroundImage = global::Audimat.Properties.Resources.patch_list;
+            this.btnSavePatchAs.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnSavePatchAs.FlatAppearance.BorderSize = 0;
+            this.btnSavePatchAs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSavePatchAs.Location = new System.Drawing.Point(97, 37);
+            this.btnSavePatchAs.Name = "btnSavePatchAs";
+            this.btnSavePatchAs.Size = new System.Drawing.Size(24, 24);
+            this.btnSavePatchAs.TabIndex = 11;
+            this.btnSavePatchAs.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnSavePatchAs, "save patch as");
+            this.btnSavePatchAs.UseVisualStyleBackColor = false;
+            this.btnSavePatchAs.Click += new System.EventHandler(this.btnSavePatchAs_Click);
+            // 
+            // btnMixer
+            // 
+            this.btnMixer.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnMixer.BackgroundImage = global::Audimat.Properties.Resources.mixer_window;
+            this.btnMixer.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnMixer.FlatAppearance.BorderSize = 0;
+            this.btnMixer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMixer.Location = new System.Drawing.Point(295, 37);
+            this.btnMixer.Name = "btnMixer";
+            this.btnMixer.Size = new System.Drawing.Size(24, 24);
+            this.btnMixer.TabIndex = 14;
+            this.btnMixer.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnMixer, "show mixer window");
+            this.btnMixer.UseVisualStyleBackColor = false;
+            this.btnMixer.Click += new System.EventHandler(this.btnMixer_Click);
+            // 
+            // btnKeys
+            // 
+            this.btnKeys.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnKeys.BackgroundImage = global::Audimat.Properties.Resources.keys_window;
+            this.btnKeys.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnKeys.FlatAppearance.BorderSize = 0;
+            this.btnKeys.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnKeys.Location = new System.Drawing.Point(271, 37);
+            this.btnKeys.Name = "btnKeys";
+            this.btnKeys.Size = new System.Drawing.Size(24, 24);
+            this.btnKeys.TabIndex = 13;
+            this.btnKeys.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnKeys, "show keyboard window");
+            this.btnKeys.UseVisualStyleBackColor = false;
+            this.btnKeys.Click += new System.EventHandler(this.btnKeys_Click);
+            // 
+            // btnLoadPlugin
+            // 
+            this.btnLoadPlugin.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnLoadPlugin.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnLoadPlugin.BackgroundImage")));
+            this.btnLoadPlugin.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnLoadPlugin.FlatAppearance.BorderSize = 0;
+            this.btnLoadPlugin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLoadPlugin.Location = new System.Drawing.Point(25, 37);
+            this.btnLoadPlugin.Name = "btnLoadPlugin";
+            this.btnLoadPlugin.Size = new System.Drawing.Size(24, 24);
+            this.btnLoadPlugin.TabIndex = 12;
+            this.btnLoadPlugin.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnLoadPlugin, "load plugin");
+            this.btnLoadPlugin.UseVisualStyleBackColor = false;
+            this.btnLoadPlugin.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // btnSaveRigAs
+            // 
+            this.btnSaveRigAs.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSaveRigAs.BackgroundImage = global::Audimat.Properties.Resources.rig_save_as;
+            this.btnSaveRigAs.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnSaveRigAs.FlatAppearance.BorderSize = 0;
+            this.btnSaveRigAs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveRigAs.Location = new System.Drawing.Point(217, 37);
+            this.btnSaveRigAs.Name = "btnSaveRigAs";
+            this.btnSaveRigAs.Size = new System.Drawing.Size(24, 24);
+            this.btnSaveRigAs.TabIndex = 7;
+            this.btnSaveRigAs.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnSaveRigAs, "save rig as");
+            this.btnSaveRigAs.UseVisualStyleBackColor = false;
+            this.btnSaveRigAs.Click += new System.EventHandler(this.btnSaveRigAs_Click);
+            // 
+            // btnNewRig
+            // 
+            this.btnNewRig.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnNewRig.BackgroundImage = global::Audimat.Properties.Resources.rig_new;
+            this.btnNewRig.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnNewRig.FlatAppearance.BorderSize = 0;
+            this.btnNewRig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNewRig.Location = new System.Drawing.Point(169, 37);
+            this.btnNewRig.Name = "btnNewRig";
+            this.btnNewRig.Size = new System.Drawing.Size(24, 24);
+            this.btnNewRig.TabIndex = 5;
+            this.btnNewRig.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnNewRig, "new rig");
+            this.btnNewRig.UseVisualStyleBackColor = false;
+            this.btnNewRig.Click += new System.EventHandler(this.btnNewRig_Click);
+            // 
+            // btnLoadRig
+            // 
+            this.btnLoadRig.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnLoadRig.BackgroundImage = global::Audimat.Properties.Resources.rig_load;
+            this.btnLoadRig.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnLoadRig.FlatAppearance.BorderSize = 0;
+            this.btnLoadRig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLoadRig.Location = new System.Drawing.Point(145, 37);
+            this.btnLoadRig.Name = "btnLoadRig";
+            this.btnLoadRig.Size = new System.Drawing.Size(24, 24);
+            this.btnLoadRig.TabIndex = 4;
+            this.btnLoadRig.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnLoadRig, "load rig");
+            this.btnLoadRig.UseVisualStyleBackColor = false;
+            this.btnLoadRig.Click += new System.EventHandler(this.btnLoadRig_Click);
+            // 
+            // btnSaveRig
+            // 
+            this.btnSaveRig.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnSaveRig.BackgroundImage = global::Audimat.Properties.Resources.rig_save;
+            this.btnSaveRig.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnSaveRig.FlatAppearance.BorderSize = 0;
+            this.btnSaveRig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveRig.Location = new System.Drawing.Point(193, 37);
+            this.btnSaveRig.Name = "btnSaveRig";
+            this.btnSaveRig.Size = new System.Drawing.Size(24, 24);
+            this.btnSaveRig.TabIndex = 6;
+            this.btnSaveRig.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnSaveRig, "save rig");
+            this.btnSaveRig.UseVisualStyleBackColor = false;
+            this.btnSaveRig.Click += new System.EventHandler(this.btnSaveRig_Click);
+            // 
+            // btnStart
+            // 
+            this.btnStart.BackgroundImage = global::Audimat.Properties.Resources.switchoff;
+            this.btnStart.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnStart.Location = new System.Drawing.Point(350, 13);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(24, 48);
+            this.btnStart.TabIndex = 0;
+            this.btnStart.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnStart, "start / stop engine");
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
+            // btnHide
+            // 
+            this.btnHide.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnHide.BackgroundImage = global::Audimat.Properties.Resources.hide;
+            this.btnHide.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnHide.FlatAppearance.BorderSize = 0;
+            this.btnHide.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHide.Location = new System.Drawing.Point(271, 13);
+            this.btnHide.Name = "btnHide";
+            this.btnHide.Size = new System.Drawing.Size(24, 24);
+            this.btnHide.TabIndex = 15;
+            this.btnHide.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnHide, "show / hide rack");
+            this.btnHide.UseVisualStyleBackColor = false;
+            this.btnHide.Click += new System.EventHandler(this.btnHide_Click);
+            // 
+            // btnPanic
+            // 
+            this.btnPanic.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnPanic.BackgroundImage = global::Audimat.Properties.Resources.panic;
+            this.btnPanic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPanic.FlatAppearance.BorderSize = 0;
+            this.btnPanic.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPanic.Location = new System.Drawing.Point(295, 13);
+            this.btnPanic.Name = "btnPanic";
+            this.btnPanic.Size = new System.Drawing.Size(24, 24);
+            this.btnPanic.TabIndex = 16;
+            this.btnPanic.TabStop = false;
+            this.controlPanelToolTip.SetToolTip(this.btnPanic, "panic button!");
+            this.btnPanic.UseVisualStyleBackColor = false;
+            this.btnPanic.Click += new System.EventHandler(this.btnPanic_Click);
             // 
             // ControlPanel
             // 
@@ -370,6 +424,7 @@ namespace Audimat.UI
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.btnHide);
             this.Controls.Add(this.btnPanic);
+            this.DoubleBuffered = true;
             this.Name = "ControlPanel";
             this.Size = new System.Drawing.Size(400, 75);
             this.ResumeLayout(false);

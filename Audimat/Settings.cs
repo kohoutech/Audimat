@@ -29,7 +29,7 @@ namespace Audimat
 {
     public class Settings
     {
-        public static String VERSION = "1.3.1";
+        public static String VERSION = "1.3.2";
 
         public int rackHeight;
         public int rackPosX;
