@@ -27,6 +27,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 
 using Audimat;
+using Audimat.Graph;
 using Transonic.VST;
 using Transonic.MIDI;
 using Transonic.MIDI.System;
@@ -35,8 +36,10 @@ namespace Audimat.UI
 {
     public class VSTPanel : UserControl
     {
-        public VSTRack rack;                //container
-        public AudimatWindow audiwin;       //container's container - for using main window icon for panel child windows
+        public VSTRig rig;                  
+        public AudimatWindow audiwin;       //for using main window icon for panel child windows
+        public VSTHost host;
+        public MidiSystem midiDevices;
 
         public VSTPlugin plugin;
         public int plugNum;
@@ -69,15 +72,17 @@ namespace Audimat.UI
         public InputDevice midiInDevice;
         public PanelMidiIn midiInUnit;
         public int midiOutDeviceNum;
-
+        public String audioOut;
 
         //cons
-        public VSTPanel(VSTRack _rack, int _plugNum)
+        public VSTPanel(VSTRig _rig, int _plugNum)
         {
             InitializeComponent();
 
-            rack = _rack;
-            audiwin = rack.auditwin;
+            rig = _rig;
+            audiwin = rig.controlPanel.auditwin;
+            host = rig.controlPanel.host;
+            midiDevices = rig.controlPanel.midiDevices;
 
             plugNum = _plugNum;
             this.lblPlugName.Text = plugName;
@@ -94,6 +99,8 @@ namespace Audimat.UI
             midiInDevice = null;
             midiInUnit = null;
             midiOutDeviceNum = -1;
+
+            audioOut = "no output";
         }
 
         private void InitializeComponent()
@@ -101,21 +108,21 @@ namespace Audimat.UI
             this.components = new System.ComponentModel.Container();
             this.lblPlugName = new System.Windows.Forms.Label();
             this.cbxProgList = new System.Windows.Forms.ComboBox();
-            this.btnPlugInfo = new System.Windows.Forms.Button();
-            this.btnPlugParam = new System.Windows.Forms.Button();
-            this.btnPlugEditor = new System.Windows.Forms.Button();
             this.btnPlugClose = new System.Windows.Forms.Button();
             this.paneltoolTip = new System.Windows.Forms.ToolTip(this.components);
             this.btnNextProg = new System.Windows.Forms.Button();
             this.btnPrevProg = new System.Windows.Forms.Button();
             this.btnPlugSettings = new System.Windows.Forms.Button();
+            this.btnPlugEditor = new System.Windows.Forms.Button();
+            this.btnPlugParam = new System.Windows.Forms.Button();
+            this.btnPlugInfo = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblPlugName
             // 
             this.lblPlugName.AutoSize = true;
             this.lblPlugName.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPlugName.Location = new System.Drawing.Point(25, 12);
+            this.lblPlugName.Location = new System.Drawing.Point(24, 12);
             this.lblPlugName.Name = "lblPlugName";
             this.lblPlugName.Size = new System.Drawing.Size(78, 19);
             this.lblPlugName.TabIndex = 0;
@@ -128,44 +135,11 @@ namespace Audimat.UI
             this.cbxProgList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxProgList.ForeColor = System.Drawing.Color.Black;
             this.cbxProgList.FormattingEnabled = true;
-            this.cbxProgList.Location = new System.Drawing.Point(43, 37);
+            this.cbxProgList.Location = new System.Drawing.Point(42, 37);
             this.cbxProgList.Name = "cbxProgList";
-            this.cbxProgList.Size = new System.Drawing.Size(175, 23);
+            this.cbxProgList.Size = new System.Drawing.Size(180, 23);
             this.cbxProgList.TabIndex = 2;
             this.cbxProgList.SelectedIndexChanged += new System.EventHandler(this.cbxProgList_SelectedIndexChanged);
-            // 
-            // btnPlugInfo
-            // 
-            this.btnPlugInfo.Location = new System.Drawing.Point(268, 36);
-            this.btnPlugInfo.Name = "btnPlugInfo";
-            this.btnPlugInfo.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugInfo.TabIndex = 5;
-            this.btnPlugInfo.Text = "I";
-            this.paneltoolTip.SetToolTip(this.btnPlugInfo, "show plugin info");
-            this.btnPlugInfo.UseVisualStyleBackColor = true;
-            this.btnPlugInfo.Click += new System.EventHandler(this.btnPlugInfo_Click);
-            // 
-            // btnPlugParam
-            // 
-            this.btnPlugParam.Location = new System.Drawing.Point(292, 36);
-            this.btnPlugParam.Name = "btnPlugParam";
-            this.btnPlugParam.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugParam.TabIndex = 6;
-            this.btnPlugParam.Text = "P";
-            this.paneltoolTip.SetToolTip(this.btnPlugParam, "edit plugin parameters");
-            this.btnPlugParam.UseVisualStyleBackColor = true;
-            this.btnPlugParam.Click += new System.EventHandler(this.btnPlugParam_Click);
-            // 
-            // btnPlugEditor
-            // 
-            this.btnPlugEditor.Location = new System.Drawing.Point(316, 36);
-            this.btnPlugEditor.Name = "btnPlugEditor";
-            this.btnPlugEditor.Size = new System.Drawing.Size(24, 24);
-            this.btnPlugEditor.TabIndex = 7;
-            this.btnPlugEditor.Text = "E";
-            this.paneltoolTip.SetToolTip(this.btnPlugEditor, "show plugin editor");
-            this.btnPlugEditor.UseVisualStyleBackColor = true;
-            this.btnPlugEditor.Click += new System.EventHandler(this.btnPlugEditor_Click);
             // 
             // btnPlugClose
             // 
@@ -181,7 +155,7 @@ namespace Audimat.UI
             // 
             // btnNextProg
             // 
-            this.btnNextProg.Location = new System.Drawing.Point(218, 36);
+            this.btnNextProg.Location = new System.Drawing.Point(222, 36);
             this.btnNextProg.Name = "btnNextProg";
             this.btnNextProg.Size = new System.Drawing.Size(18, 24);
             this.btnNextProg.TabIndex = 3;
@@ -192,7 +166,7 @@ namespace Audimat.UI
             // 
             // btnPrevProg
             // 
-            this.btnPrevProg.Location = new System.Drawing.Point(25, 36);
+            this.btnPrevProg.Location = new System.Drawing.Point(24, 36);
             this.btnPrevProg.Name = "btnPrevProg";
             this.btnPrevProg.Size = new System.Drawing.Size(18, 24);
             this.btnPrevProg.TabIndex = 1;
@@ -203,14 +177,59 @@ namespace Audimat.UI
             // 
             // btnPlugSettings
             // 
-            this.btnPlugSettings.Location = new System.Drawing.Point(244, 36);
+            this.btnPlugSettings.BackgroundImage = global::Audimat.Properties.Resources.panel_settings;
+            this.btnPlugSettings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPlugSettings.FlatAppearance.BorderSize = 0;
+            this.btnPlugSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPlugSettings.Location = new System.Drawing.Point(247, 36);
             this.btnPlugSettings.Name = "btnPlugSettings";
             this.btnPlugSettings.Size = new System.Drawing.Size(24, 24);
             this.btnPlugSettings.TabIndex = 4;
-            this.btnPlugSettings.Text = "S";
             this.paneltoolTip.SetToolTip(this.btnPlugSettings, "change plugin settings");
             this.btnPlugSettings.UseVisualStyleBackColor = true;
             this.btnPlugSettings.Click += new System.EventHandler(this.btnPlugSettings_Click);
+            // 
+            // btnPlugEditor
+            // 
+            this.btnPlugEditor.BackgroundImage = global::Audimat.Properties.Resources.panel_editor;
+            this.btnPlugEditor.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPlugEditor.FlatAppearance.BorderSize = 0;
+            this.btnPlugEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPlugEditor.Location = new System.Drawing.Point(319, 36);
+            this.btnPlugEditor.Name = "btnPlugEditor";
+            this.btnPlugEditor.Size = new System.Drawing.Size(24, 24);
+            this.btnPlugEditor.TabIndex = 7;
+            this.paneltoolTip.SetToolTip(this.btnPlugEditor, "show plugin editor");
+            this.btnPlugEditor.UseVisualStyleBackColor = true;
+            this.btnPlugEditor.Click += new System.EventHandler(this.btnPlugEditor_Click);
+            // 
+            // btnPlugParam
+            // 
+            this.btnPlugParam.BackgroundImage = global::Audimat.Properties.Resources.panel_params;
+            this.btnPlugParam.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPlugParam.FlatAppearance.BorderSize = 0;
+            this.btnPlugParam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPlugParam.Location = new System.Drawing.Point(295, 36);
+            this.btnPlugParam.Name = "btnPlugParam";
+            this.btnPlugParam.Size = new System.Drawing.Size(24, 24);
+            this.btnPlugParam.TabIndex = 6;
+            this.paneltoolTip.SetToolTip(this.btnPlugParam, "edit plugin parameters");
+            this.btnPlugParam.UseVisualStyleBackColor = true;
+            this.btnPlugParam.Click += new System.EventHandler(this.btnPlugParam_Click);
+            // 
+            // btnPlugInfo
+            // 
+            this.btnPlugInfo.BackgroundImage = global::Audimat.Properties.Resources.panel_info;
+            this.btnPlugInfo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnPlugInfo.FlatAppearance.BorderSize = 0;
+            this.btnPlugInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPlugInfo.Location = new System.Drawing.Point(271, 36);
+            this.btnPlugInfo.Name = "btnPlugInfo";
+            this.btnPlugInfo.Size = new System.Drawing.Size(24, 24);
+            this.btnPlugInfo.TabIndex = 5;
+            this.paneltoolTip.SetToolTip(this.btnPlugInfo, "show plugin info");
+            this.btnPlugInfo.UseVisualStyleBackColor = true;
+            this.btnPlugInfo.Click += new System.EventHandler(this.btnPlugInfo_Click);
             // 
             // VSTPanel
             // 
@@ -225,6 +244,7 @@ namespace Audimat.UI
             this.Controls.Add(this.btnPrevProg);
             this.Controls.Add(this.cbxProgList);
             this.Controls.Add(this.lblPlugName);
+            this.DoubleBuffered = true;
             this.Name = "VSTPanel";
             this.Size = new System.Drawing.Size(400, 75);
             this.ResumeLayout(false);
@@ -238,14 +258,26 @@ namespace Audimat.UI
         {
             plugPath = _plugPath;
             fileName = Path.GetFileNameWithoutExtension(plugPath);
-            plugin = rack.host.loadPlugin(plugPath);
+            plugin = host.loadPlugin(plugPath);
             if (plugin != null)
             {
                 plugName = (plugin.name.Length > 0) ? plugin.name : fileName;
                 lblPlugName.Text = plugName;
                 editorWindowSize = new Size(plugin.editorWidth, plugin.editorHeight);
-                cbxProgList.DisplayMember = "name";
-                cbxProgList.DataSource = plugin.programs;
+
+                if (plugin.programs != null)
+                {
+                    cbxProgList.DisplayMember = "name";
+                    cbxProgList.DataSource = plugin.programs;
+                }
+                else
+                {
+                    cbxProgList.Items.Add("no programs");
+                    cbxProgList.SelectedIndex = 0;
+                    cbxProgList.Enabled = false;
+                    btnPrevProg.Enabled = false;
+                    btnNextProg.Enabled = false;
+                }
                 return true;
             }
             return false;
@@ -278,10 +310,49 @@ namespace Audimat.UI
             //disconnect midi i/o
             if (midiInDevice != null)
             {
-                rack.disconnectMidiInput(midiInDevice, midiInUnit);
+                disconnectMidiInput(midiInDevice, midiInUnit);
             }
 
-            rack.host.unloadPlugin(plugin);     //disconnect and unload back end
+            host.unloadPlugin(plugin);     //disconnect and unload back end
+        }
+
+        //- midi i/o connections ----------------------------------------------
+
+        public void connectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
+        {
+            //InputDevice indev = midiDevices.inputDevices[idx];
+            try
+            {
+                indev.open();
+                indev.connectUnit(pluginMidiIn);
+                indev.start();
+            }
+            catch
+            {
+                //Console.WriteLine("error connecting midi input");
+            }
+        }
+
+        public void disconnectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
+        {
+            //InputDevice indev = midiDevices.inputDevices[idx];
+            indev.disconnectUnit(pluginMidiIn);
+        }
+
+        public void connectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
+        {
+        }
+
+        public void disconnectMidiOutput(int idx, PanelMidiOut pluginMidiOut)
+        {
+        }
+
+        public void sendMidiPanicMessage()
+        {
+            for (int i = 0; i < 16; i++)
+            {                
+                plugin.sendShortMidiMessage(0xB0 + i, 123, 0);
+            }
         }
 
         //- event handlers ------------------------------------------------------------
@@ -330,18 +401,18 @@ namespace Audimat.UI
 
         public void setMidiIn(String deviceName)
         {
-            InputDevice indev = rack.midiDevices.findInputDevice(deviceName);
+            InputDevice indev = midiDevices.findInputDevice(deviceName);
             if (midiInDevice != indev)
             {
                 if (midiInUnit != null)
                 {
-                    rack.disconnectMidiInput(midiInDevice, midiInUnit);
+                    disconnectMidiInput(midiInDevice, midiInUnit);
                 }
                 midiInDevice = indev;
                 if (midiInDevice != null)
                 {
                     midiInUnit = new PanelMidiIn(this);
-                    rack.connectMidiInput(midiInDevice, midiInUnit);
+                    connectMidiInput(midiInDevice, midiInUnit);
                 }
                 else
                 {
@@ -420,7 +491,7 @@ namespace Audimat.UI
 
         private void btnPlugClose_Click(object sender, EventArgs e)
         {
-            rack.removePanel(this);
+            rig.removePanel(this);
         }
         
         //- painting ------------------------------------------------------------------
@@ -447,10 +518,10 @@ namespace Audimat.UI
             //rack screws
             int rightOfs = PANELWIDTH - VSTRack.SCREWHOLE - VSTRack.SCREWOFS;
             int bottomofs = PANELHEIGHT - (VSTRack.SCREWHOLE * 2);
-            drawRackScrew(g, VSTRack.SCREWOFS, VSTRack.SCREWHOLE);
-            drawRackScrew(g, VSTRack.SCREWOFS, bottomofs);
-            drawRackScrew(g, rightOfs, VSTRack.SCREWHOLE);
-            drawRackScrew(g, rightOfs, bottomofs);
+            drawRackScrew(g, VSTRack.SCREWOFS - 1, VSTRack.SCREWHOLE);      //left side
+            drawRackScrew(g, VSTRack.SCREWOFS - 1, bottomofs);
+            drawRackScrew(g, rightOfs - 2, VSTRack.SCREWHOLE);              //right side
+            drawRackScrew(g, rightOfs - 2   , bottomofs);
         }
     }
 
@@ -484,6 +555,7 @@ namespace Audimat.UI
         {
             panel = _panel;
         }
-
     }
 }
+
+//  Console.WriteLine(" there's no sun in the shadow of the wizard");

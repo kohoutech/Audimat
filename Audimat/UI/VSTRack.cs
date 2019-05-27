@@ -58,9 +58,9 @@ namespace Audimat.UI
 
             this.Size = new Size(VSTPanel.PANELWIDTH + scrollbar.Width, VSTPanel.PANELHEIGHT);        //initial size
             this.BackColor = Color.Black;
+            this.DoubleBuffered = true;
 
             panels = new List<VSTPanel>();
-
         }
 
         void scrollbar_ValueChanged(object sender, EventArgs e)
@@ -137,7 +137,7 @@ namespace Audimat.UI
             int bottomofs = VSTPanel.PANELHEIGHT - (SCREWHOLE * 2);
             for (int i = 0; i < unitCount; i++)
             {
-                int rackofs = i * VSTPanel.PANELHEIGHT + panelSpace.Bottom;
+                int rackofs = i * VSTPanel.PANELHEIGHT + panelSpace.Bottom;     //y pos of hole
 
                 g.FillEllipse(Brushes.Black, SCREWOFS, rackofs + SCREWHOLE, SCREWHOLE, SCREWHOLE);
                 g.FillEllipse(Brushes.Black, SCREWOFS, rackofs + bottomofs, SCREWHOLE, SCREWHOLE);

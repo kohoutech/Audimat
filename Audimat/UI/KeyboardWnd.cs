@@ -36,7 +36,7 @@ namespace Audimat.UI
         KeyboardBar.Range[] keySizeVals = { KeyboardBar.Range.TWENTYFIVE, KeyboardBar.Range.THIRTYSEVEN, KeyboardBar.Range.FORTYNINE,
                                               KeyboardBar.Range.SIXTYONE, KeyboardBar.Range.SEVENTYSIX, KeyboardBar.Range.EIGHTYEIGHT};
 
-        public AudimatWindow auditwin;
+        public ControlPanel controlPanel;
         public List<VSTPlugin> plugins;
         public VSTPlugin currentPlugin;
         public String currentPluginName;
@@ -47,9 +47,9 @@ namespace Audimat.UI
 
         public KeyboardBar.Range keySize;
 
-        public KeyboardWnd(AudimatWindow _auditwin)
+        public KeyboardWnd(ControlPanel _controlPanel)
         {
-            auditwin = _auditwin;
+            controlPanel = _controlPanel;
 
             InitializeComponent();
 
@@ -62,8 +62,7 @@ namespace Audimat.UI
             cbxKeySize.Items.AddRange(keySizeStrings);
             cbxKeySize.SelectedIndex = 3;
 
-            setPluginList();
-            cbxPlugin.SelectedIndex = 0;        //this triggers selected index change listener
+            setPluginList();        //init plugin list
         }
 
         private void InitializeComponent()
@@ -126,7 +125,7 @@ namespace Audimat.UI
 
         public void setPluginList()
         {
-            plugins = auditwin.rack.getPluginList();
+            plugins = controlPanel.getPluginList();
             cbxPlugin.Items.Clear();
             if (plugins.Count > 0)
             {
@@ -194,6 +193,5 @@ namespace Audimat.UI
                 currentPlugin.sendShortMidiMessage(0x80, keyNumber, 0x60);
             }
         }
-
     }
 }

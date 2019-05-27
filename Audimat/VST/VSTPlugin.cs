@@ -138,8 +138,9 @@ namespace Transonic.VST
             }
             else
             {
-                programs = new VSTProgram[1];
-                programs[0] = new VSTProgram(0, "no programs");
+                //programs = new VSTProgram[1];
+                programs = null;
+                //programs[0] = new VSTProgram(0, "no programs");
             }
             curProgramNum = 0;
         }
@@ -209,7 +210,7 @@ namespace Transonic.VST
         public void sendShortMidiMessage(int b1, int b2, int b3)
         {
             VashtiHandleMidiMsg(id, b1, b2, b3);
-        }
+        }        
     }
 
     //-----------------------------------------------------------------------------
