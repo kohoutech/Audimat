@@ -1,0 +1,28 @@
+PatchWorker User Manual outline
+-------------------------------
+Introduction
+
+User Interface
+  control panel
+  unit controls
+  host settings
+
+Patching
+  loading
+  saving
+
+Windows
+  keyboard
+  mixer
+
+Other Features
+  rack hiding
+  panic button
+
+Contact
+  upgrades
+  bug reporting
+  feature requests   
+
+Appendix A : Configuration File
+
