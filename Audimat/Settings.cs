@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 
 using Audimat.UI;
-using Origami.Serial;
+using Origami.ENAML;
 
 namespace Audimat
 {
@@ -39,7 +39,7 @@ namespace Audimat
 
         public Settings()
         {
-            SerialData data = new SerialData("Audimat.cfg");
+            EnamlData data = new EnamlData("Audimat.cfg");
 
             string version = data.getStringValue("version", VERSION);
             rackHeight = data.getIntValue("global-settings.rack-window-height", VSTPanel.PANELHEIGHT);
@@ -51,7 +51,7 @@ namespace Audimat
 
         public void save()
         {
-            SerialData data = new SerialData("Audimat.cfg");
+            EnamlData data = new EnamlData("Audimat.cfg");
 
             data.setStringValue("version", VERSION);
             data.setIntValue("global-settings.rack-window-height", rackHeight);

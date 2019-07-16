@@ -25,7 +25,7 @@ using System.Text;
 using Audimat.UI;
 using Transonic.VST;
 using Transonic.MIDI.System;
-using Origami.Serial;
+using Origami.ENAML;
 
 //Mrs. Peel, we're needed
 
@@ -50,7 +50,7 @@ namespace Audimat.Graph
         {
             VSTRig rig = null;
 
-            SerialData rigData = new SerialData(path);      //load data from file
+            EnamlData rigData = new EnamlData(path);      //load data from file
 
             if (rigData != null)
             {
@@ -219,7 +219,7 @@ namespace Audimat.Graph
 
         public void saveToFile(String filename)
         {
-            SerialData rigData = new SerialData();
+            EnamlData rigData = new EnamlData();
             rigData.setStringValue("version", Settings.VERSION);
 
             Dictionary<VSTPanel, String> plugList = new Dictionary<VSTPanel, string>();
