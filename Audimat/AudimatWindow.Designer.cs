@@ -41,6 +41,8 @@
             this.newPatchFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePatchPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savePatchAsPatchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hostMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,8 +52,6 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.hideShowRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsRackMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadPluginMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AudimatStatus = new System.Windows.Forms.StatusStrip();
@@ -158,6 +158,23 @@
             this.savePatchAsPatchMenuItem.Text = "Save Patch &As";
             this.savePatchAsPatchMenuItem.Click += new System.EventHandler(this.savePatchAsMenuItem_Click);
             // 
+            // pluginMenuItem
+            // 
+            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadPluginMenuItem});
+            this.pluginMenuItem.Name = "pluginMenuItem";
+            this.pluginMenuItem.ShowShortcutKeys = false;
+            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.pluginMenuItem.Text = "&Plugin";
+            // 
+            // loadPluginMenuItem
+            // 
+            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
+            this.loadPluginMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.loadPluginMenuItem.Text = "&Load Plugin";
+            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
+            // 
             // hostMenuItem
             // 
             this.hostMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -224,23 +241,6 @@
             this.settingsRackMenuItem.Size = new System.Drawing.Size(182, 22);
             this.settingsRackMenuItem.Text = "&Rack Settings";
             this.settingsRackMenuItem.Click += new System.EventHandler(this.settingsHostMenuItem_Click);
-            // 
-            // pluginMenuItem
-            // 
-            this.pluginMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadPluginMenuItem});
-            this.pluginMenuItem.Name = "pluginMenuItem";
-            this.pluginMenuItem.ShowShortcutKeys = false;
-            this.pluginMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.pluginMenuItem.Text = "&Plugin";
-            // 
-            // loadPluginMenuItem
-            // 
-            this.loadPluginMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.loadPluginMenuItem.Name = "loadPluginMenuItem";
-            this.loadPluginMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.loadPluginMenuItem.Text = "&Load Plugin";
-            this.loadPluginMenuItem.Click += new System.EventHandler(this.loadPlugin_Click);
             // 
             // helpMenuItem
             // 

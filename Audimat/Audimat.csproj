@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icon1.ico</ApplicationIcon>
+    <ApplicationIcon>Audimat.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -74,14 +74,15 @@
     <Compile Include="Midi\System\SystemUnit.cs" />
     <Compile Include="Midi\TempoMap.cs" />
     <Compile Include="Midi\Track.cs" />
-    <Compile Include="Patch\iPatchConnector.cs" />
-    <Compile Include="Patch\IPatchView.cs" />
     <Compile Include="Patch\PatchBox.cs" />
     <Compile Include="Patch\PatchCanvas.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Patch\PatchLine.cs" />
+    <Compile Include="Patch\PatchPalette.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Patch\PatchPanel.cs" />
+    <Compile Include="Patch\PatchWire.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
@@ -129,7 +130,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Widget\Knob.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <EmbeddedResource Include="AudimatWindow.resx">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
@@ -189,9 +190,9 @@
     <None Include="VST\Vashti.vcxproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icon1.ico" />
     <None Include="resources\switchoff.png" />
     <None Include="resources\switchon.png" />
+    <Content Include="Audimat.ico" />
     <Content Include="resources\hide.png" />
     <Content Include="resources\host-settings.png" />
     <Content Include="resources\keys-window.png" />
@@ -219,8 +220,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+  $(TargetDir)\release.bat
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
