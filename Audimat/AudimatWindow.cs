@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using Audimat.UI;
-using Transonic.Widget;
+using Kohoutech.Widget;
 
 namespace Audimat
 {
@@ -260,7 +260,7 @@ namespace Audimat
 
         private void aboutHelpMenuItem_Click(object sender, EventArgs e)
         {
-            String msg = "Audimat\nversion " + Settings.VERSION + "\n\xA9 Transonic Software 2007-2019\n" + "http://transonic.kohoutech.com";
+            String msg = "Audimat\nversion " + Settings.VERSION + "\n\xA9 Transonic Software 2007-2020\n" + "http://transonic.kohoutech.com";
             MessageBox.Show(msg, "About");
         }
 

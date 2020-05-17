@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,11 +24,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
-using Transonic.Patch;
+using Kohoutech.Patch;
 
 namespace Audimat.UI
 {
-    public class PatchWindow : Form, IPatchView
+    public class PatchWindow : Form
     {
         public AudimatWindow audimatWindow;
         public PatchCanvas canvas; 
@@ -38,7 +38,7 @@ namespace Audimat.UI
         {
             audimatWindow = _audimatWindow;
 
-            canvas = new PatchCanvas(this);
+            canvas = new PatchCanvas();
             canvas.Size = new Size(this.ClientSize.Width, this.ClientSize.Height);
             canvas.Location = new Point(0, 0);
             canvas.BackColor = Color.LawnGreen;

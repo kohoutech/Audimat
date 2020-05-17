@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 
 using Audimat.UI;
-using Origami.ENAML;
+using Kohoutech.ENAML;
 
 namespace Audimat
 {
@@ -39,7 +39,7 @@ namespace Audimat
 
         public Settings()
         {
-            EnamlData data = new EnamlData("Audimat.cfg");
+            EnamlData data = EnamlData.loadFromFile("Audimat.cfg");
 
             string version = data.getStringValue("version", VERSION);
             rackHeight = data.getIntValue("global-settings.rack-window-height", VSTPanel.PANELHEIGHT);
@@ -51,7 +51,7 @@ namespace Audimat
 
         public void save()
         {
-            EnamlData data = new EnamlData("Audimat.cfg");
+            EnamlData data = new EnamlData();
 
             data.setStringValue("version", VERSION);
             data.setIntValue("global-settings.rack-window-height", rackHeight);
@@ -60,7 +60,7 @@ namespace Audimat
             data.setIntValue("global-settings.keyboard-window-pos.x", keyWndPosX);
             data.setIntValue("global-settings.keyboard-window-pos.y", keyWndPosY);
 
-            data.saveToFile();
+            data.saveToFile("Audimat.cfg");
         }
     }
 }

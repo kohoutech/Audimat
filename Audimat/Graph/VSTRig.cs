@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -23,9 +23,9 @@ using System.Linq;
 using System.Text;
 
 using Audimat.UI;
-using Transonic.VST;
-using Transonic.MIDI.System;
-using Origami.ENAML;
+using Kohoutech.VST;
+using Kohoutech.MIDI.System;
+using Kohoutech.ENAML;
 
 //Mrs. Peel, we're needed
 
@@ -50,14 +50,14 @@ namespace Audimat.Graph
         {
             VSTRig rig = null;
 
-            EnamlData rigData = new EnamlData(path);      //load data from file
+            EnamlData rigData = EnamlData.loadFromFile(path);      //load data from file
 
             if (rigData != null)
             {
                 rig = new VSTRig(controlPanel);
 
                 //load plugins
-                List<String> plugs = rigData.getSubpathKeys("plugin-list");
+                List<String> plugs = rigData.getPathKeys("plugin-list");
                 Dictionary<String, VSTPanel> plugList = new Dictionary<string, VSTPanel>();      //temp dict for matching plugins to patches
                 foreach (String plug in plugs)
                 {
@@ -73,7 +73,7 @@ namespace Audimat.Graph
                 }
 
                 //load patches
-                List<String> pats = rigData.getSubpathKeys("patch-list");
+                List<String> pats = rigData.getPathKeys("patch-list");
                 foreach (String pat in pats)
                 {
                     String patchName = rigData.getStringValue("patch-list." + pat + ".name", "");

@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,6 +40,15 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ENAML, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Kohoutech.ENAML.1.0.1\lib\net40\ENAML.dll</HintPath>
+    </Reference>
+    <Reference Include="MIDI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Kohoutech.MIDI.1.0.0\lib\net40\MIDI.dll</HintPath>
+    </Reference>
+    <Reference Include="Patch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Kohoutech.Patch.1.0.0\lib\net40\Patch.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +59,12 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="VST, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Kohoutech.VST.1.0.1\lib\net40\VST.dll</HintPath>
+    </Reference>
+    <Reference Include="Widget, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Kohoutech.Widget.1.0.0\lib\net40\Widget.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudimatWindow.cs">
@@ -58,31 +73,7 @@
     <Compile Include="AudimatWindow.Designer.cs">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="ENAML\EnamlData.cs" />
     <Compile Include="Graph\VSTRig.cs" />
-    <Compile Include="Midi\Engine\MidiTimer.cs" />
-    <Compile Include="Midi\Engine\Transport.cs" />
-    <Compile Include="Midi\Event.cs" />
-    <Compile Include="Midi\MarkerMap.cs" />
-    <Compile Include="Midi\Message.cs" />
-    <Compile Include="Midi\MeterMap.cs" />
-    <Compile Include="Midi\MidiFile.cs" />
-    <Compile Include="Midi\Sequence.cs" />
-    <Compile Include="Midi\System\InputDevice.cs" />
-    <Compile Include="Midi\System\MidiSystem.cs" />
-    <Compile Include="Midi\System\OutputDevice.cs" />
-    <Compile Include="Midi\System\SystemUnit.cs" />
-    <Compile Include="Midi\TempoMap.cs" />
-    <Compile Include="Midi\Track.cs" />
-    <Compile Include="Patch\PatchBox.cs" />
-    <Compile Include="Patch\PatchCanvas.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Patch\PatchPalette.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Patch\PatchPanel.cs" />
-    <Compile Include="Patch\PatchWire.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
@@ -122,21 +113,8 @@
     <Compile Include="UI\VSTRack.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="VST\Vashti.cs" />
-    <Compile Include="VST\VSTHost.cs" />
-    <Compile Include="VST\VSTPlugin.cs" />
-    <Compile Include="VST\WaveDevices.cs" />
-    <Compile Include="Widget\KeyboardBar.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Widget\Knob.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <EmbeddedResource Include="AudimatWindow.resx">
       <DependentUpon>AudimatWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Patch\PatchCanvas.resx">
-      <DependentUpon>PatchCanvas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -175,9 +153,13 @@
     <EmbeddedResource Include="UI\VSTRack.resx">
       <DependentUpon>VSTRack.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Widget\KeyboardBar.resx">
-      <DependentUpon>KeyboardBar.cs</DependentUpon>
-    </EmbeddedResource>
+    <None Include="bin\Debug\Audimat.cfg" />
+    <None Include="bin\Debug\Audimat.vshost.exe.manifest" />
+    <None Include="bin\Release\Audimat.vshost.exe.manifest" />
+    <None Include="bin\Release\audimat.zip" />
+    <None Include="bin\Release\publish.bat" />
+    <None Include="bin\Release\release.bat" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -187,12 +169,25 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="VST\Vashti.vcxproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\switchoff.png" />
     <None Include="resources\switchon.png" />
     <Content Include="Audimat.ico" />
+    <Content Include="bin\Debug\Audimat.exe" />
+    <Content Include="bin\Debug\Audimat.pdb" />
+    <Content Include="bin\Debug\ENAML.dll" />
+    <Content Include="bin\Debug\MIDI.dll" />
+    <Content Include="bin\Debug\Patch.dll" />
+    <Content Include="bin\Debug\Vashti.dll" />
+    <Content Include="bin\Debug\Widget.dll" />
+    <Content Include="bin\Release\Audimat.exe" />
+    <Content Include="bin\Release\Audimat.pdb" />
+    <Content Include="bin\Release\ENAML.dll" />
+    <Content Include="bin\Release\MIDI.dll" />
+    <Content Include="bin\Release\Patch.dll" />
+    <Content Include="bin\Release\Vashti.dll" />
+    <Content Include="bin\Release\Widget.dll" />
     <Content Include="resources\hide.png" />
     <Content Include="resources\host-settings.png" />
     <Content Include="resources\keys-window.png" />
@@ -214,8 +209,6 @@
     <Content Include="resources\rig-save-as.png" />
     <Content Include="resources\rig-save.png" />
     <Content Include="resources\virtual-audio-window.png" />
-    <Content Include="VST\Vashti.vcxproj.filters" />
-    <Content Include="VST\Vashti.vcxproj.user" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

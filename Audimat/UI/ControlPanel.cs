@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -27,8 +27,8 @@ using System.Drawing.Drawing2D;
 using System.IO;
 
 using Audimat.Graph;
-using Transonic.VST;
-using Transonic.MIDI.System;
+using Kohoutech.VST;
+using Kohoutech.MIDI.System;
 
 namespace Audimat.UI
 {
@@ -114,10 +114,6 @@ namespace Audimat.UI
             this.controlPanelToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.btnNextPatch = new System.Windows.Forms.Button();
             this.btnPrevPatch = new System.Windows.Forms.Button();
-            this.cbxPatchList = new System.Windows.Forms.ComboBox();
-            this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
-            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnPatchList = new System.Windows.Forms.Button();
             this.btnNewPatch = new System.Windows.Forms.Button();
             this.btnSavePatch = new System.Windows.Forms.Button();
@@ -132,6 +128,10 @@ namespace Audimat.UI
             this.btnStart = new System.Windows.Forms.Button();
             this.btnHide = new System.Windows.Forms.Button();
             this.btnPanic = new System.Windows.Forms.Button();
+            this.cbxPatchList = new System.Windows.Forms.ComboBox();
+            this.loadRigDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveRigDialog = new System.Windows.Forms.SaveFileDialog();
+            this.loadPluginDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // btnNextPatch
@@ -157,31 +157,6 @@ namespace Audimat.UI
             this.controlPanelToolTip.SetToolTip(this.btnPrevPatch, "previous patch");
             this.btnPrevPatch.UseVisualStyleBackColor = true;
             this.btnPrevPatch.Click += new System.EventHandler(this.btnPrevPatch_Click);
-            // 
-            // cbxPatchList
-            // 
-            this.cbxPatchList.BackColor = System.Drawing.Color.GreenYellow;
-            this.cbxPatchList.Enabled = false;
-            this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbxPatchList.ForeColor = System.Drawing.Color.Black;
-            this.cbxPatchList.FormattingEnabled = true;
-            this.cbxPatchList.Location = new System.Drawing.Point(42, 14);
-            this.cbxPatchList.Name = "cbxPatchList";
-            this.cbxPatchList.Size = new System.Drawing.Size(182, 23);
-            this.cbxPatchList.TabIndex = 2;
-            this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
-            // 
-            // loadRigDialog
-            // 
-            this.loadRigDialog.DefaultExt = "rig";
-            this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            this.loadRigDialog.Title = "load an Audimat rig";
-            // 
-            // saveRigDialog
-            // 
-            this.saveRigDialog.DefaultExt = "rig";
-            this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
-            this.saveRigDialog.Title = "save an Audimat rig";
             // 
             // btnPatchList
             // 
@@ -404,9 +379,34 @@ namespace Audimat.UI
             this.btnPanic.UseVisualStyleBackColor = false;
             this.btnPanic.Click += new System.EventHandler(this.btnPanic_Click);
             // 
+            // cbxPatchList
+            // 
+            this.cbxPatchList.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
+            this.cbxPatchList.Enabled = false;
+            this.cbxPatchList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbxPatchList.ForeColor = System.Drawing.Color.Black;
+            this.cbxPatchList.FormattingEnabled = true;
+            this.cbxPatchList.Location = new System.Drawing.Point(42, 14);
+            this.cbxPatchList.Name = "cbxPatchList";
+            this.cbxPatchList.Size = new System.Drawing.Size(182, 23);
+            this.cbxPatchList.TabIndex = 2;
+            this.cbxPatchList.SelectedIndexChanged += new System.EventHandler(this.cbxPatchList_SelectedIndexChanged);
+            // 
+            // loadRigDialog
+            // 
+            this.loadRigDialog.DefaultExt = "rig";
+            this.loadRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.loadRigDialog.Title = "load an Audimat rig";
+            // 
+            // saveRigDialog
+            // 
+            this.saveRigDialog.DefaultExt = "rig";
+            this.saveRigDialog.Filter = "Audimat rigs (*.rig)|*.rig|All files (*.*)|*.*";
+            this.saveRigDialog.Title = "save an Audimat rig";
+            // 
             // ControlPanel
             // 
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
             this.Controls.Add(this.btnPatchList);
             this.Controls.Add(this.btnNewPatch);
             this.Controls.Add(this.btnSavePatch);

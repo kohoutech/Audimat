@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,9 +28,9 @@ using System.Drawing.Drawing2D;
 
 using Audimat;
 using Audimat.Graph;
-using Transonic.VST;
-using Transonic.MIDI;
-using Transonic.MIDI.System;
+using Kohoutech.VST;
+using Kohoutech.MIDI;
+using Kohoutech.MIDI.System;
 
 namespace Audimat.UI
 {
@@ -131,7 +131,7 @@ namespace Audimat.UI
             // 
             // cbxProgList
             // 
-            this.cbxProgList.BackColor = System.Drawing.Color.GreenYellow;
+            this.cbxProgList.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
             this.cbxProgList.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxProgList.ForeColor = System.Drawing.Color.Black;
             this.cbxProgList.FormattingEnabled = true;
@@ -233,7 +233,7 @@ namespace Audimat.UI
             // 
             // VSTPanel
             // 
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.btnPlugSettings);
             this.Controls.Add(this.btnPlugEditor);
@@ -336,7 +336,7 @@ namespace Audimat.UI
         public void disconnectMidiInput(InputDevice indev, PanelMidiIn pluginMidiIn)
         {
             //InputDevice indev = midiDevices.inputDevices[idx];
-            indev.disconnectUnit(pluginMidiIn);
+            //indev.disconnectUnit(pluginMidiIn);
         }
 
         public void connectMidiOutput(int idx, PanelMidiOut pluginMidiOut)

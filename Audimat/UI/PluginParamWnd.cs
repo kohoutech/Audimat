@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-using Transonic.VST;
+using Kohoutech.VST;
 
 namespace Audimat.UI
 {
@@ -101,18 +101,18 @@ namespace Audimat.UI
             // pnlParams
             // 
             this.pnlParams.AutoScroll = true;
-            this.pnlParams.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.pnlParams.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
             this.pnlParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlParams.Location = new System.Drawing.Point(0, 0);
             this.pnlParams.Name = "pnlParams";
             this.pnlParams.Size = new System.Drawing.Size(509, 361);
             this.pnlParams.TabIndex = 0;
             // 
-            // ParamEditor
+            // PluginParamWnd
             // 
             this.ClientSize = new System.Drawing.Size(509, 361);
             this.Controls.Add(this.pnlParams);
-            this.Name = "ParamEditor";
+            this.Name = "PluginParamWnd";
             this.ShowInTaskbar = false;
             this.ResumeLayout(false);
 

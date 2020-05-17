@@ -1,6 +1,6 @@
 ﻿/* ----------------------------------------------------------------------------
 Audimat : an audio plugin host
-Copyright (C) 2005-2019  George E Greaney
+Copyright (C) 2005-2020  George E Greaney
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,9 +24,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 
-using Transonic.Widget;
-using Transonic.VST;
-using Transonic.MIDI;
+using Kohoutech.Widget;
+using Kohoutech.VST;
+using Kohoutech.MIDI;
 
 namespace Audimat.UI
 {
@@ -93,7 +93,7 @@ namespace Audimat.UI
             // 
             // KeyboardWnd
             // 
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(180)))), ((int)(((byte)(30)))));
             this.ClientSize = new System.Drawing.Size(434, 46);
             this.Controls.Add(this.cbxKeySize);
             this.Controls.Add(this.cbxPlugin);
